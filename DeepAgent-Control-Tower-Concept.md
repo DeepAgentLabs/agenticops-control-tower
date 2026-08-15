@@ -18,7 +18,7 @@ pip install agenticops-control-tower
 DeepAgentLabs provides modular capabilities for operating Agentic AI systems:
 
 - **AgenticLens — OBSERVE**
-- **Agentic-Sidecar — GOVERN**
+- **Agentic-Sidecar — SUPERVISE**
 - **Agentic-Chaos — TEST**
 - **Agentic MCP — CONNECT**
 - **DeepAgent Control Tower — OPERATE**
@@ -84,7 +84,7 @@ DeepAgent Control Tower fills this gap.
           │                  │                  │
           ▼                  ▼                  ▼
     AgenticLens       Agentic-Sidecar     Agentic-Chaos
-      OBSERVE              GOVERN              TEST
+      OBSERVE            SUPERVISE             TEST
 ```
 
 DeepAgent Control Tower is therefore **not merely a dashboard**.
@@ -810,7 +810,7 @@ Conceptually:
      ┌───────────┐      ┌─────────────┐    ┌─────────────┐
      │AgenticLens│      │   Agentic   │    │   Agentic   │
      │           │      │   Sidecar   │    │    Chaos    │
-     │  OBSERVE  │      │   GOVERN    │    │    TEST     │
+     │  OBSERVE  │      │ SUPERVISE   │    │    TEST     │
      └───────────┘      └─────────────┘    └─────────────┘
            ▲                  ▲                  ▲
            │                  │                  │
@@ -845,7 +845,7 @@ MCP           = CONNECT
 
 LENS          = OBSERVE
 
-SIDECAR       = GOVERN
+SIDECAR       = SUPERVISE
 
 CHAOS         = TEST
 
@@ -943,7 +943,7 @@ The entire ecosystem can now be communicated in five words:
 
 Understand what agents are doing.
 
-### GOVERN
+### SUPERVISE
 
 **Agentic-Sidecar**
 
