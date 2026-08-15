@@ -2,8 +2,8 @@
 
 ## Release Status
 
-- **v0.1** 🚧 Planned — Registry, Heartbeats, Capability Discovery, Read-Only API
-- **v0.2** 🚧 Planned — CLI, Status Views, Health Rollups, Version Inventory
+- **v0.1** ✅ Implemented — Registry, Heartbeats, Capability Discovery, Read-Only API
+- **v0.2** ✅ Implemented — CLI, Status Views, Health Rollups, Version Inventory
 - **v0.3** 🚧 Planned — AgenticOps Console (read-only dashboard)
 - **v0.4** 🚧 Planned — Configuration Model and Controlled Write Operations
 - **v0.5** 🚧 Planned — Lens, Sidecar, and Chaos Surface Integration
@@ -12,8 +12,9 @@
 - **v0.8** 🚧 Planned — Alerts, Audit Trails, and Incident Views
 - **v1.0** 🚧 Planned — Stable Control Plane and Published Capability Contract
 
-Nothing has shipped yet. This repository currently contains the concept
-document, this roadmap, and the README only.
+`v0.2` now exists as an in-memory Python control model plus a first real CLI.
+The next milestone is `v0.3`, which adds a read-only console on top of the
+same underlying registry, discovery, and status surfaces.
 
 ## Design Constraints
 
@@ -153,7 +154,7 @@ spec repo instead?`
 
 ## Phase 0: Concept and Product Boundary
 
-Status: current
+Status: complete
 
 Goals:
 
@@ -169,6 +170,8 @@ Deliverables:
 - [x] implementation scaffold
 
 ## Phase 1: Registry and Discovery Core (`v0.1`)
+
+Status: complete
 
 Goals:
 
@@ -192,7 +195,17 @@ Success criteria:
 - the system works without assuming Kubernetes, Docker, or one framework
 - example registration payloads exist for at least two runtime styles
 
+Delivered in `v0.1`:
+
+- in-memory registry with explicit registration payloads
+- heartbeat updates with last-seen tracking and metadata merging
+- aggregated capability inventory across known agents
+- runtime-agnostic examples for Lambda-style and container-style agents
+- tests covering registration, heartbeat, and discovery flows
+
 ## Phase 2: CLI and Status Model (`v0.2`)
+
+Status: complete
 
 Goals:
 
@@ -213,6 +226,14 @@ Success criteria:
 - CLI and API share the same underlying control model
 - a user can answer basic inventory questions without touching raw JSON
 - health state is computed consistently rather than ad hoc per interface
+
+Delivered in `v0.2`:
+
+- published `deepagent` console script for operator workflows
+- status rollups shared between CLI and Python API
+- agent filters for health status, environment, present capability, and missing capability
+- capability coverage summaries and fleet status views
+- snapshot-based CLI input for local inspection before a future API server exists
 
 ## Phase 3: Read-Only Console (`v0.3`)
 

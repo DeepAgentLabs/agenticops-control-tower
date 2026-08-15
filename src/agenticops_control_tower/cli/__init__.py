@@ -1,1 +1,1 @@
-"""CLI placeholders."""
+"""Operator CLI surface."""

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agenticops-control-tower"
-version = "0.0.1"
+version = "0.2.0"
 description = "Unified control plane and operations console for the DeepAgentLabs ecosystem."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -49,9 +49,8 @@ dev = [
   "twine>=5.1",
 ]
 
-# Intentionally omitted for now. Add a console script once the CLI becomes a
-# real supported surface instead of a scaffold placeholder.
-# [project.scripts]
+[project.scripts]
+deepagent = "agenticops_control_tower.cli.main:main"
 
 [project.urls]
 Homepage = "https://github.com/DeepAgentLabs/agenticops-control-tower"
@@ -99,4 +98,3 @@ addopts = "-ra --cov=agenticops_control_tower --cov-report=term-missing"
 
 [tool.coverage.run]
 source = ["src/agenticops_control_tower"]
-
