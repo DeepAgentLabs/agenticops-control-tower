@@ -1,0 +1,69 @@
+{
+  "registrations": [
+    {
+      "agent_id": "payment-agent",
+      "name": "payment-agent",
+      "environment": "production",
+      "runtime": "aws-lambda",
+      "framework": "langgraph",
+      "status": "unknown",
+      "capabilities": {
+        "agenticlens": "0.8.1",
+        "agentic-sidecar": "0.4.0"
+      },
+      "runtime_metadata": {
+        "python_version": "3.12",
+        "region": "us-east-1"
+      },
+      "package_metadata": {
+        "build_sha": "5f3d0c9",
+        "release_channel": "stable"
+      }
+    },
+    {
+      "agent_id": "support-agent",
+      "name": "support-agent",
+      "environment": "staging",
+      "runtime": "docker",
+      "framework": "openai-agents",
+      "status": "unknown",
+      "capabilities": {
+        "agenticlens": "0.8.2"
+      },
+      "runtime_metadata": {
+        "python_version": "3.11",
+        "container_image": "deepagentlabs/support-agent:0.2.0"
+      },
+      "package_metadata": {
+        "build_sha": "9a2c1de",
+        "release_channel": "staging"
+      }
+    }
+  ],
+  "heartbeats": [
+    {
+      "agent_id": "payment-agent",
+      "heartbeat": {
+        "status": "healthy",
+        "capabilities": {
+          "deep-agentic-core-mcp": "0.2.0"
+        },
+        "runtime_metadata": {
+          "region": "us-east-1"
+        }
+      }
+    },
+    {
+      "agent_id": "support-agent",
+      "heartbeat": {
+        "status": "degraded",
+        "capabilities": {
+          "agentic-sidecar": "0.4.0"
+        },
+        "runtime_metadata": {
+          "node": "staging-01"
+        }
+      }
+    }
+  ]
+}

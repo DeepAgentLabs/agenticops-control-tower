@@ -4,12 +4,19 @@
   "environment": "production",
   "runtime": "aws-lambda",
   "framework": "langgraph",
-  "status": "healthy",
+  "status": "unknown",
   "capabilities": {
     "agenticlens": "0.8.1",
     "agentic-sidecar": "0.4.0",
     "agentic-chaos": "0.5.2",
     "deep-agentic-core-mcp": "0.2.0"
+  },
+  "runtime_metadata": {
+    "python_version": "3.12",
+    "region": "us-east-1"
+  },
+  "package_metadata": {
+    "build_sha": "5f3d0c9",
+    "release_channel": "stable"
   }
 }
-

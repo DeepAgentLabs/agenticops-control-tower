@@ -7,14 +7,17 @@
 
 ## Status
 
-**Concept / pre-implementation.** This repository currently contains the
-architecture proposal ([`DeepAgent Control Tower End-to-End Concept.md`](DeepAgent%20Control%20Tower%20End-to-End%20Concept.md)),
-this README, and the build plan in [ROADMAP.md](ROADMAP.md).
+**Pre-alpha `v0.2` implemented.** This repository now contains a working
+Python control model for registration, heartbeats, capability discovery,
+read-only inventory access, and the first real `deepagent` operator CLI,
+alongside the architecture proposal
+([`DeepAgent Control Tower End-to-End Concept.md`](DeepAgent%20Control%20Tower%20End-to-End%20Concept.md))
+and [ROADMAP.md](ROADMAP.md).
 
-There is **no package code, no PyPI release, no API server, no CLI, and no web
-console yet**. The point of the project today is to define the control-plane
-shape clearly enough that implementation can start in a narrow, believable
-order.
+There is still **no HTTP server and no web console yet**. Those remain later
+roadmap phases built on top of the current control model and CLI.
+
+For release-readiness steps, see [PRE_RELEASE.md](PRE_RELEASE.md).
 
 ## Contents
 
@@ -83,8 +86,8 @@ dashboard is only one interface to the underlying control plane.
   above LangGraph, CrewAI, AutoGen, OpenAI Agents SDK, AWS AgentCore-style
   workloads, MCP-native agents, and custom Python systems rather than
   assuming one execution model.
-- **Not implemented yet.** The architecture in the concept doc is broader
-  than what a first real release should attempt. See [ROADMAP.md](ROADMAP.md)
+- **Not fully implemented yet.** The architecture in the concept doc is
+  broader than what the current milestones attempt. See [ROADMAP.md](ROADMAP.md)
   for the narrowed build order.
 
 ## Architecture
@@ -218,6 +221,36 @@ The first usable version should likely prove four things only:
 3. operators can inspect that inventory through a simple API and CLI
 4. the same inventory can be surfaced later in a console without changing the
    underlying control model
+
+That core is now implemented as an in-memory Python API.
+
+## Current `v0.2` Surface
+
+The package currently exposes:
+
+- `register_agent(...)`
+- `record_heartbeat(...)`
+- `list_agents(...)`
+- `get_agent(agent_id)`
+- `list_capabilities()`
+- `get_agent_capabilities(agent_id)`
+- `get_status(...)`
+
+The operator CLI is now available as:
+
+- `deepagent agents list`
+- `deepagent agents get <agent-id>`
+- `deepagent capabilities list`
+- `deepagent status`
+
+The CLI reads fleet inventory from a snapshot file so it can operate on the
+same control model without requiring the future API server yet.
+
+Example registration payloads are included for two runtime styles:
+
+- [`examples/sample_agent_registration.json`](examples/sample_agent_registration.json)
+- [`examples/sample_agent_registration_container.json`](examples/sample_agent_registration_container.json)
+- [`examples/sample_fleet_snapshot.json`](examples/sample_fleet_snapshot.json)
 
 That is enough to validate the control-plane idea without pretending the full
 dashboard, configuration orchestration, and cross-agent operations engine
