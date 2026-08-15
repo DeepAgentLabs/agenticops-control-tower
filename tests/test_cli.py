@@ -58,6 +58,45 @@ def test_cli_status_reports_fleet_rollup(
     assert payload["capability_count"] == 3
 
 
+def test_cli_invalid_snapshot_returns_error(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    snapshot_path = tmp_path / "broken.json"
+    snapshot_path.write_text("{not-json")
+
+    exit_code = main(
+        [
+            "--snapshot",
+            str(snapshot_path),
+            "status",
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 1
+    assert "Could not load snapshot" in captured.err
+
+
+def test_cli_missing_snapshot_returns_error(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(
+        [
+            "--snapshot",
+            str(tmp_path / "missing.json"),
+            "status",
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 1
+    assert "Could not load snapshot" in captured.err
+
+
 def test_cli_agents_list_renders_default_table(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
@@ -197,6 +236,7 @@ def test_cli_unknown_agent_returns_error(
 
 def _write_snapshot(tmp_path: Path) -> Path:
     snapshot = {
+        "captured_at": "2026-08-15T12:00:00Z",
         "registrations": [
             {
                 "agent_id": "payment-agent",

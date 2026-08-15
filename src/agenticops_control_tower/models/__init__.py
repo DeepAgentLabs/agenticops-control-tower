@@ -13,6 +13,8 @@ from .status import (
     FleetSnapshot,
     FleetStatusSummary,
     HeartbeatEvent,
+    SnapshotAgentRegistration,
+    SnapshotHeartbeatPayload,
 )
 
 __all__ = [
@@ -26,4 +28,6 @@ __all__ = [
     "FleetStatusSummary",
     "HeartbeatEvent",
     "HeartbeatPayload",
+    "SnapshotAgentRegistration",
+    "SnapshotHeartbeatPayload",
 ]

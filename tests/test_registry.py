@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from pathlib import Path
 
 from agenticops_control_tower.api import ControlTowerAPI
 from agenticops_control_tower.discovery import CapabilityDiscoveryService
@@ -9,6 +10,7 @@ from agenticops_control_tower.models import (
     FleetStatusSummary,
     HeartbeatPayload,
 )
+from agenticops_control_tower.snapshot import load_snapshot
 from agenticops_control_tower.registry import AgentRegistry
 from agenticops_control_tower.status import StatusService
 
@@ -185,3 +187,38 @@ def test_unknown_agent_raises_domain_error() -> None:
         assert exc.agent_id == "missing-agent"
     else:
         raise AssertionError("Expected AgentNotFoundError")
+
+
+def test_snapshot_uses_capture_time_when_event_times_are_missing(tmp_path: Path) -> None:
+    snapshot_path = tmp_path / "fleet.json"
+    snapshot_path.write_text(
+        """
+        {
+          "captured_at": "2026-08-15T12:00:00Z",
+          "registrations": [
+            {
+              "agent_id": "payment-agent",
+              "name": "payment-agent",
+              "environment": "production",
+              "runtime": "aws-lambda",
+              "framework": "langgraph"
+            }
+          ],
+          "heartbeats": [
+            {
+              "agent_id": "payment-agent",
+              "heartbeat": {
+                "status": "healthy"
+              }
+            }
+          ]
+        }
+        """.strip()
+    )
+
+    api = load_snapshot(snapshot_path)
+    agent = api.get_agent("payment-agent")
+
+    assert agent.registered_at.isoformat() == "2026-08-15T12:00:00+00:00"
+    assert agent.last_seen is not None
+    assert agent.last_seen.isoformat() == "2026-08-15T12:00:00+00:00"

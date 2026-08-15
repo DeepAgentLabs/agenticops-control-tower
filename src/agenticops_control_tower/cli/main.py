@@ -12,7 +12,7 @@ from typing import Any
 from pydantic import BaseModel
 
 from agenticops_control_tower.api import ControlTowerAPI
-from agenticops_control_tower.errors import AgentNotFoundError
+from agenticops_control_tower.errors import AgentNotFoundError, SnapshotLoadError
 from agenticops_control_tower.models import (
     AgentRecord,
     AgentStatus,
@@ -116,7 +116,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         api = load_snapshot(args.snapshot) if args.snapshot is not None else create_api()
         rendered = _dispatch(api, args)
-    except AgentNotFoundError as exc:
+    except (AgentNotFoundError, SnapshotLoadError) as exc:
         print(str(exc), file=sys.stderr)
         return 1
 

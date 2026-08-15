@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
-from .agent import AgentRegistrationPayload, AgentStatus, HeartbeatPayload
+from .agent import AgentStatus
 
 
 class CapabilityCoverageRecord(BaseModel):
@@ -50,11 +52,37 @@ class HeartbeatEvent(BaseModel):
     """Snapshot event that applies a heartbeat to a known agent."""
 
     agent_id: str
-    heartbeat: HeartbeatPayload
+    heartbeat: "SnapshotHeartbeatPayload"
+
+
+class SnapshotAgentRegistration(BaseModel):
+    """Registration data as stored in a fleet snapshot artifact."""
+
+    agent_id: str
+    name: str
+    environment: str
+    runtime: str
+    framework: str
+    status: AgentStatus = AgentStatus.UNKNOWN
+    capabilities: dict[str, str] = Field(default_factory=dict)
+    runtime_metadata: dict[str, str] = Field(default_factory=dict)
+    package_metadata: dict[str, str] = Field(default_factory=dict)
+    registered_at: datetime | None = None
+
+
+class SnapshotHeartbeatPayload(BaseModel):
+    """Heartbeat data as stored in a fleet snapshot artifact."""
+
+    status: AgentStatus = AgentStatus.UNKNOWN
+    last_seen: datetime | None = None
+    capabilities: dict[str, str] = Field(default_factory=dict)
+    runtime_metadata: dict[str, str] = Field(default_factory=dict)
+    package_metadata: dict[str, str] = Field(default_factory=dict)
 
 
 class FleetSnapshot(BaseModel):
     """Bootstrap artifact for loading a registry snapshot into the API."""
 
-    registrations: list[AgentRegistrationPayload] = Field(default_factory=list)
+    captured_at: datetime
+    registrations: list[SnapshotAgentRegistration] = Field(default_factory=list)
     heartbeats: list[HeartbeatEvent] = Field(default_factory=list)
