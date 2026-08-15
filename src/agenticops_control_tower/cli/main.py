@@ -33,10 +33,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--snapshot",
         type=Path,
-        help=(
-            "Path to a fleet snapshot JSON file. "
-            "If omitted, the CLI starts with an empty registry."
-        ),
+        help="Path to a fleet snapshot JSON file. If omitted, the CLI starts with an empty registry.",
     )
 
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -169,10 +166,7 @@ def _render_json(data: object) -> str:
         payload: object = data.model_dump(mode="json")
     elif isinstance(data, list):
         payload = [
-            item.model_dump(mode="json")
-            if isinstance(item, BaseModel)
-            else item
-            for item in data
+            item.model_dump(mode="json") if isinstance(item, BaseModel) else item for item in data
         ]
     else:
         payload = data
@@ -288,16 +282,12 @@ def _render_table(headers: list[str], rows: list[list[str]], empty_message: str)
         return empty_message
 
     widths = [
-        max(len(header), *(len(row[index]) for row in rows))
-        for index, header in enumerate(headers)
+        max(len(header), *(len(row[index]) for row in rows)) for index, header in enumerate(headers)
     ]
     rendered_rows = [
-        "  ".join(value.ljust(widths[index]) for index, value in enumerate(row))
-        for row in rows
+        "  ".join(value.ljust(widths[index]) for index, value in enumerate(row)) for row in rows
     ]
-    header_row = "  ".join(
-        header.ljust(widths[index]) for index, header in enumerate(headers)
-    )
+    header_row = "  ".join(header.ljust(widths[index]) for index, header in enumerate(headers))
     separator_row = "  ".join("-" * width for width in widths)
     return "\n".join([header_row, separator_row, *rendered_rows])
 
