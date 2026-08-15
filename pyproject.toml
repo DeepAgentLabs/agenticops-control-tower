@@ -1,0 +1,102 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agenticops-control-tower"
+version = "0.0.1"
+description = "Unified control plane and operations console for the DeepAgentLabs ecosystem."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [{ name = "agenticops-control-tower Contributors" }]
+keywords = ["agents", "control-plane", "operations", "observability", "governance", "chaos"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "pydantic>=2.0,<3",
+]
+
+[project.optional-dependencies]
+# These extras are intentionally declared before real adapters exist so the
+# dependency boundaries stay visible in the scaffold.
+agenticlens = [
+  "agenticlens>=0.1.3",
+]
+agentic-sidecar = [
+  "agentic-sidecar>=0.0.1",
+]
+agentic-chaos = [
+  "agentic-chaos>=0.1",
+]
+deep-agentic-core-mcp = [
+  "deep-agentic-core-mcp>=0.2.0",
+]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "ruff>=0.6",
+  "mypy>=1.10",
+  "build>=1.2",
+  "twine>=5.1",
+]
+
+# Intentionally omitted for now. Add a console script once the CLI becomes a
+# real supported surface instead of a scaffold placeholder.
+# [project.scripts]
+
+[project.urls]
+Homepage = "https://github.com/DeepAgentLabs/agenticops-control-tower"
+Repository = "https://github.com/DeepAgentLabs/agenticops-control-tower"
+Issues = "https://github.com/DeepAgentLabs/agenticops-control-tower/issues"
+Changelog = "https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/CHANGELOG.md"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agenticops_control_tower"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "N"]
+ignore = ["B008"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["agenticops_control_tower"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+packages = ["agenticops_control_tower"]
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = [
+  "agenticlens.*",
+  "agentic_sidecar.*",
+  "agentic_chaos.*",
+  "deep_agentic_core_mcp.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra --cov=agenticops_control_tower --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["src/agenticops_control_tower"]
+

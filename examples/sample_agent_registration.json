@@ -1,0 +1,15 @@
+{
+  "agent_id": "payment-agent",
+  "name": "payment-agent",
+  "environment": "production",
+  "runtime": "aws-lambda",
+  "framework": "langgraph",
+  "status": "healthy",
+  "capabilities": {
+    "agenticlens": "0.8.1",
+    "agentic-sidecar": "0.4.0",
+    "agentic-chaos": "0.5.2",
+    "deep-agentic-core-mcp": "0.2.0"
+  }
+}
+
