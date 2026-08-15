@@ -45,10 +45,10 @@ DeepAgentLabs capabilities.
 
 ### Current Roadmap Focus
 
-The current build focus is the v0.1 registry and discovery core. Work in this
-repo should strengthen explicit registration, heartbeat handling, capability
-inventory, and the read-only control surface before attempting orchestration,
-bulk actions, or a rich dashboard.
+The current build focus is the completed v0.2 CLI and status model. Work in
+this repo should now strengthen operator inventory views, shared status
+semantics, and the console-ready read surface before attempting write-side
+orchestration or bulk actions.
 
 ### Before You Build Here
 
@@ -62,9 +62,10 @@ bulk actions, or a rich dashboard.
 
 ## Status
 
-This repository is a **scaffold**. Package layout, docs, tests, and CI/release
-workflows exist; only a very small in-memory registry/discovery/API skeleton is
-implemented today. See [ROADMAP.md](ROADMAP.md) for the actual build order.
+This repository is a **pre-alpha implementation**. Package layout, docs,
+tests, and CI/release workflows exist, along with an in-memory registry,
+discovery, status, and CLI surface through `v0.2`. See [ROADMAP.md](ROADMAP.md)
+for the remaining build order.
 
 ## Build and Run
 
@@ -72,8 +73,7 @@ implemented today. See [ROADMAP.md](ROADMAP.md) for the actual build order.
 - Test: `make test` or `make check` (lint + format + typecheck + test)
 - Lint: `make lint`
 - Type check: `make typecheck`
-- CLI: not published yet — `[project.scripts]` is intentionally absent from
-  `pyproject.toml` until the CLI becomes a real supported surface
+- CLI: `deepagent ...`
 
 ## Code Style
 
@@ -109,8 +109,9 @@ These are load-bearing, not preferences — see
 | `src/agenticops_control_tower/models/` | Shared inventory and status models | v0.1 |
 | `src/agenticops_control_tower/registry/` | Agent registration, heartbeat, and inventory state | v0.1 |
 | `src/agenticops_control_tower/discovery/` | Capability discovery and normalization | v0.1 |
-| `src/agenticops_control_tower/api/` | Unified read-only control-plane API surface | v0.1 |
+| `src/agenticops_control_tower/api/` | Unified read-only control-plane API surface | v0.1-v0.2 |
 | `src/agenticops_control_tower/cli/` | Operator CLI | v0.2 |
+| `src/agenticops_control_tower/status/` | Shared fleet and agent status rollups | v0.2 |
 | `src/agenticops_control_tower/console/` | AgenticOps Console / dashboard | v0.3 |
 | `src/agenticops_control_tower/config/` | Central configuration models and safe write paths | v0.4 |
 | `src/agenticops_control_tower/adapters/` | Thin ecosystem adapters to sibling projects and MCP | v0.5+ |
@@ -120,10 +121,10 @@ These are load-bearing, not preferences — see
 
 Full architecture and build order: [ROADMAP.md](ROADMAP.md).
 
-## Entry Points (planned)
+## Entry Points
 
 - Python API: read-only control surface through `api/`
-- CLI: `deepagent ...` (planned in v0.2)
+- CLI: `deepagent ...`
 - Console: AgenticOps Console (planned in v0.3)
 
 ## Package Boundaries
@@ -166,6 +167,10 @@ Full architecture and build order: [ROADMAP.md](ROADMAP.md).
 
 Run `make check` before every push. It runs: lint -> format-check -> typecheck
 -> test.
+
+## Pre-release Checklist
+
+Use [PRE_RELEASE.md](PRE_RELEASE.md) before tagging or publishing.
 
 ## Release
 
