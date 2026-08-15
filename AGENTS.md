@@ -25,8 +25,8 @@ DeepAgentLabs capabilities.
   belongs in `agenticlens`
 - Fault injection and resilience-testing logic — that belongs in
   `agentic-chaos`
-- Decision-time governance or pre-action intervention logic — that belongs in
-  `agentic-sidecar`
+- Decision-time supervision/governance or pre-action intervention logic — that
+  belongs in `agentic-sidecar`
 - The MCP-native access surface itself — that belongs in
   `deep-agentic-core-mcp`, even when it later connects to Control Tower
 
@@ -36,8 +36,8 @@ DeepAgentLabs capabilities.
   inventory, status, or configuration contracts
 - `agenticlens` when Control Tower needs summarized observability or readiness
   posture
-- `agentic-sidecar` when Control Tower needs summarized governance or risk
-  posture
+- `agentic-sidecar` when Control Tower needs summarized supervision/governance
+  or risk posture
 - `agentic-chaos` when Control Tower needs summarized experiment or resilience
   posture
 - `deep-agentic-core-mcp` when the control plane is later exposed to AI
