@@ -33,7 +33,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--snapshot",
         type=Path,
-        help="Path to a fleet snapshot JSON file. If omitted, the CLI starts with an empty registry.",
+        help=(
+            "Path to a fleet snapshot JSON file. "
+            "If omitted, the CLI starts with an empty registry."
+        ),
     )
 
     subparsers = parser.add_subparsers(dest="command", required=True)
