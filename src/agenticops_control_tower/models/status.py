@@ -52,7 +52,7 @@ class HeartbeatEvent(BaseModel):
     """Snapshot event that applies a heartbeat to a known agent."""
 
     agent_id: str
-    heartbeat: "SnapshotHeartbeatPayload"
+    heartbeat: SnapshotHeartbeatPayload
 
 
 class SnapshotAgentRegistration(BaseModel):

@@ -10,8 +10,8 @@ from agenticops_control_tower.models import (
     FleetStatusSummary,
     HeartbeatPayload,
 )
-from agenticops_control_tower.snapshot import load_snapshot
 from agenticops_control_tower.registry import AgentRegistry
+from agenticops_control_tower.snapshot import load_snapshot
 from agenticops_control_tower.status import StatusService
 
 
