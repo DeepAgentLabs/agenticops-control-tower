@@ -183,6 +183,12 @@ Checklist](#pre-release-checklist) above first.
 `CHANGELOG.md` (a dated release section under `[Unreleased]`). Commit as
 part of the branch's normal history; goes in with the rest of the PR.
 
+For `CHANGELOG.md`, write release headings in the plain form:
+`## X.Y.Z`
+Example: `## 0.2.0`
+Do not add brackets or a trailing date unless the release parser and existing
+file style are updated together.
+
 **2. Release (on `main`, once that branch has merged):** plain `git`, no
 manual `gh release` step required.
 
