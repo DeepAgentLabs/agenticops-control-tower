@@ -7,17 +7,39 @@
 
 ## Status
 
-**Concept / pre-implementation.** This repository currently contains the
-architecture proposal ([`DeepAgent Control Tower End-to-End Concept.md`](DeepAgent%20Control%20Tower%20End-to-End%20Concept.md)),
-this README, and the build plan in [ROADMAP.md](ROADMAP.md).
+**Early v0.1/v0.2 scaffold, no PyPI release yet.** A small in-memory agent
+registry, capability discovery, an HTTP API (`agenticops-control-tower serve`,
+via the optional `api` extra), and a CLI talking to that API are real, tested
+code — see [Quickstart](#quickstart) below. There is still **no persistence
+across restarts, no auth, and no web console** — the registry lives only in
+the server process's memory. See [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md) for the
+full evidence-based status and [ROADMAP.md](ROADMAP.md) for the build plan.
 
-There is **no package code, no PyPI release, no API server, no CLI, and no web
-console yet**. The point of the project today is to define the control-plane
-shape clearly enough that implementation can start in a narrow, believable
-order.
+## Quickstart
+
+```bash
+pip install agenticops-control-tower[api]   # fastapi/uvicorn/httpx for the HTTP API + CLI
+
+# Terminal 1: run the API (in-memory, no persistence, no auth)
+agenticops-control-tower serve --port 8000
+
+# Terminal 2: register an agent, send a heartbeat, and inspect the fleet
+agenticops-control-tower agents register examples/sample_agent_registration.json
+echo '{"status":"healthy","capabilities":{"agenticlens":"0.8.1"}}' > heartbeat.json
+agenticops-control-tower agents heartbeat payment-agent heartbeat.json
+agenticops-control-tower agents list
+agenticops-control-tower capabilities list
+```
+
+Without the `api` extra, `pip install agenticops-control-tower` still gives
+you the underlying Python control model (`ControlTowerAPI`, `AgentRegistry`,
+`CapabilityDiscoveryService`) with zero web-framework dependency — the HTTP
+server and CLI are optional surfaces over the same model, not the only way to
+use it.
 
 ## Contents
 
+- [Quickstart](#quickstart)
 - [Why this exists](#why-this-exists)
 - [What Control Tower is](#what-control-tower-is)
 - [What it is not](#what-it-is-not)
@@ -83,9 +105,11 @@ dashboard is only one interface to the underlying control plane.
   above LangGraph, CrewAI, AutoGen, OpenAI Agents SDK, AWS AgentCore-style
   workloads, MCP-native agents, and custom Python systems rather than
   assuming one execution model.
-- **Not implemented yet.** The architecture in the concept doc is broader
-  than what a first real release should attempt. See [ROADMAP.md](ROADMAP.md)
-  for the narrowed build order.
+- **Not the full architecture yet.** The concept doc describes a broader end
+  state than what's built so far — see [Status](#status) for what's real
+  today (registry, discovery, HTTP API, CLI) versus [ROADMAP.md](ROADMAP.md)
+  for the narrowed build order still ahead (persistence, auth, console,
+  configuration, MCP connector, bulk operations).
 
 ## Architecture
 
@@ -213,11 +237,14 @@ needs to be much narrower.
 
 The first usable version should likely prove four things only:
 
-1. agents can register and heartbeat
+1. agents can register and heartbeat — **done**, in-memory only (no
+   persistence across restarts)
 2. the system can discover installed DeepAgentLabs capabilities and versions
-3. operators can inspect that inventory through a simple API and CLI
+   — **done**, from agent-reported heartbeat data (not automatic detection)
+3. operators can inspect that inventory through a simple API and CLI —
+   **done**, via the optional `api` extra (see [Quickstart](#quickstart))
 4. the same inventory can be surfaced later in a console without changing the
-   underlying control model
+   underlying control model — **still open**, no console yet (v0.3)
 
 That is enough to validate the control-plane idea without pretending the full
 dashboard, configuration orchestration, and cross-agent operations engine

@@ -62,9 +62,12 @@ bulk actions, or a rich dashboard.
 
 ## Status
 
-This repository is a **scaffold**. Package layout, docs, tests, and CI/release
-workflows exist; only a very small in-memory registry/discovery/API skeleton is
-implemented today. See [ROADMAP.md](ROADMAP.md) for the actual build order.
+This repository is an **early scaffold**. Package layout, docs, tests, and
+CI/release workflows exist; a real (if minimal) in-memory registry,
+discovery, HTTP API, and CLI exist today — see
+[ROADMAP_AUDIT.md](ROADMAP_AUDIT.md) for the evidence-based status and
+[ROADMAP.md](ROADMAP.md) for the actual build order. No persistence across
+restarts, no auth, and no console yet.
 
 ## Build and Run
 
@@ -72,8 +75,12 @@ implemented today. See [ROADMAP.md](ROADMAP.md) for the actual build order.
 - Test: `make test` or `make check` (lint + format + typecheck + test)
 - Lint: `make lint`
 - Type check: `make typecheck`
-- CLI: not published yet — `[project.scripts]` is intentionally absent from
-  `pyproject.toml` until the CLI becomes a real supported surface
+- CLI: `agenticops-control-tower` console script is registered in
+  `[project.scripts]`; requires the `api` extra (`pip install
+  agenticops-control-tower[api]`) for `httpx`/`uvicorn`. `serve` runs the
+  HTTP API; `agents register|heartbeat|list|get` and `capabilities list` talk
+  to a running server (default `http://localhost:8000`, override with
+  `--api-url` or `$AGENTICOPS_API_URL`)
 
 ## Code Style
 
@@ -109,8 +116,8 @@ These are load-bearing, not preferences — see
 | `src/agenticops_control_tower/models/` | Shared inventory and status models | v0.1 |
 | `src/agenticops_control_tower/registry/` | Agent registration, heartbeat, and inventory state | v0.1 |
 | `src/agenticops_control_tower/discovery/` | Capability discovery and normalization | v0.1 |
-| `src/agenticops_control_tower/api/` | Unified read-only control-plane API surface | v0.1 |
-| `src/agenticops_control_tower/cli/` | Operator CLI | v0.2 |
+| `src/agenticops_control_tower/api/` | Python facade (`api/surface.py`) plus an HTTP surface (`api/http.py`, optional `api` extra) | v0.1 |
+| `src/agenticops_control_tower/cli/` | Operator CLI (`agenticops-control-tower`), optional `api` extra | v0.2 |
 | `src/agenticops_control_tower/console/` | AgenticOps Console / dashboard | v0.3 |
 | `src/agenticops_control_tower/config/` | Central configuration models and safe write paths | v0.4 |
 | `src/agenticops_control_tower/adapters/` | Thin ecosystem adapters to sibling projects and MCP | v0.5+ |
@@ -120,10 +127,13 @@ These are load-bearing, not preferences — see
 
 Full architecture and build order: [ROADMAP.md](ROADMAP.md).
 
-## Entry Points (planned)
+## Entry Points
 
-- Python API: read-only control surface through `api/`
-- CLI: `deepagent ...` (planned in v0.2)
+- Python API: `agenticops_control_tower.api.ControlTowerAPI` (registry +
+  discovery facade, no extra dependencies)
+- HTTP API: `agenticops_control_tower.api.http.create_app()` (optional `api`
+  extra) or `agenticops-control-tower serve`
+- CLI: `agenticops-control-tower` console script (optional `api` extra)
 - Console: AgenticOps Console (planned in v0.3)
 
 ## Package Boundaries

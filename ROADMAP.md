@@ -1,9 +1,19 @@
 # agenticops-control-tower — Roadmap & Architecture
 
+> **Audit note:** [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md) is an evidence-based
+> review of what in this roadmap is actually implemented versus aspirational.
+> Read it alongside this document.
+
 ## Release Status
 
-- **v0.1** 🚧 Planned — Registry, Heartbeats, Capability Discovery, Read-Only API
-- **v0.2** 🚧 Planned — CLI, Status Views, Health Rollups, Version Inventory
+- **v0.1** 🏗️ Partial — in-memory registry, heartbeat, capability discovery,
+  a Python API facade, and a real HTTP-reachable API (`agenticops-control-tower
+  serve`, optional `api` extra) all exist with tests and CI; still no
+  persistence across restarts and no auth — see the audit's v0.1 section for
+  the full gap list
+- **v0.2** 🏗️ Partial — a real CLI (`agenticops-control-tower agents
+  register|heartbeat|list|get`, `capabilities list`) talks to the HTTP API;
+  no health rollups or version-inventory filters yet
 - **v0.3** 🚧 Planned — AgenticOps Console (read-only dashboard)
 - **v0.4** 🚧 Planned — Configuration Model and Controlled Write Operations
 - **v0.5** 🚧 Planned — Lens, Sidecar, and Chaos Surface Integration
@@ -12,8 +22,13 @@
 - **v0.8** 🚧 Planned — Alerts, Audit Trails, and Incident Views
 - **v1.0** 🚧 Planned — Stable Control Plane and Published Capability Contract
 
-Nothing has shipped yet. This repository currently contains the concept
-document, this roadmap, and the README only.
+v0.1 and v0.2 now have a real, tested, CI-wired HTTP API and CLI
+(`src/agenticops_control_tower/api/http.py`, `cli/main.py`) behind the
+optional `api` extra, in addition to the underlying in-memory registry and
+discovery scaffold. v0.3-v1.0 remain correctly marked Planned — no console,
+persistence, auth, configuration, MCP connector, or bulk-operation code
+exists yet. See [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md) for exactly what exists
+versus what is still aspirational text.
 
 ## Design Constraints
 
@@ -170,49 +185,63 @@ Deliverables:
 
 ## Phase 1: Registry and Discovery Core (`v0.1`)
 
+Status: **partial** — see [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md#v01-registry-and-discovery-core).
+
 Goals:
 
-- create a minimal agent registry
-- accept explicit agent registration and heartbeats
-- record runtime, framework, environment, and package metadata
-- expose a read-only API for listing agents and capabilities
+- create a minimal agent registry — done, in-memory only
+- accept explicit agent registration and heartbeats — done
+- record runtime, framework, environment, and package metadata — done
+- expose a read-only API for listing agents and capabilities — done, plus
+  the write endpoints below, all HTTP-reachable via the optional `api` extra
 
-Suggested initial surface:
+Suggested initial surface (all implemented in `api/http.py`):
 
-- `POST /agents/register`
-- `POST /agents/{id}/heartbeat`
-- `GET /agents`
-- `GET /agents/{id}`
-- `GET /capabilities`
+- [x] `POST /agents/register`
+- [x] `POST /agents/{id}/heartbeat`
+- [x] `GET /agents`
+- [x] `GET /agents/{id}`
+- [x] `GET /capabilities` (aggregated across all registered agents)
 
 Success criteria:
 
-- operators can see which agents are known to the system
-- each agent record includes capability versions and last-seen status
-- the system works without assuming Kubernetes, Docker, or one framework
-- example registration payloads exist for at least two runtime styles
+- [x] operators can see which agents are known to the system
+- [x] each agent record includes capability versions and last-seen status
+- [x] the system works without assuming Kubernetes, Docker, or one framework
+- [x] example registration payloads exist for at least two runtime styles
+      (`examples/sample_agent_registration.json`,
+      `examples/sample_agent_registration_kubernetes.json`)
+
+Still open: no persistence across process restarts, no auth/authorization.
 
 ## Phase 2: CLI and Status Model (`v0.2`)
 
+Status: **partial** — see [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md#v02-cli-and-status-model).
+
 Goals:
 
-- ship a first operator CLI
-- add health rollups and version inventory summaries
+- ship a first operator CLI — done (`agenticops-control-tower`, optional
+  `api` extra)
+- add health rollups and version inventory summaries — not done
 - expose useful filters such as unhealthy agents or agents missing a
-  capability
+  capability — not done
 
-Suggested commands:
+Suggested commands (shipped as `agenticops-control-tower <command>`, not
+`deepagent <command>` -- no `deepagent` binary exists in this ecosystem):
 
-- `deepagent agents list`
-- `deepagent agents get <agent-id>`
-- `deepagent capabilities list`
-- `deepagent status`
+- [x] `agents list`
+- [x] `agents get <agent-id>`
+- [x] `capabilities list`
+- [ ] `status` (health rollup) — not implemented
 
 Success criteria:
 
-- CLI and API share the same underlying control model
-- a user can answer basic inventory questions without touching raw JSON
-- health state is computed consistently rather than ad hoc per interface
+- [x] CLI and API share the same underlying control model (the CLI is an
+      HTTP client of `api/http.py`, which wraps the same `ControlTowerAPI`
+      facade used directly by tests)
+- [x] a user can answer basic inventory questions without touching raw JSON
+- [ ] health state is computed consistently rather than ad hoc per interface
+      — no health-rollup computation exists yet
 
 ## Phase 3: Read-Only Console (`v0.3`)
 
