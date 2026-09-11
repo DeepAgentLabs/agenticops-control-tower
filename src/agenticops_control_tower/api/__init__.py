@@ -1,4 +1,4 @@
-"""Control-plane API placeholders."""
+"""Control-plane API surface."""
 
 from .surface import ControlTowerAPI
 

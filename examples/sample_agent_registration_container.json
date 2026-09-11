@@ -1,0 +1,20 @@
+{
+  "agent_id": "support-agent",
+  "name": "support-agent",
+  "environment": "staging",
+  "runtime": "docker",
+  "framework": "openai-agents",
+  "status": "unknown",
+  "capabilities": {
+    "agenticlens": "0.8.2",
+    "agentic-sidecar": "0.4.0"
+  },
+  "runtime_metadata": {
+    "python_version": "3.11",
+    "container_image": "deepagentlabs/support-agent:0.2.0"
+  },
+  "package_metadata": {
+    "build_sha": "9a2c1de",
+    "release_channel": "staging"
+  }
+}

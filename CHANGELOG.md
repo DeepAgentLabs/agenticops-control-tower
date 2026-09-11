@@ -23,4 +23,3 @@
 - Initial repository scaffold
 - Concept-stage README and roadmap
 - Package layout, tests, and CI/release workflows
-

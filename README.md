@@ -246,6 +246,36 @@ The first usable version should likely prove four things only:
 4. the same inventory can be surfaced later in a console without changing the
    underlying control model — **still open**, no console yet (v0.3)
 
+That core is now implemented as an in-memory Python API.
+
+## Current `v0.2` Surface
+
+The package currently exposes:
+
+- `register_agent(...)`
+- `record_heartbeat(...)`
+- `list_agents(...)`
+- `get_agent(agent_id)`
+- `list_capabilities()`
+- `get_agent_capabilities(agent_id)`
+- `get_status(...)`
+
+The operator CLI is now available as:
+
+- `deepagent agents list`
+- `deepagent agents get <agent-id>`
+- `deepagent capabilities list`
+- `deepagent status`
+
+The CLI reads fleet inventory from a snapshot file so it can operate on the
+same control model without requiring the future API server yet.
+
+Example registration payloads are included for two runtime styles:
+
+- [`examples/sample_agent_registration.json`](examples/sample_agent_registration.json)
+- [`examples/sample_agent_registration_container.json`](examples/sample_agent_registration_container.json)
+- [`examples/sample_fleet_snapshot.json`](examples/sample_fleet_snapshot.json)
+
 That is enough to validate the control-plane idea without pretending the full
 dashboard, configuration orchestration, and cross-agent operations engine
 already exist.

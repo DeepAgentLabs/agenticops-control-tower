@@ -168,7 +168,7 @@ spec repo instead?`
 
 ## Phase 0: Concept and Product Boundary
 
-Status: current
+Status: complete
 
 Goals:
 
@@ -214,6 +214,14 @@ Success criteria:
 
 Still open: no persistence across process restarts, no auth/authorization.
 
+Delivered in `v0.1`:
+
+- in-memory registry with explicit registration payloads
+- heartbeat updates with last-seen tracking and metadata merging
+- aggregated capability inventory across known agents
+- runtime-agnostic examples for Lambda-style and container-style agents
+- tests covering registration, heartbeat, and discovery flows
+
 ## Phase 2: CLI and Status Model (`v0.2`)
 
 Status: **partial** — see [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md#v02-cli-and-status-model).
@@ -242,6 +250,14 @@ Success criteria:
 - [x] a user can answer basic inventory questions without touching raw JSON
 - [ ] health state is computed consistently rather than ad hoc per interface
       — no health-rollup computation exists yet
+
+Delivered in `v0.2`:
+
+- published `deepagent` console script for operator workflows
+- status rollups shared between CLI and Python API
+- agent filters for health status, environment, present capability, and missing capability
+- capability coverage summaries and fleet status views
+- snapshot-based CLI input for local inspection before a future API server exists
 
 ## Phase 3: Read-Only Console (`v0.3`)
 

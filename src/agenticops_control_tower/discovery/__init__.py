@@ -1,4 +1,4 @@
-"""Capability discovery placeholders."""
+"""Capability discovery surface."""
 
 from .service import CapabilityDiscoveryService
 

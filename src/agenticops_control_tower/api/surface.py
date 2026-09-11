@@ -6,18 +6,21 @@ from __future__ import annotations
 from agenticops_control_tower.discovery import CapabilityDiscoveryService
 from agenticops_control_tower.models import AgentRecord, HeartbeatPayload
 from agenticops_control_tower.registry import AgentRegistry
+from agenticops_control_tower.status import StatusService
 
 
 class ControlTowerAPI:
-    """Small facade that mirrors the v0.1 roadmap surface."""
+    """Small facade that mirrors the roadmap's initial control-plane surface."""
 
     def __init__(
         self,
         registry: AgentRegistry,
         discovery: CapabilityDiscoveryService,
+        status_service: StatusService | None = None,
     ) -> None:
         self._registry = registry
         self._discovery = discovery
+        self._status_service = status_service or StatusService(discovery)
 
     def register(self, agent: AgentRecord) -> AgentRecord:
         return self._registry.register(agent)
