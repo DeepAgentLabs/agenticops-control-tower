@@ -1,283 +1,117 @@
+"""CLI tests against an in-process ASGI app -- no real server/socket needed.
+Skips automatically if `httpx`/`fastapi` aren't installed (`api` extra)."""
+
+from __future__ import annotations
+
 import json
 from pathlib import Path
 
 import pytest
 
-from agenticops_control_tower.cli.main import main
+pytest.importorskip("httpx")
+pytest.importorskip("fastapi")
+
+from fastapi.testclient import TestClient  # noqa: E402
+
+from agenticops_control_tower.api.http import create_app  # noqa: E402
+from agenticops_control_tower.cli.main import main  # noqa: E402
 
 
-def test_cli_agents_list_filters_by_status(
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
+@pytest.fixture
+def api_client() -> TestClient:
+    # FastAPI's TestClient (not a bare httpx.Client(transport=ASGITransport))
+    # -- it behaves like an httpx.Client (same .get()/.post()/.is_error
+    # surface main()'s handlers rely on) but handles the sync/ASGI bridging
+    # itself, which a hand-built ASGITransport can't in this httpx version
+    # (sync Client.close()/. __enter__() call transport methods ASGITransport
+    # no longer implements -- it's async-only here).
+    return TestClient(create_app())
+
+
+def _write_json(tmp_path: Path, name: str, payload: dict) -> Path:
+    path = tmp_path / name
+    path.write_text(json.dumps(payload))
+    return path
+
+
+def test_register_list_and_get(
+    tmp_path: Path, api_client: TestClient, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    snapshot_path = _write_snapshot(tmp_path)
-
-    exit_code = main(
-        [
-            "--snapshot",
-            str(snapshot_path),
-            "agents",
-            "list",
-            "--status",
-            "healthy",
-            "--format",
-            "json",
-        ]
+    payload_file = _write_json(
+        tmp_path,
+        "agent.json",
+        {
+            "agent_id": "payment-agent",
+            "name": "payment-agent",
+            "environment": "staging",
+            "runtime": "local-python",
+            "framework": "langgraph",
+        },
     )
 
-    captured = capsys.readouterr()
-    payload = json.loads(captured.out)
-
+    exit_code = main(["agents", "register", str(payload_file)], client=api_client)
     assert exit_code == 0
-    assert [agent["agent_id"] for agent in payload] == ["payment-agent"]
+    registered = json.loads(capsys.readouterr().out)
+    assert registered["agent_id"] == "payment-agent"
 
-
-def test_cli_status_reports_fleet_rollup(
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    snapshot_path = _write_snapshot(tmp_path)
-
-    exit_code = main(
-        [
-            "--snapshot",
-            str(snapshot_path),
-            "status",
-            "--format",
-            "json",
-        ]
-    )
-
-    captured = capsys.readouterr()
-    payload = json.loads(captured.out)
-
+    exit_code = main(["agents", "list"], client=api_client)
     assert exit_code == 0
-    assert payload["total_agents"] == 2
-    assert payload["healthy_agents"] == 1
-    assert payload["unhealthy_agents"] == 1
-    assert payload["capability_count"] == 3
+    listed = json.loads(capsys.readouterr().out)
+    assert [a["agent_id"] for a in listed] == ["payment-agent"]
 
-
-def test_cli_invalid_snapshot_returns_error(
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    snapshot_path = tmp_path / "broken.json"
-    snapshot_path.write_text("{not-json")
-
-    exit_code = main(
-        [
-            "--snapshot",
-            str(snapshot_path),
-            "status",
-        ]
-    )
-
-    captured = capsys.readouterr()
-
-    assert exit_code == 1
-    assert "Could not load snapshot" in captured.err
-
-
-def test_cli_missing_snapshot_returns_error(
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    exit_code = main(
-        [
-            "--snapshot",
-            str(tmp_path / "missing.json"),
-            "status",
-        ]
-    )
-
-    captured = capsys.readouterr()
-
-    assert exit_code == 1
-    assert "Could not load snapshot" in captured.err
-
-
-def test_cli_agents_list_renders_default_table(
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    snapshot_path = _write_snapshot(tmp_path)
-
-    exit_code = main(
-        [
-            "--snapshot",
-            str(snapshot_path),
-            "agents",
-            "list",
-        ]
-    )
-
-    captured = capsys.readouterr()
-
+    exit_code = main(["agents", "get", "payment-agent"], client=api_client)
     assert exit_code == 0
-    assert "AGENT ID" in captured.out
-    assert "payment-agent" in captured.out
-    assert "support-agent" in captured.out
+    fetched = json.loads(capsys.readouterr().out)
+    assert fetched["agent_id"] == "payment-agent"
 
 
-def test_cli_agent_get_renders_default_detail_table(
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
+def test_heartbeat_and_capabilities(
+    tmp_path: Path, api_client: TestClient, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    snapshot_path = _write_snapshot(tmp_path)
-
-    exit_code = main(
-        [
-            "--snapshot",
-            str(snapshot_path),
-            "agents",
-            "get",
-            "payment-agent",
-        ]
+    agent_file = _write_json(
+        tmp_path,
+        "agent.json",
+        {
+            "agent_id": "fraud-agent",
+            "name": "fraud-agent",
+            "environment": "production",
+            "runtime": "kubernetes",
+            "framework": "crewai",
+        },
     )
+    main(["agents", "register", str(agent_file)], client=api_client)
+    capsys.readouterr()
 
-    captured = capsys.readouterr()
-
+    heartbeat_file = _write_json(
+        tmp_path,
+        "heartbeat.json",
+        {"status": "healthy", "capabilities": {"agenticlens": "0.8.1"}},
+    )
+    exit_code = main(["agents", "heartbeat", "fraud-agent", str(heartbeat_file)], client=api_client)
     assert exit_code == 0
-    assert "Agent ID: payment-agent" in captured.out
-    assert "Capabilities:" in captured.out
-    assert "agenticlens: 0.8.1" in captured.out
+    updated = json.loads(capsys.readouterr().out)
+    assert updated["status"] == "healthy"
 
-
-def test_cli_capabilities_list_renders_default_table(
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    snapshot_path = _write_snapshot(tmp_path)
-
-    exit_code = main(
-        [
-            "--snapshot",
-            str(snapshot_path),
-            "capabilities",
-            "list",
-        ]
-    )
-
-    captured = capsys.readouterr()
-
+    exit_code = main(["capabilities", "list"], client=api_client)
     assert exit_code == 0
-    assert "CAPABILITY" in captured.out
-    assert "agenticlens" in captured.out
-    assert "deep-agentic-core-mcp" in captured.out
+    capabilities = json.loads(capsys.readouterr().out)
+    assert capabilities == {"agenticlens": ["0.8.1"]}
 
 
-def test_cli_status_renders_default_fleet_table(
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    snapshot_path = _write_snapshot(tmp_path)
-
-    exit_code = main(
-        [
-            "--snapshot",
-            str(snapshot_path),
-            "status",
-        ]
-    )
-
-    captured = capsys.readouterr()
-
-    assert exit_code == 0
-    assert "Total Agents: 2" in captured.out
-    assert "Capability Coverage:" in captured.out
-    assert "agenticlens" in captured.out
+def test_get_unknown_agent_exits_nonzero(api_client: TestClient) -> None:
+    with pytest.raises(SystemExit):
+        main(["agents", "get", "does-not-exist"], client=api_client)
 
 
-def test_cli_status_agent_renders_default_detail_table(
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    snapshot_path = _write_snapshot(tmp_path)
+def test_missing_client_dependency_without_extra(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Without a caller-supplied client, a missing `httpx` (no `api` extra
+    installed) should fail with a clear message, not an ImportError
+    traceback. `sys.modules["httpx"] = None` is the standard trick to make
+    `import httpx` raise ImportError even though it's already imported and
+    cached for the rest of this test session."""
+    import sys
 
-    exit_code = main(
-        [
-            "--snapshot",
-            str(snapshot_path),
-            "status",
-            "support-agent",
-        ]
-    )
+    monkeypatch.setitem(sys.modules, "httpx", None)
 
-    captured = capsys.readouterr()
-
-    assert exit_code == 0
-    assert "Agent ID: support-agent" in captured.out
-    assert "Status: unhealthy" in captured.out
-    assert "Capability Count: 1" in captured.out
-
-
-def test_cli_unknown_agent_returns_error(
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    snapshot_path = _write_snapshot(tmp_path)
-
-    exit_code = main(
-        [
-            "--snapshot",
-            str(snapshot_path),
-            "agents",
-            "get",
-            "missing-agent",
-        ]
-    )
-
-    captured = capsys.readouterr()
-
-    assert exit_code == 1
-    assert "missing-agent" in captured.err
-
-
-def _write_snapshot(tmp_path: Path) -> Path:
-    snapshot = {
-        "captured_at": "2026-08-15T12:00:00Z",
-        "registrations": [
-            {
-                "agent_id": "payment-agent",
-                "name": "payment-agent",
-                "environment": "production",
-                "runtime": "aws-lambda",
-                "framework": "langgraph",
-                "capabilities": {
-                    "agenticlens": "0.8.1",
-                    "agentic-sidecar": "0.4.0",
-                },
-            },
-            {
-                "agent_id": "support-agent",
-                "name": "support-agent",
-                "environment": "staging",
-                "runtime": "docker",
-                "framework": "openai-agents",
-                "capabilities": {
-                    "agenticlens": "0.8.2",
-                },
-            },
-        ],
-        "heartbeats": [
-            {
-                "agent_id": "payment-agent",
-                "heartbeat": {
-                    "status": "healthy",
-                    "capabilities": {
-                        "deep-agentic-core-mcp": "0.2.0",
-                    },
-                },
-            },
-            {
-                "agent_id": "support-agent",
-                "heartbeat": {
-                    "status": "unhealthy",
-                },
-            },
-        ],
-    }
-    snapshot_path = tmp_path / "fleet.json"
-    snapshot_path.write_text(json.dumps(snapshot))
-    return snapshot_path
+    with pytest.raises(SystemExit, match=r"\[api\]"):
+        main(["agents", "list"])

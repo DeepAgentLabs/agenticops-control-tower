@@ -1,0 +1,12 @@
+{
+  "agent_id": "fraud-review-agent",
+  "name": "fraud-review-agent",
+  "environment": "staging",
+  "runtime": "kubernetes",
+  "framework": "crewai",
+  "status": "degraded",
+  "capabilities": {
+    "agenticlens": "0.8.1",
+    "agentic-sidecar": "0.4.0"
+  }
+}

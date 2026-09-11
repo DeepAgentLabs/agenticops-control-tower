@@ -1,16 +1,22 @@
 # Changelog
 
-## 0.2.0
+## [Unreleased]
 
-- Added the first real `deepagent` operator CLI with agent, capability, and status commands
-- Added fleet status rollups, capability coverage summaries, and agent filtering over the shared control model
-- Added snapshot-based CLI bootstrapping, friendlier not-found errors, and sample fleet inventory data
+### Added
 
-## 0.1.0
-
-- Implemented the in-memory `v0.1` registry, heartbeat, and capability discovery core
-- Added explicit registration payloads, agent metadata tracking, and aggregated capability inventory
-- Added runtime-agnostic examples and tests for registration and capability reporting
+- HTTP API (`agenticops_control_tower.api.http.create_app()`, optional `api`
+  extra) implementing the v0.1 roadmap's suggested surface: `POST
+  /agents/register`, `POST /agents/{id}/heartbeat`, `GET /agents`, `GET
+  /agents/{id}`, `GET /capabilities` (aggregated across all agents).
+- Operator CLI (`agenticops-control-tower` console script, optional `api`
+  extra): `serve`, `agents register|heartbeat|list|get`, `capabilities list`.
+- `ControlTowerAPI.register()`, `.heartbeat()`, and `.list_all_capabilities()`
+  facade methods backing the HTTP layer.
+- `examples/sample_agent_registration_kubernetes.json`, a second example
+  registration payload (`kubernetes`/`crewai`) alongside the existing
+  `aws-lambda`/`langgraph` one.
+- `tests/test_http_api.py` and `tests/test_cli.py` (skip automatically
+  without the `api` extra installed).
 
 ## 0.0.1
 

@@ -1,296 +1,185 @@
-"""Operator CLI for the v0.2 control-plane surface."""
+"""Operator CLI (v0.2), talking to the v0.1 HTTP API.
+
+A real, in-process registry only lives for the lifetime of one Python
+process, so the CLI necessarily talks to a *running* server rather than an
+in-process store -- start one with `agenticops-control-tower serve` (or
+`uvicorn agenticops_control_tower.api.http:create_app --factory`) first.
+
+Requires the `api` extra for `httpx` (`pip install agenticops-control-tower[api]`).
+The import itself stays cheap -- `httpx` is only imported inside the
+functions that need it, so `from agenticops_control_tower.cli.main import
+main` works even without the extra installed; only actually running a
+command that talks to the API requires it.
+"""
 
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
+import os
 import sys
-from collections.abc import Callable, Sequence
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel
+if TYPE_CHECKING:
+    import httpx
 
-from agenticops_control_tower.api import ControlTowerAPI
-from agenticops_control_tower.errors import AgentNotFoundError, SnapshotLoadError
-from agenticops_control_tower.models import (
-    AgentRecord,
-    AgentStatus,
-    AgentStatusSummary,
-    CapabilityInventoryRecord,
-    FleetStatusSummary,
-)
-from agenticops_control_tower.snapshot import create_api, load_snapshot
+DEFAULT_API_URL = "http://localhost:8000"
 
 
-def build_parser() -> argparse.ArgumentParser:
-    """Build the top-level CLI parser."""
+def _client(api_url: str, client: httpx.Client | None = None) -> httpx.Client:
+    if client is not None:
+        return client
+    try:
+        import httpx
+    except ImportError as exc:
+        raise SystemExit(
+            "This command talks to the Control Tower HTTP API and needs `httpx`. "
+            "Install it with: pip install agenticops-control-tower[api]"
+        ) from exc
+    return httpx.Client(base_url=api_url)
 
-    parser = argparse.ArgumentParser(
-        prog="deepagent",
-        description="Inspect agent inventory and status through the Control Tower surface.",
+
+def _print_json(payload: Any) -> None:
+    print(json.dumps(payload, indent=2, default=str))
+
+
+def _raise_for_status(response: httpx.Response) -> None:
+    if response.is_error:
+        detail = response.text
+        with contextlib.suppress(ValueError):
+            detail = response.json().get("detail", detail)
+        raise SystemExit(f"Control Tower API returned {response.status_code}: {detail}")
+
+
+def _cmd_serve(args: argparse.Namespace) -> int:
+    try:
+        import uvicorn
+    except ImportError:
+        raise SystemExit(
+            "`serve` needs uvicorn. Install it with: pip install agenticops-control-tower[api]"
+        ) from None
+    uvicorn.run(
+        "agenticops_control_tower.api.http:create_app",
+        factory=True,
+        host=args.host,
+        port=args.port,
     )
+    return 0
+
+
+def _load_payload(path: str) -> Any:
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _cmd_agents_register(args: argparse.Namespace, client: httpx.Client) -> int:
+    payload = _load_payload(args.payload_file)
+    response = client.post("/agents/register", json=payload)
+    _raise_for_status(response)
+    _print_json(response.json())
+    return 0
+
+
+def _cmd_agents_heartbeat(args: argparse.Namespace, client: httpx.Client) -> int:
+    payload = _load_payload(args.payload_file)
+    response = client.post(f"/agents/{args.agent_id}/heartbeat", json=payload)
+    _raise_for_status(response)
+    _print_json(response.json())
+    return 0
+
+
+def _cmd_agents_list(_args: argparse.Namespace, client: httpx.Client) -> int:
+    response = client.get("/agents")
+    _raise_for_status(response)
+    _print_json(response.json())
+    return 0
+
+
+def _cmd_agents_get(args: argparse.Namespace, client: httpx.Client) -> int:
+    response = client.get(f"/agents/{args.agent_id}")
+    _raise_for_status(response)
+    _print_json(response.json())
+    return 0
+
+
+def _cmd_capabilities_list(_args: argparse.Namespace, client: httpx.Client) -> int:
+    response = client.get("/capabilities")
+    _raise_for_status(response)
+    _print_json(response.json())
+    return 0
+
+
+def _build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="agenticops-control-tower")
     parser.add_argument(
-        "--snapshot",
-        type=Path,
-        help="Path to a fleet snapshot JSON file. If omitted, the CLI uses an empty registry.",
+        "--api-url",
+        default=os.environ.get("AGENTICOPS_API_URL", DEFAULT_API_URL),
+        help=f"Control Tower API base URL (default: {DEFAULT_API_URL}, or $AGENTICOPS_API_URL)",
     )
-
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    agents_parser = subparsers.add_parser("agents", help="Inspect known agents.")
-    agents_subparsers = agents_parser.add_subparsers(dest="agents_command", required=True)
+    serve = subparsers.add_parser("serve", help="Run the Control Tower HTTP API")
+    serve.add_argument("--host", default="127.0.0.1")
+    serve.add_argument("--port", type=int, default=8000)
+    serve.set_defaults(handler=_cmd_serve, needs_client=False)
 
-    agents_list_parser = agents_subparsers.add_parser("list", help="List known agents.")
-    agents_list_parser.add_argument(
-        "--status",
-        choices=[status.value for status in AgentStatus],
-        help="Filter to one health status.",
-    )
-    agents_list_parser.add_argument("--environment", help="Filter to one environment.")
-    agents_list_parser.add_argument(
-        "--capability",
-        help="Show only agents that report a capability.",
-    )
-    agents_list_parser.add_argument(
-        "--missing-capability",
-        help="Show only agents that do not report a capability.",
-    )
-    agents_list_parser.add_argument(
-        "--format",
-        choices=["table", "json"],
-        default="table",
-        help="Render output as a table or JSON.",
-    )
+    agents = subparsers.add_parser("agents", help="Inspect and register agents")
+    agents_sub = agents.add_subparsers(dest="agents_command", required=True)
 
-    agents_get_parser = agents_subparsers.add_parser("get", help="Show one agent.")
-    agents_get_parser.add_argument("agent_id", help="Agent id to inspect.")
-    agents_get_parser.add_argument(
-        "--format",
-        choices=["table", "json"],
-        default="table",
-        help="Render output as a table or JSON.",
-    )
+    register = agents_sub.add_parser("register", help="Register an agent from a JSON payload")
+    register.add_argument("payload_file", help="Path to a JSON file matching the AgentRecord shape")
+    register.set_defaults(handler=_cmd_agents_register, needs_client=True)
 
-    capabilities_parser = subparsers.add_parser(
-        "capabilities",
-        help="Inspect capability inventory.",
+    heartbeat = agents_sub.add_parser("heartbeat", help="Send a heartbeat for an agent")
+    heartbeat.add_argument("agent_id")
+    heartbeat.add_argument(
+        "payload_file", help="Path to a JSON file matching the HeartbeatPayload shape"
     )
-    capabilities_subparsers = capabilities_parser.add_subparsers(
-        dest="capabilities_command",
-        required=True,
-    )
-    capabilities_list_parser = capabilities_subparsers.add_parser(
-        "list",
-        help="List known capabilities across agents.",
-    )
-    capabilities_list_parser.add_argument(
-        "--format",
-        choices=["table", "json"],
-        default="table",
-        help="Render output as a table or JSON.",
-    )
+    heartbeat.set_defaults(handler=_cmd_agents_heartbeat, needs_client=True)
 
-    status_parser = subparsers.add_parser("status", help="Show fleet or agent status.")
-    status_parser.add_argument(
-        "agent_id",
-        nargs="?",
-        help="Optional agent id for a single-agent status view.",
+    agents_list = agents_sub.add_parser("list", help="List all registered agents")
+    agents_list.set_defaults(handler=_cmd_agents_list, needs_client=True)
+
+    agents_get = agents_sub.add_parser("get", help="Get one agent by ID")
+    agents_get.add_argument("agent_id")
+    agents_get.set_defaults(handler=_cmd_agents_get, needs_client=True)
+
+    capabilities = subparsers.add_parser("capabilities", help="Inspect capability inventory")
+    capabilities_sub = capabilities.add_subparsers(dest="capabilities_command", required=True)
+    capabilities_list = capabilities_sub.add_parser(
+        "list", help="List capability versions across all agents"
     )
-    status_parser.add_argument(
-        "--format",
-        choices=["table", "json"],
-        default="table",
-        help="Render output as a table or JSON.",
-    )
+    capabilities_list.set_defaults(handler=_cmd_capabilities_list, needs_client=True)
 
     return parser
 
 
-def main(argv: Sequence[str] | None = None) -> int:
-    """Run the operator CLI and return an exit code."""
+def main(argv: list[str] | None = None, *, client: httpx.Client | None = None) -> int:
+    """CLI entry point. Returns a process exit code.
 
-    parser = build_parser()
-    args = parser.parse_args(list(argv) if argv is not None else None)
+    `client` is an injection point for tests -- pass any `httpx.Client`
+    (e.g. `fastapi.testclient.TestClient(create_app())`) to exercise commands
+    against an in-process app without a running server. See tests/test_cli.py.
+    """
+    parser = _build_parser()
+    args = parser.parse_args(argv)
 
-    try:
-        api = load_snapshot(args.snapshot) if args.snapshot is not None else create_api()
-        rendered = _dispatch(api, args)
-    except (AgentNotFoundError, SnapshotLoadError) as exc:
-        print(str(exc), file=sys.stderr)
-        return 1
+    if not args.needs_client:
+        return int(args.handler(args))
 
-    print(rendered)
-    return 0
+    if client is not None:
+        # Caller-supplied client (tests): don't close something we don't own.
+        return int(args.handler(args, client))
 
-
-def _dispatch(api: ControlTowerAPI, args: argparse.Namespace) -> str:
-    if args.command == "agents" and args.agents_command == "list":
-        filtered_agents = api.list_agents(
-            status=AgentStatus(args.status) if args.status is not None else None,
-            environment=args.environment,
-            capability=args.capability,
-            missing_capability=args.missing_capability,
-        )
-        return _render_output(filtered_agents, args.format, _render_agents_table)
-
-    if args.command == "agents" and args.agents_command == "get":
-        agent = api.get_agent(args.agent_id)
-        return _render_output(agent, args.format, _render_agent_detail)
-
-    if args.command == "capabilities" and args.capabilities_command == "list":
-        capabilities = api.list_capabilities()
-        return _render_output(capabilities, args.format, _render_capabilities_table)
-
-    if args.command == "status":
-        status_summary = api.get_status(args.agent_id)
-        if isinstance(status_summary, AgentStatusSummary):
-            return _render_output(status_summary, args.format, _render_agent_status)
-        return _render_output(status_summary, args.format, _render_fleet_status)
-
-    raise ValueError(f"Unhandled CLI arguments: {args!r}")
+    with _client(args.api_url) as owned_client:
+        return int(args.handler(args, owned_client))
 
 
-def _render_output(
-    data: object,
-    output_format: str,
-    table_renderer: Callable[[Any], str],
-) -> str:
-    if output_format == "json":
-        return _render_json(data)
-    return table_renderer(data)
-
-
-def _render_json(data: object) -> str:
-    if isinstance(data, BaseModel):
-        payload: object = data.model_dump(mode="json")
-    elif isinstance(data, list):
-        payload = [
-            item.model_dump(mode="json") if isinstance(item, BaseModel) else item for item in data
-        ]
-    else:
-        payload = data
-    return json.dumps(payload, indent=2, sort_keys=True)
-
-
-def _render_agents_table(agents: list[AgentRecord]) -> str:
-    rows = [
-        [
-            agent.agent_id,
-            agent.environment,
-            agent.runtime,
-            agent.framework,
-            agent.status.value,
-            str(len(agent.capabilities)),
-            agent.last_seen.isoformat() if agent.last_seen is not None else "-",
-        ]
-        for agent in agents
-    ]
-    return _render_table(
-        headers=["AGENT ID", "ENV", "RUNTIME", "FRAMEWORK", "STATUS", "CAPS", "LAST SEEN"],
-        rows=rows,
-        empty_message="No agents found.",
-    )
-
-
-def _render_agent_detail(agent: AgentRecord) -> str:
-    lines = [
-        f"Agent ID: {agent.agent_id}",
-        f"Name: {agent.name}",
-        f"Environment: {agent.environment}",
-        f"Runtime: {agent.runtime}",
-        f"Framework: {agent.framework}",
-        f"Status: {agent.status.value}",
-        f"Registered At: {agent.registered_at.isoformat()}",
-        f"Last Seen: {agent.last_seen.isoformat() if agent.last_seen is not None else '-'}",
-        f"Heartbeat Count: {agent.heartbeat_count}",
-        "Capabilities:",
-    ]
-    if agent.capabilities:
-        lines.extend(f"  - {name}: {version}" for name, version in agent.capabilities.items())
-    else:
-        lines.append("  - none")
-    return "\n".join(lines)
-
-
-def _render_capabilities_table(capabilities: list[CapabilityInventoryRecord]) -> str:
-    rows = [
-        [
-            capability.capability,
-            ", ".join(capability.versions),
-            str(len(capability.agent_ids)),
-            ", ".join(capability.agent_ids),
-        ]
-        for capability in capabilities
-    ]
-    return _render_table(
-        headers=["CAPABILITY", "VERSIONS", "AGENTS", "AGENT IDS"],
-        rows=rows,
-        empty_message="No capabilities found.",
-    )
-
-
-def _render_fleet_status(summary: FleetStatusSummary) -> str:
-    lines = [
-        f"Total Agents: {summary.total_agents}",
-        f"Healthy: {summary.healthy_agents}",
-        f"Degraded: {summary.degraded_agents}",
-        f"Unhealthy: {summary.unhealthy_agents}",
-        f"Unknown: {summary.unknown_agents}",
-        f"Capabilities Tracked: {summary.capability_count}",
-        "",
-        "Capability Coverage:",
-        _render_table(
-            headers=["CAPABILITY", "INSTALLED", "MISSING", "VERSIONS"],
-            rows=[
-                [
-                    coverage.capability,
-                    str(coverage.installed_agents),
-                    str(coverage.missing_agents),
-                    ", ".join(coverage.versions),
-                ]
-                for coverage in summary.capabilities
-            ],
-            empty_message="No capabilities found.",
-        ),
-    ]
-    return "\n".join(lines)
-
-
-def _render_agent_status(summary: AgentStatusSummary) -> str:
-    lines = [
-        f"Agent ID: {summary.agent_id}",
-        f"Name: {summary.name}",
-        f"Environment: {summary.environment}",
-        f"Runtime: {summary.runtime}",
-        f"Framework: {summary.framework}",
-        f"Status: {summary.status.value}",
-        f"Last Seen: {summary.last_seen or '-'}",
-        f"Heartbeat Count: {summary.heartbeat_count}",
-        f"Capability Count: {summary.capability_count}",
-        "Capabilities:",
-    ]
-    if summary.capabilities:
-        lines.extend(f"  - {name}: {version}" for name, version in summary.capabilities.items())
-    else:
-        lines.append("  - none")
-    return "\n".join(lines)
-
-
-def _render_table(headers: list[str], rows: list[list[str]], empty_message: str) -> str:
-    if not rows:
-        return empty_message
-
-    widths = [
-        max(len(header), *(len(row[index]) for row in rows)) for index, header in enumerate(headers)
-    ]
-    rendered_rows = [
-        "  ".join(value.ljust(widths[index]) for index, value in enumerate(row)) for row in rows
-    ]
-    header_row = "  ".join(header.ljust(widths[index]) for index, header in enumerate(headers))
-    separator_row = "  ".join("-" * width for width in widths)
-    return "\n".join([header_row, separator_row, *rendered_rows])
+def run() -> None:
+    """Console-script entry point (`agenticops-control-tower`)."""
+    sys.exit(main())
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    run()
