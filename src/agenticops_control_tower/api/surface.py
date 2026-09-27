@@ -35,12 +35,17 @@ class ControlTowerAPI:
         return self._registry.get(agent_id)
 
     def list_capabilities(self, agent_id: str) -> dict[str, str]:
-        return self._discovery.list_capabilities(self._registry.get(agent_id))
+        return self._discovery.list_agent_capabilities(
+            self._registry.get(agent_id)
+        )
 
     def list_all_capabilities(self) -> dict[str, list[str]]:
-        """Aggregate capability versions seen across every registered agent."""
-        aggregated: dict[str, set[str]] = {}
-        for agent in self._registry.list_agents():
-            for name, version in self._discovery.list_capabilities(agent).items():
-                aggregated.setdefault(name, set()).add(version)
-        return {name: sorted(versions) for name, versions in sorted(aggregated.items())}
+       """Aggregate capability versions seen across every registered agent."""
+       inventory = self._discovery.list_capabilities(
+           self._registry.list_agents()
+       )
+
+       return {
+           item.capability: item.versions
+           for item in inventory
+       }
