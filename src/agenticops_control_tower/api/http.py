@@ -16,7 +16,12 @@ from fastapi import FastAPI, HTTPException
 
 from agenticops_control_tower.api.surface import ControlTowerAPI
 from agenticops_control_tower.discovery import CapabilityDiscoveryService
-from agenticops_control_tower.models import AgentRecord, HeartbeatPayload
+from agenticops_control_tower.errors import AgentNotFoundError
+from agenticops_control_tower.models import (
+    AgentRecord,
+    AgentRegistrationPayload,
+    HeartbeatPayload,
+)
 from agenticops_control_tower.registry import AgentRegistry
 
 
@@ -41,14 +46,14 @@ def create_app(api: ControlTowerAPI | None = None) -> FastAPI:
     )
 
     @app.post("/agents/register", response_model=AgentRecord, status_code=201)
-    def register_agent(agent: AgentRecord) -> AgentRecord:
-        return control_api.register(agent)
+    def register_agent(agent: AgentRegistrationPayload) -> AgentRecord:
+        return control_api.register_agent(agent)
 
     @app.post("/agents/{agent_id}/heartbeat", response_model=AgentRecord)
     def send_heartbeat(agent_id: str, payload: HeartbeatPayload) -> AgentRecord:
         try:
-            return control_api.heartbeat(agent_id, payload)
-        except KeyError as exc:
+            return control_api.record_heartbeat(agent_id, payload)
+        except AgentNotFoundError as exc:
             raise HTTPException(status_code=404, detail=f"unknown agent: {agent_id}") from exc
 
     @app.get("/agents", response_model=list[AgentRecord])
@@ -59,7 +64,7 @@ def create_app(api: ControlTowerAPI | None = None) -> FastAPI:
     def get_agent(agent_id: str) -> AgentRecord:
         try:
             return control_api.get_agent(agent_id)
-        except KeyError as exc:
+        except AgentNotFoundError as exc:
             raise HTTPException(status_code=404, detail=f"unknown agent: {agent_id}") from exc
 
     @app.get("/capabilities")
