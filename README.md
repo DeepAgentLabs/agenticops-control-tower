@@ -120,7 +120,12 @@ storage; omit it and `--database` for in-memory mode.
 
 Health rollups count agent-reported `healthy`, `degraded`, `unhealthy`, and
 `unknown` states. They do not infer failures from heartbeat age. Capability
-versions are reported inventory, not an upgrade recommendation. Re-registering
+versions are reported inventory, not an upgrade recommendation. New agent IDs
+must start with an ASCII letter or digit and contain only ASCII letters, digits,
+dots, underscores and hyphens (e.g. `payment-agent_1.0`).
+Slashes, percent escapes, whitespace and dot-only IDs are rejected by registration
+and snapshot validation. Use the free-form `name` field for display labels.
+Existing stored records are not renamed automatically. Re-registering
 an ID replaces its record; heartbeats merge metadata and increment its count.
 
 Without the `api` extra, `pip install agenticops-control-tower` still gives
@@ -202,9 +207,9 @@ dashboard is only one interface to the underlying control plane.
   assuming one execution model.
 - **Not the full architecture yet.** The concept doc describes a broader end
   state than what's built so far — see [Status](#status) for what's real
-  today (registry, discovery, HTTP API, CLI) versus [ROADMAP.md](ROADMAP.md)
-  for the narrowed build order still ahead (console,
-  configuration, MCP connector, bulk operations).
+  today (registry, discovery, HTTP API, CLI, read-only console) versus [ROADMAP.md](ROADMAP.md)
+  for the narrowed build order still ahead (configuration, MCP connector,
+  bulk operations).
 
 ## Architecture
 
@@ -340,12 +345,12 @@ The first usable version should likely prove four things only:
    — **done**, from agent-reported heartbeat data (not automatic detection)
 3. operators can inspect that inventory through a simple API and CLI —
    **done**, via the optional `api` extra (see [Quickstart](#quickstart))
-4. the same inventory can be surfaced later in a console without changing the
-   underlying control model — **still open**, no console yet (v0.3)
+4. the same inventory is surfaced in a console over the same underlying
+   control model — **done**, at `/console/` (v0.3)
 
 That core is implemented as a Python API with optional SQLite storage.
 
-## Current `v0.2` Surface
+## Current `v0.3` Surface
 
 The package currently exposes:
 

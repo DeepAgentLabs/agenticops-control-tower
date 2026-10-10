@@ -13,6 +13,12 @@
 
 ## 0.3.0
 
+### Fixed
+
+- Reject route-unsafe agent IDs at registration and snapshot validation; cover
+  accepted IDs through real HTTP detail, heartbeat and evidence routes.
+- Reconcile README implementation status with the shipped read-only console.
+
 ### Added
 
 - Packaged read-only AgenticOps Console at `/console/`, using existing authenticated

@@ -4,8 +4,13 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from enum import Enum
+from typing import Annotated
 
 from pydantic import BaseModel, Field
+
+# Start with an ASCII letter or digit; remaining characters are URL-safe.
+# Excluding percent escapes, slashes and dot-only IDs prevents route ambiguity.
+AgentId = Annotated[str, Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$")]
 
 
 class AgentStatus(str, Enum):
@@ -20,7 +25,7 @@ class AgentStatus(str, Enum):
 class AgentRegistrationPayload(BaseModel):
     """Explicit registration request for a runtime-agnostic agent."""
 
-    agent_id: str
+    agent_id: AgentId
     name: str
     environment: str
     runtime: str

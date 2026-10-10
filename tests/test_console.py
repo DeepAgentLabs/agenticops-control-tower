@@ -115,3 +115,52 @@ def test_evidence_readiness_is_honest_and_checks_agent(console_client: TestClien
     assert evidence["availability"] == "unavailable"
     assert "not collected or persisted" in evidence["reason"]
     assert console_client.get("/agents/absent/evidence", headers=headers).status_code == 404
+
+
+@pytest.mark.parametrize(
+    "agent_id", ["a/b", "a%2Fb", "", ".", "..", "a\\b", "a b", "a?b", "a#b", "a\nb"]
+)
+def test_registration_rejects_route_unsafe_ids(agent_id: str) -> None:
+    from pydantic import ValidationError
+
+    from agenticops_control_tower.models import FleetSnapshot
+
+    payload = {
+        "agent_id": agent_id,
+        "name": "display name",
+        "environment": "staging",
+        "runtime": "python",
+        "framework": "custom",
+    }
+    with pytest.raises(ValidationError):
+        AgentRegistrationPayload.model_validate(payload)
+    with pytest.raises(ValidationError):
+        FleetSnapshot.model_validate(
+            {
+                "captured_at": "2026-10-10T00:00:00Z",
+                "registrations": [payload],
+            }
+        )
+    client = TestClient(create_app())
+    assert client.post("/agents/register", json=payload).status_code == 422
+    assert client.get("/agents").json() == []
+
+
+@pytest.mark.parametrize(
+    "agent_id", ["a", "0", "payment-agent", "Agent_1.0-evidence", "register", "evidence"]
+)
+def test_accepted_ids_work_through_real_console_routes(agent_id: str) -> None:
+    client = TestClient(create_app())
+    payload = {
+        "agent_id": agent_id,
+        "name": "<script>display name</script>",
+        "environment": "staging",
+        "runtime": "python",
+        "framework": "custom",
+    }
+    assert client.post("/agents/register", json=payload).status_code == 201
+    assert client.get(f"/agents/{agent_id}").json()["agent_id"] == agent_id
+    assert (
+        client.post(f"/agents/{agent_id}/heartbeat", json={"status": "healthy"}).status_code == 200
+    )
+    assert client.get(f"/agents/{agent_id}/evidence").json()["agent_id"] == agent_id

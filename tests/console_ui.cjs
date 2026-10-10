@@ -7,7 +7,7 @@ const dom = new JSDOM(fs.readFileSync(`${base}/index.html`, 'utf8'), {url:'http:
 const w = dom.window, calls=[];
 w.HTMLElement.prototype.scrollIntoView = function(){};
 let failing = false;
-const agent = {agent_id:'<script>bad</script>', name:'<img src=x onerror=alert(1)>', environment:'staging',runtime:'python',framework:'custom',status:'unhealthy',last_seen:null,capabilities:{lens:'0.4.0'}};
+const agent = {agent_id:'agent-demo_1.0', name:'<img src=x onerror=alert(1)>', environment:'staging',runtime:'python',framework:'custom',status:'unhealthy',last_seen:null,capabilities:{lens:'0.4.0'}};
 w.fetch = async (url, options) => {
  calls.push({url:String(url),options});
  if(failing) return {ok:false,status:401};
