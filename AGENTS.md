@@ -7,12 +7,16 @@
 `agenticops-control-tower` is the operations and control-plane layer in the
 DeepAgentLabs ecosystem. Its job is to centralize inventory, visibility,
 configuration, and operator workflows across many deployed agents and many
-DeepAgentLabs capabilities.
+DeepAgentLabs capabilities. Its intended product is an AI-native operations
+command center connecting detection, evidence-based investigation, human
+approval, runbook execution and verified recovery.
 
 ### Owns
 
 - Agent registry, heartbeat, and fleet-inventory concerns
 - Capability discovery and version/status visibility across deployed agents
+- Incident coordination, the operations copilot workflow, operator approval
+  gates, bounded remediation runbooks and recovery verification (planned)
 - The unified control-plane API, CLI, and future console surface
 - Thin ecosystem adapters that summarize sibling-package posture without
   re-implementing sibling-package logic
@@ -21,8 +25,9 @@ DeepAgentLabs capabilities.
 
 - The canonical operational schema or shared normative object model — that
   belongs in `ai-operations-spec`
-- Core observability, profiling, evaluation, or recommendation logic — that
-  belongs in `agenticlens`
+- Core observability, profiling, and recommendation logic — that belongs in
+  `agenticlens`
+- Scoring and release-gate computation — that belongs in `agentic-evals`
 - Fault injection and resilience-testing logic — that belongs in
   `agentic-chaos`
 - Decision-time supervision/governance or pre-action intervention logic — that
@@ -34,6 +39,7 @@ DeepAgentLabs capabilities.
 
 - `ai-operations-spec` for shared terminology and any ecosystem-facing
   inventory, status, or configuration contracts
+- `agentic-evals` for existing evaluation reports and release-gate decisions
 - `agenticlens` when Control Tower needs summarized observability or readiness
   posture
 - `agentic-sidecar` when Control Tower needs summarized supervision/governance
@@ -45,7 +51,7 @@ DeepAgentLabs capabilities.
 
 ### Current Roadmap Focus
 
-The current build focus is the completed v0.2 CLI and status model. Work in
+The current build focus is the completed v0.3 read-only console. Work in
 this repo should now strengthen operator inventory views, shared status
 semantics, and the console-ready read surface before attempting write-side
 orchestration or bulk actions.
@@ -56,18 +62,17 @@ orchestration or bulk actions.
   is really analysis, governance, chaos execution, or MCP exposure, it may
   belong in a sibling repo instead
 - Keep adapters thin and contract-driven; do not copy implementation logic from
-  Lens, Sidecar, Chaos, or MCP into this package
+  Lens, Evals, Sidecar, Chaos, or MCP into this package
 - Build read-only inventory and status first; avoid jumping ahead to write-side
   orchestration without the underlying control model in place
 
 ## Status
 
-This repository is an **early scaffold**. Package layout, docs, tests, and
-CI/release workflows exist; a real (if minimal) in-memory registry,
+The v0.1–v0.3 milestones are **implemented**. Package layout, docs, tests, and
+CI/release workflows exist; a registry with optional SQLite persistence,
 discovery, HTTP API, and CLI exist today — see
 [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md) for the evidence-based status and
-[ROADMAP.md](ROADMAP.md) for the actual build order. No persistence across
-restarts, no auth, and no console yet.
+[ROADMAP.md](ROADMAP.md) for the actual build order. Reader/writer bearer authorization is available; read-only console at `/console/`.
 
 ## Build and Run
 
@@ -103,7 +108,7 @@ These are load-bearing, not preferences — see
 3. **API and CLI before dashboard.** The console should sit on the same control
    model, not become the hidden place where the real behavior lives.
 4. **Adapters stay thin.** `adapters/` should summarize or bridge, not own
-   Lens, Sidecar, Chaos, or MCP behavior.
+   Lens, Evals, Sidecar, Chaos, or MCP behavior.
 5. **Runtime agnostic means no early runtime lock-in.** Do not quietly design
    the first release around one cloud, one orchestrator, or one framework.
 6. **MCP comes after the control API.** AI-native access is valuable, but it
@@ -120,7 +125,7 @@ These are load-bearing, not preferences — see
 | `src/agenticops_control_tower/cli/` | Operator CLI (`agenticops-control-tower`), optional `api` extra | v0.2 |
 | `src/agenticops_control_tower/console/` | AgenticOps Console / dashboard | v0.3 |
 | `src/agenticops_control_tower/config/` | Central configuration models and safe write paths | v0.4 |
-| `src/agenticops_control_tower/adapters/` | Thin ecosystem adapters to sibling projects and MCP | v0.5+ |
+| `src/agenticops_control_tower/adapters/` | Native artifact readers; remote ecosystem and MCP integration planned | v0.5 partial |
 | `examples/` | Sample registration and capability payloads | ongoing |
 | `tests/` | Pytest test suite | ongoing |
 | `Makefile` | Local dev automation | — |
@@ -134,7 +139,7 @@ Full architecture and build order: [ROADMAP.md](ROADMAP.md).
 - HTTP API: `agenticops_control_tower.api.http.create_app()` (optional `api`
   extra) or `agenticops-control-tower serve`
 - CLI: `agenticops-control-tower` console script (optional `api` extra)
-- Console: AgenticOps Console (planned in v0.3)
+- Console: AgenticOps Console at `/console/` (read-only, v0.3)
 
 ## Package Boundaries
 
@@ -219,3 +224,10 @@ and does both of the following from the same tag:
 The GitHub Release title is the tag name, and its body is copied from the
 matching `CHANGELOG.md` section so the changelog, tag, PyPI release, and
 GitHub Releases page stay aligned.
+
+## Evidence Integration Boundaries
+
+Use `docs/ecosystem-alignment.md` for the Tower-local link contract. Reader
+adapters project native producer fields; never recompute evaluations, decisions,
+or resilience verdicts. Deployment health is independent of evidence outcomes.
+AIOS is draft and no native reader is an AIOS-conformance implementation.

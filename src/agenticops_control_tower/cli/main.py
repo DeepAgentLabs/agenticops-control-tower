@@ -1,9 +1,8 @@
 """Operator CLI (v0.2), talking to the v0.1 HTTP API.
 
-A real, in-process registry only lives for the lifetime of one Python
-process, so the CLI necessarily talks to a *running* server rather than an
-in-process store -- start one with `agenticops-control-tower serve` (or
-`uvicorn agenticops_control_tower.api.http:create_app --factory`) first.
+The CLI connects to a running HTTP server, or inspects an offline fleet snapshot.
+`serve --database` enables durable SQLite storage; bearer tokens are configured
+through environment variables and supplied by `--token` or AGENTICOPS_TOKEN.
 
 Requires the `api` extra for `httpx` (`pip install agenticops-control-tower[api]`).
 The import itself stays cheap -- `httpx` is only imported inside the
@@ -59,9 +58,10 @@ def _cmd_serve(args: argparse.Namespace) -> int:
         raise SystemExit(
             "`serve` needs uvicorn. Install it with: pip install agenticops-control-tower[api]"
         ) from None
+    from agenticops_control_tower.api.http import create_app
+
     uvicorn.run(
-        "agenticops_control_tower.api.http:create_app",
-        factory=True,
+        create_app(database_path=args.database),
         host=args.host,
         port=args.port,
     )
@@ -89,8 +89,15 @@ def _cmd_agents_heartbeat(args: argparse.Namespace, client: httpx.Client) -> int
     return 0
 
 
-def _cmd_agents_list(_args: argparse.Namespace, client: httpx.Client) -> int:
-    response = client.get("/agents")
+def _cmd_agents_list(args: argparse.Namespace, client: httpx.Client) -> int:
+    response = client.get(
+        "/agents",
+        params={
+            key: getattr(args, key)
+            for key in ("status", "environment", "capability", "missing_capability")
+            if getattr(args, key) is not None
+        },
+    )
     _raise_for_status(response)
     _print_json(response.json())
     return 0
@@ -110,6 +117,15 @@ def _cmd_capabilities_list(_args: argparse.Namespace, client: httpx.Client) -> i
     return 0
 
 
+def _cmd_status(args: argparse.Namespace, client: httpx.Client) -> int:
+    response = client.get(
+        "/status", params={"environment": args.environment} if args.environment else {}
+    )
+    _raise_for_status(response)
+    _print_json(response.json())
+    return 0
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="agenticops-control-tower")
     parser.add_argument(
@@ -117,11 +133,18 @@ def _build_parser() -> argparse.ArgumentParser:
         default=os.environ.get("AGENTICOPS_API_URL", DEFAULT_API_URL),
         help=f"Control Tower API base URL (default: {DEFAULT_API_URL}, or $AGENTICOPS_API_URL)",
     )
+    parser.add_argument(
+        "--token",
+        default=os.environ.get("AGENTICOPS_TOKEN"),
+        help="API bearer token (or $AGENTICOPS_TOKEN)",
+    )
+    parser.add_argument("--snapshot", help="Inspect a local fleet snapshot without an HTTP server")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     serve = subparsers.add_parser("serve", help="Run the Control Tower HTTP API")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)
+    serve.add_argument("--database", help="SQLite registry file (or $AGENTICOPS_DATABASE)")
     serve.set_defaults(handler=_cmd_serve, needs_client=False)
 
     agents = subparsers.add_parser("agents", help="Inspect and register agents")
@@ -139,6 +162,11 @@ def _build_parser() -> argparse.ArgumentParser:
     heartbeat.set_defaults(handler=_cmd_agents_heartbeat, needs_client=True)
 
     agents_list = agents_sub.add_parser("list", help="List all registered agents")
+    agents_list.add_argument("--status", choices=["healthy", "degraded", "unhealthy", "unknown"])
+    agents_list.add_argument("--unhealthy", dest="status", action="store_const", const="unhealthy")
+    agents_list.add_argument("--environment")
+    agents_list.add_argument("--capability")
+    agents_list.add_argument("--missing-capability")
     agents_list.set_defaults(handler=_cmd_agents_list, needs_client=True)
 
     agents_get = agents_sub.add_parser("get", help="Get one agent by ID")
@@ -152,6 +180,11 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     capabilities_list.set_defaults(handler=_cmd_capabilities_list, needs_client=True)
 
+    status = subparsers.add_parser(
+        "status", help="Fleet health, capability coverage and version rollups"
+    )
+    status.add_argument("--environment")
+    status.set_defaults(handler=_cmd_status, needs_client=True)
     return parser
 
 
@@ -165,14 +198,43 @@ def main(argv: list[str] | None = None, *, client: httpx.Client | None = None) -
     parser = _build_parser()
     args = parser.parse_args(argv)
 
+    if args.snapshot:
+        from agenticops_control_tower.models import AgentStatus
+        from agenticops_control_tower.snapshot import load_snapshot
+
+        if args.command == "serve" or (
+            args.command == "agents" and args.agents_command in ("register", "heartbeat")
+        ):
+            parser.error("--snapshot supports read commands only")
+        api = load_snapshot(args.snapshot)
+        if args.command == "status":
+            _print_json(api.get_status(environment=args.environment).model_dump(mode="json"))
+        elif args.command == "capabilities":
+            _print_json(api.list_all_capabilities())
+        elif args.agents_command == "get":
+            _print_json(api.get_agent(args.agent_id).model_dump(mode="json"))
+        else:
+            records = api.list_agents(
+                status=AgentStatus(args.status) if args.status else None,
+                environment=args.environment,
+                capability=args.capability,
+                missing_capability=args.missing_capability,
+            )
+            _print_json([record.model_dump(mode="json") for record in records])
+        return 0
+
     if not args.needs_client:
         return int(args.handler(args))
 
     if client is not None:
+        if args.token:
+            client.headers["Authorization"] = f"Bearer {args.token}"
         # Caller-supplied client (tests): don't close something we don't own.
         return int(args.handler(args, client))
 
     with _client(args.api_url) as owned_client:
+        if args.token:
+            owned_client.headers["Authorization"] = f"Bearer {args.token}"
         return int(args.handler(args, owned_client))
 
 

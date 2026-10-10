@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from .agent import AgentStatus
+from .agent import AgentId, AgentStatus
 
 
 class CapabilityCoverageRecord(BaseModel):
@@ -51,14 +51,14 @@ class FleetStatusSummary(BaseModel):
 class HeartbeatEvent(BaseModel):
     """Snapshot event that applies a heartbeat to a known agent."""
 
-    agent_id: str
+    agent_id: AgentId
     heartbeat: SnapshotHeartbeatPayload
 
 
 class SnapshotAgentRegistration(BaseModel):
     """Registration data as stored in a fleet snapshot artifact."""
 
-    agent_id: str
+    agent_id: AgentId
     name: str
     environment: str
     runtime: str

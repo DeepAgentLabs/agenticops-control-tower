@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help install lint format format-check typecheck test test-cov clean build check
+.PHONY: help install lint format format-check typecheck test test-cov test-ecosystem clean build check
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
@@ -35,3 +35,6 @@ build: ## Build package distributions
 
 check: lint format-check typecheck test ## Run all quality gates
 
+
+test-ecosystem: ## Test against actual local sibling artifacts (requires sibling checkouts)
+	uv run --with ../agenticlens --with ../agentic-evals --with ../agentic-sidecar --with ../agentic-chaos python -m pytest

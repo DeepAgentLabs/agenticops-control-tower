@@ -11,3 +11,7 @@ build/
 .venv/
 .DS_Store
 
+
+# Local registry state
+*.sqlite
+*.sqlite-journal

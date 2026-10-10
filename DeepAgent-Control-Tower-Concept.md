@@ -18,6 +18,7 @@ pip install agenticops-control-tower
 DeepAgentLabs provides modular capabilities for operating Agentic AI systems:
 
 - **AgenticLens — OBSERVE**
+- **Agentic-Evals — EVALUATE**
 - **Agentic-Sidecar — SUPERVISE**
 - **Agentic-Chaos — TEST**
 - **Agentic MCP — CONNECT**
@@ -338,7 +339,7 @@ capabilities.list()
 capabilities.status()
 
 lens.get_traces()
-lens.get_evaluations()
+evals.get_evaluation_summaries()
 
 sidecar.get_decisions()
 sidecar.get_risks()
@@ -899,7 +900,7 @@ Every DeepAgentLabs project works independently.
 
 ## 4. Control Tower Optional
 
-Using AgenticLens, Sidecar, Chaos, or MCP does not require Control Tower.
+Using AgenticLens, Evals, Sidecar, Chaos, or MCP does not require Control Tower.
 
 ## 5. MCP Independent
 
@@ -988,3 +989,13 @@ Agentic MCP complements it by providing the AI-native connectivity layer:
 Together, the ecosystem provides:
 
 > **Observe. Govern. Test. Connect. Operate. Standardize.**
+
+## Implementation alignment note
+
+This document describes the intended end state; conceptual API names above
+are not shipped method names. Standalone scoring and release gates belong to
+Agentic Evals. Lens owns observability and analysis; Sidecar supervises decisions;
+Chaos owns resilience experiments. Tower's implemented Python artifact readers
+only project existing native outputs. See `docs/ecosystem-alignment.md` for the
+explicit deployment/evidence link, separate health semantics, supported shapes
+and remaining remote integration work. No stable AIOS conformance is claimed.

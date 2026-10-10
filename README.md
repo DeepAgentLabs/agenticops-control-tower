@@ -1,35 +1,132 @@
 # agenticops-control-tower
 
-**A unified control plane and operations console for the DeepAgentLabs ecosystem.**
+**An AI-native operations command center and unified control plane for autonomous agents and the DeepAgentLabs ecosystem.**
 
-> AgenticLens observes. Agentic Sidecar governs. Agentic Chaos tests. Agentic
+> AgenticLens observes. Agentic Evals evaluates. Agentic Sidecar supervises. Agentic Chaos tests. Agentic
 > MCP connects. Control Tower operates.
 
 ## Status
 
-**Early v0.1/v0.2 scaffold, no PyPI release yet.** A small in-memory agent
-registry, capability discovery, an HTTP API (`agenticops-control-tower serve`,
-via the optional `api` extra), and a CLI talking to that API are real, tested
-code — see [Quickstart](#quickstart) below. There is still **no persistence
-across restarts, no auth, and no web console** — the registry lives only in
-the server process's memory. See [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md) for the
-full evidence-based status and [ROADMAP.md](ROADMAP.md) for the build plan.
+**v0.1–v0.3 implemented; release publication is separate.** The registry,
+HTTP API and CLI support SQLite persistence, reader/writer bearer authorization,
+shared fleet health and capability coverage, agent filters, and offline snapshots.
+The read-only web console is served at `/console/`. See [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md)
+for milestone evidence and [ROADMAP.md](ROADMAP.md) for the build plan.
+
+## Read-only console (v0.3)
+
+Run `agenticops-control-tower serve --database registry.sqlite --port 8000`,
+then open **http://localhost:8000/console/**. The `api` extra includes the
+console; no Node build or separate UI server is required.
+
+Enter the server's reader token and select **Connect / refresh** (leave it blank
+for anonymous local development). The console shows reported fleet health,
+searchable/filterable inventory, environment-scoped capability coverage,
+versions, heartbeat timestamps and agent metadata. Select a capability and enter
+an optional minimum version to identify outdated installations using PEP 440;
+missing capabilities and invalid reported versions remain distinct. This minimum
+is your policy, not an inferred latest release. Refresh is manual.
+
+Select an agent to inspect details and incident/evidence readiness. Evidence is
+currently unavailable because the service does not collect or persist artifacts;
+native readers remain accessible through the Python API. Incident detection,
+RCA, approval and remediation are planned.
+
+The public HTML shell contains no fleet data. Every data request uses the same
+reader/writer bearer authorization as API and CLI reads. Credentials are retained
+only in page memory, cleared by **Disconnect** or page reload; failed refreshes
+clear the displayed inventory. Use HTTPS when serving bearer-authenticated
+traffic remotely. The console sends only GET requests.
+
+Additional read endpoints: `GET /versions?capability=agenticlens&minimum_version=0.5.0`
+(optionally `environment=staging`) and `GET /agents/{agent_id}/evidence` (readiness,
+not artifact contents). Version policy is also available as
+`ControlTowerAPI.assess_versions(capability, minimum_version, environment=...)`.
+
+## Generate access tokens and host your console
+
+Customers self-hosting this PyPI package generate and manage their own tokens;
+no DeepAgentLabs account or token service is needed. Generate a reader value
+with Python's standard library (Bash):
+
+```bash
+export AGENTICOPS_READ_TOKEN="$(python -c 'import secrets; print(secrets.token_hex(32))')"
+```
+
+Alternatively use `openssl rand -hex 32`; use `python3` if that is your Python
+command. Configure a separate `AGENTICOPS_WRITE_TOKEN` for registration and
+heartbeats. Save both in secret storage and reuse them when restarting the server.
+Users paste the reader value into the console and select **Connect / refresh**.
+These are shared deployment credentials, not user accounts. With only a reader
+configured, writes are rejected; with neither token configured, access is anonymous.
+
+- [Authentication guide](docs/authentication.md): generation, PowerShell setup,
+  reader/writer roles, CLI access and rotation.
+- [Hosting guide](docs/hosting.md): local `http://localhost:8000/console/`,
+  private-network access and cloud `https://<your-hostname>/console/` links.
+- [Examples](examples/README.md): local startup and an HTTPS reverse-proxy template.
+
+The console and API run in the same Python service. Cloud deployments need
+HTTPS ingress, configured tokens and persistent storage for durable inventory.
+Installing from PyPI alone does not create a hosted URL. Localhost links work
+only on the computer running the browser.
+
+## Command-center vision
+
+The intended workflow is **detect failure → investigate with live evidence →
+explain the cause → recommend remediation → obtain human approval → execute a
+runbook → verify recovery**. An operations copilot uses MCP tools to correlate
+Lens traces, tool calls, prompt versions, dependencies and sibling evidence.
+Diagnoses cite evidence and distinguish confirmed causes from hypotheses.
+Tower owns incident coordination; the sibling packages retain their engines.
+
+This full loop is planned, not implemented. The roadmap introduces the first
+approved staging scenario in v0.6.x, broader live incident views in v0.8 and
+reusable automated runbooks in v0.9. See [the command-center roadmap](ROADMAP.md#product-vision-ai-native-operations-command-center).
 
 ## Quickstart
 
 ```bash
 pip install agenticops-control-tower[api]   # fastapi/uvicorn/httpx for the HTTP API + CLI
 
-# Terminal 1: run the API (in-memory, no persistence, no auth)
-agenticops-control-tower serve --port 8000
+# Customers generate their own tokens. Save and reuse these values on restart.
+export AGENTICOPS_READ_TOKEN="$(python -c 'import secrets; print(secrets.token_hex(32))')"
+export AGENTICOPS_WRITE_TOKEN="$(python -c 'import secrets; print(secrets.token_hex(32))')"
+export AGENTICOPS_TOKEN="$AGENTICOPS_WRITE_TOKEN"
 
-# Terminal 2: register an agent, send a heartbeat, and inspect the fleet
+# Terminal 1: durable registry (file survives server restarts)
+agenticops-control-tower serve --database registry.sqlite --port 8000
+
+# Terminal 2: obtain the SAME writer token from your deployment's secret storage.
+# Exports in Terminal 1 are not automatically available in Terminal 2.
+export AGENTICOPS_TOKEN='paste-your-generated-writer-token-here'
+# Register an agent, send a heartbeat, and inspect the fleet
 agenticops-control-tower agents register examples/sample_agent_registration.json
-echo '{"status":"healthy","capabilities":{"agenticlens":"0.8.1"}}' > heartbeat.json
+echo '{"status":"healthy","capabilities":{"agenticlens":"0.5.0"}}' > heartbeat.json
 agenticops-control-tower agents heartbeat payment-agent heartbeat.json
 agenticops-control-tower agents list
 agenticops-control-tower capabilities list
+agenticops-control-tower status
+agenticops-control-tower agents list --unhealthy
+agenticops-control-tower agents list --environment staging --missing-capability agentic-sidecar
+agenticops-control-tower --snapshot examples/sample_fleet_snapshot.json status
 ```
+
+`AGENTICOPS_TOKEN` authenticates the CLI. Reader tokens permit GET routes;
+writer tokens permit reads, registration and heartbeats. With only a reader
+token configured, writes are rejected. With no server tokens configured, access
+is anonymous for local development. `AGENTICOPS_DATABASE` also selects SQLite
+storage; omit it and `--database` for in-memory mode.
+
+Health rollups count agent-reported `healthy`, `degraded`, `unhealthy`, and
+`unknown` states. They do not infer failures from heartbeat age. Capability
+versions are reported inventory, not an upgrade recommendation. New agent IDs
+must start with an ASCII letter or digit and contain only ASCII letters, digits,
+dots, underscores and hyphens (e.g. `payment-agent_1.0`).
+Slashes, percent escapes, whitespace and dot-only IDs are rejected by registration
+and snapshot validation. Use the free-form `name` field for display labels.
+Existing stored records are not renamed automatically. Re-registering
+an ID replaces its record; heartbeats merge metadata and increment its count.
 
 Without the `api` extra, `pip install agenticops-control-tower` still gives
 you the underlying Python control model (`ControlTowerAPI`, `AgentRegistry`,
@@ -56,6 +153,7 @@ use it.
 The DeepAgentLabs projects each answer a different operational question:
 
 - **AgenticLens** asks: what happened, why did it happen, and what should I fix?
+- **Agentic Evals** asks: how well did the output meet expectations, and did it pass the release gate?
 - **Agentic Sidecar** asks: should this action happen right now, given the
   user's intent and current risk?
 - **Agentic Chaos** asks: what breaks under stress, failure, and silent
@@ -91,8 +189,10 @@ dashboard is only one interface to the underlying control plane.
 
 ## What it is not
 
+- **Not a replacement for Agentic Evals.** Evals owns scoring and release-gate
+  evaluation; Control Tower reads the resulting evidence.
 - **Not a replacement for AgenticLens.** Control Tower may surface Lens
-  insights, but Lens remains the observability and evaluation engine.
+  insights, but Lens remains the observability and analysis engine, composing Evals for scoring.
 - **Not a replacement for Agentic Sidecar.** Control Tower may surface
   Sidecar decisions and governance posture, but Sidecar remains the
   decision-time supervision layer.
@@ -107,9 +207,9 @@ dashboard is only one interface to the underlying control plane.
   assuming one execution model.
 - **Not the full architecture yet.** The concept doc describes a broader end
   state than what's built so far — see [Status](#status) for what's real
-  today (registry, discovery, HTTP API, CLI) versus [ROADMAP.md](ROADMAP.md)
-  for the narrowed build order still ahead (persistence, auth, console,
-  configuration, MCP connector, bulk operations).
+  today (registry, discovery, HTTP API, CLI, read-only console) versus [ROADMAP.md](ROADMAP.md)
+  for the narrowed build order still ahead (configuration, MCP connector,
+  bulk operations).
 
 ## Architecture
 
@@ -119,7 +219,8 @@ The ecosystem boundary should stay crisp:
 Control Tower = OPERATE
 Agentic MCP   = CONNECT
 AgenticLens   = OBSERVE
-Agentic Sidecar = GOVERN
+Agentic Evals = EVALUATE
+Agentic Sidecar = SUPERVISE
 Agentic Chaos = TEST
 AI Operations Specification = STANDARDIZE
 ```
@@ -136,10 +237,10 @@ Conceptually:
                                       v
                          DeepAgent Control Tower
                                       |
-                   +------------------+------------------+
-                   |                  |                  |
-                   v                  v                  v
-              AgenticLens      Agentic Sidecar     Agentic Chaos
+             +---------------+--------------+---------------+
+             |               |              |               |
+             v               v              v               v
+         AgenticLens    Agentic Evals  Agentic Sidecar  Agentic Chaos
 ```
 
 Control Tower's role is to centralize operations across agents and
@@ -204,13 +305,15 @@ Control Tower only makes sense if the package boundaries stay clear:
 | Project | Role |
 | --- | --- |
 | `agenticlens` | Observe |
-| `agentic-sidecar` | Govern |
+| `agentic-evals` | Evaluate |
+| `agentic-sidecar` | Supervise |
 | `agentic-chaos` | Test |
 | `deep-agentic-core-mcp` | Connect |
 | `ai-operations-spec` | Standardize |
 | `agenticops-control-tower` | Operate |
 
-- **AgenticLens** remains package-first observability, evaluation, and
+- **Agentic Evals** remains the standalone scoring and release-gate engine
+- **AgenticLens** remains package-first observability, evaluation workflows, and
   operational intelligence
 - **Agentic Sidecar** remains package-first supervision and governance
 - **Agentic Chaos** remains package-first resilience and fault injection
@@ -237,18 +340,17 @@ needs to be much narrower.
 
 The first usable version should likely prove four things only:
 
-1. agents can register and heartbeat — **done**, in-memory only (no
-   persistence across restarts)
+1. agents can register and heartbeat — **done**, with optional SQLite persistence
 2. the system can discover installed DeepAgentLabs capabilities and versions
    — **done**, from agent-reported heartbeat data (not automatic detection)
 3. operators can inspect that inventory through a simple API and CLI —
    **done**, via the optional `api` extra (see [Quickstart](#quickstart))
-4. the same inventory can be surfaced later in a console without changing the
-   underlying control model — **still open**, no console yet (v0.3)
+4. the same inventory is surfaced in a console over the same underlying
+   control model — **done**, at `/console/` (v0.3)
 
-That core is now implemented as an in-memory Python API.
+That core is implemented as a Python API with optional SQLite storage.
 
-## Current `v0.2` Surface
+## Current `v0.3` Surface
 
 The package currently exposes:
 
@@ -262,13 +364,13 @@ The package currently exposes:
 
 The operator CLI is now available as:
 
-- `deepagent agents list`
-- `deepagent agents get <agent-id>`
-- `deepagent capabilities list`
-- `deepagent status`
+- `agenticops-control-tower agents list`
+- `agenticops-control-tower agents get <agent-id>`
+- `agenticops-control-tower capabilities list`
+- `agenticops-control-tower status`
 
-The CLI reads fleet inventory from a snapshot file so it can operate on the
-same control model without requiring the future API server yet.
+The CLI talks to the HTTP API or reads a fleet snapshot with `--snapshot`.
+Both paths use the same status and inventory model.
 
 Example registration payloads are included for two runtime styles:
 
@@ -294,3 +396,32 @@ should be:
 
 If you want the full architectural reasoning behind those choices, read the
 concept doc first and the roadmap second.
+
+## Ecosystem evidence alignment
+
+Control Tower has thin Python readers for native Lens Runs, Evals reports and
+gate decisions, Sidecar Decisions, and Chaos Reports. Supply an explicit
+`EvidenceLink` to `ControlTowerAPI.summarize_evidence()` to attribute an artifact
+to an existing registered deployment. The result preserves producer outcomes
+and never changes fleet health. Invalid, unsupported or missing artifacts
+return `unavailable`; unknown deployment IDs raise `AgentNotFoundError`.
+
+These are local artifact readers, without remote collection, evidence storage,
+HTTP posture routes, or console integration. Phase v0.5 remains partial.
+AIOS is draft; native artifacts and Tower's link contract do not establish
+AIOS conformance. See [the evidence contract](docs/ecosystem-alignment.md) and
+[the runnable example](examples/inspect_ecosystem_evidence.py).
+
+
+### Console DOM acceptance checks
+
+Python console/API checks run with `make check`. Optional Node DOM checks exercise
+rendering, safe text handling, filtering, details, credential retention on refresh,
+failed-refresh clearing, disconnect and read-only network requests:
+
+```bash
+npm install --prefix /tmp/tower-console-qa --no-audit --no-fund jsdom
+NODE_PATH=/tmp/tower-console-qa/node_modules node tests/console_ui.cjs
+```
+
+This is a test-only dependency; serving the packaged console requires no Node.

@@ -1,0 +1,45 @@
+// Run with Node and jsdom available; see README for isolated setup.
+const {JSDOM} = require('jsdom');
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const base = process.argv[2] || require('node:path').resolve(__dirname, '../src/agenticops_control_tower/console/static');
+const dom = new JSDOM(fs.readFileSync(`${base}/index.html`, 'utf8'), {url:'http://localhost:8000/console/', runScripts:'outside-only'});
+const w = dom.window, calls=[];
+w.HTMLElement.prototype.scrollIntoView = function(){};
+let failing = false;
+const agent = {agent_id:'agent-demo_1.0', name:'<img src=x onerror=alert(1)>', environment:'staging',runtime:'python',framework:'custom',status:'unhealthy',last_seen:null,capabilities:{lens:'0.4.0'}};
+w.fetch = async (url, options) => {
+ calls.push({url:String(url),options});
+ if(failing) return {ok:false,status:401};
+ const u = new URL(url);
+ let result;
+ if(u.pathname==='/status') result={total_agents:1,healthy_agents:0,degraded_agents:0,unhealthy_agents:1,unknown_agents:0,capabilities:[{capability:'lens', installed_agents:1,missing_agents:0,versions:['0.4.0']}]};
+ else if(u.pathname==='/versions') result=[{agent_id:agent.agent_id,assessment:'outdated'}];
+ else if(u.pathname.endsWith('/evidence')) result={availability:'unavailable',reason:'Not collected'};
+ else if(u.pathname==='/agents') result=[agent];
+ else result=agent;
+ return {ok:true,json:async()=>result};
+};
+w.eval(fs.readFileSync(`${base}/console.js`,'utf8'));
+const id = n=>w.document.getElementById(n);
+const submit = n=>id(n).dispatchEvent(new w.Event('submit',{cancelable:true}));
+const tick = ()=>new Promise(resolve=>setTimeout(resolve,10));
+(async()=>{
+ id('token').value='reader';submit('connection');await tick();
+ assert.equal(id('fleet').hidden,false);assert.equal(id('agents').rows.length,1);
+ assert.equal(id('agents').querySelector('img'),null);assert.ok(id('agents').textContent.includes(agent.name));
+ assert.equal(id('token').value,'');assert.equal(w.localStorage.length,0);
+ submit('connection');await tick();
+ assert.equal(calls.at(-1).options.headers.Authorization,'Bearer reader');
+ id('capability').value='lens';id('minimum').value='0.5.0';submit('filters');await tick();
+ assert.ok(id('agents').textContent.includes('outdated'));
+ id('agents').querySelector('button').click();await tick();
+ assert.equal(id('detail').hidden,false);assert.ok(id('evidence').textContent.includes('unavailable'));
+ assert.ok(calls.some(c=>c.url.includes(encodeURIComponent(agent.agent_id))));
+ failing=true;submit('connection');await tick();
+ assert.equal(id('fleet').hidden,true);assert.equal(id('agents').rows.length,0);assert.ok(id('message').textContent.includes('invalid'));
+ id('disconnect').click();failing=false;submit('connection');await tick();
+ assert.equal(Object.keys(calls.at(-1).options.headers).length,0);
+ assert.ok(calls.every(c=>c.options.method==='GET'));
+ console.log('Console DOM checks passed: rendering, escaping, filters, details, token refresh, failed refresh, disconnect, GET-only requests.');
+})().catch(error=>{console.error(error);process.exitCode=1;});
