@@ -9,8 +9,8 @@
       "framework": "langgraph",
       "status": "unknown",
       "capabilities": {
-        "agenticlens": "0.8.1",
-        "agentic-sidecar": "0.4.0"
+        "agenticlens": "0.5.0",
+        "agentic-sidecar": "0.6.0"
       },
       "runtime_metadata": {
         "python_version": "3.12",
@@ -29,7 +29,7 @@
       "framework": "openai-agents",
       "status": "unknown",
       "capabilities": {
-        "agenticlens": "0.8.2"
+        "agenticlens": "0.5.0"
       },
       "runtime_metadata": {
         "python_version": "3.11",
@@ -59,7 +59,7 @@
       "heartbeat": {
         "status": "degraded",
         "capabilities": {
-          "agentic-sidecar": "0.4.0"
+          "agentic-sidecar": "0.6.0"
         },
         "runtime_metadata": {
           "node": "staging-01"

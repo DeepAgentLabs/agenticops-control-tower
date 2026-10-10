@@ -13,14 +13,14 @@ from agenticops_control_tower.registry import AgentRegistry
 
 
 def test_surface_imports() -> None:
-    assert __version__ == "0.2.0"
+    assert __version__ == "0.3.0"
     assert "agenticlens" in ADAPTER_NAMES
     # `cli.main` is a real CLI now (v0.2) -- see tests/test_cli.py for
     # command-level coverage. This just confirms the console-script entry
     # points (`main`/`run`) import cleanly even without the `api` extra.
     assert callable(main)
     assert callable(run)
-    assert console_status() == "AgenticOps Console scaffold"
+    assert console_status() == "AgenticOps Console (read-only)"
     assert AgentRegistry is not None
     assert CapabilityDiscoveryService is not None
     assert ControlTowerAPI is not None

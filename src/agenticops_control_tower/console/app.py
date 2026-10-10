@@ -1,7 +1,10 @@
-"""Console placeholder surface."""
+"""Packaged, dependency-free assets for the read-only console."""
+
+from pathlib import Path
+
+ASSET_DIRECTORY = Path(__file__).parent / "static"
 
 
 def console_status() -> str:
-    """Return a scaffold-only status string."""
-
-    return "AgenticOps Console scaffold"
+    """Describe the shipped operator surface."""
+    return "AgenticOps Console (read-only)"

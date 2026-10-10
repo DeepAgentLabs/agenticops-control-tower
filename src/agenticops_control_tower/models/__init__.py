@@ -7,6 +7,7 @@ from .agent import (
     CapabilityInventoryRecord,
     HeartbeatPayload,
 )
+from .evidence import EvidenceLink, EvidenceSummary
 from .status import (
     AgentStatusSummary,
     CapabilityCoverageRecord,
@@ -24,6 +25,8 @@ __all__ = [
     "AgentStatus",
     "CapabilityCoverageRecord",
     "CapabilityInventoryRecord",
+    "EvidenceLink",
+    "EvidenceSummary",
     "FleetSnapshot",
     "FleetStatusSummary",
     "HeartbeatEvent",

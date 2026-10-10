@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgenticOps Console</title><link rel="stylesheet" href="./assets/console.css">
+<script src="./assets/console.js" defer></script>
+</head>
+<body>
+<header><div><span class="eyebrow">DEEPAGENTLABS / OPERATIONS</span><h1>AgenticOps Console</h1></div><span class="tag">Read-only · v0.3</span></header>
+<main>
+<section class="connection"><form id="connection"><label>Reader token <input id="token" type="password" autocomplete="off" placeholder="Required on protected servers"></label><button>Connect / refresh</button><button id="disconnect" type="button">Disconnect</button></form><p>Credentials stay in memory for this page. Health reflects reported status; heartbeat age does not change it.</p></section>
+<p id="message" role="status" aria-live="polite">Connect to load your fleet.</p>
+<div id="fleet" hidden>
+<section id="metrics" class="metrics" aria-label="Fleet health"></section>
+<section><div class="section-heading"><h2>Fleet inventory</h2><span id="updated"></span></div>
+<form id="filters" class="filters">
+<label>Search <input id="search" type="search" placeholder="Agent name or ID"></label>
+<label>Environment <select id="environment"><option value="">All environments</option></select></label>
+<label>Health <select id="health"><option value="">All states</option><option>healthy</option><option>degraded</option><option>unhealthy</option><option>unknown</option></select></label>
+<label>Capability <select id="capability"><option value="">All capabilities</option></select></label>
+<label>Presence <select id="presence"><option value="present">Installed</option><option value="missing">Missing</option></select></label>
+<label>Minimum version <input id="minimum" placeholder="e.g. 0.5.0"></label>
+<button>Apply filters</button>
+</form><p>Minimum versions are operator policy, not a claim about the latest release. Missing and unrecognized versions are shown separately.</p>
+<div class="table-scroll"><table><thead><tr><th>Agent</th><th>Environment / runtime</th><th>Reported health</th><th>Last heartbeat</th><th>Capabilities / versions</th><th>Version check</th></tr></thead><tbody id="agents"></tbody></table></div><p id="empty" hidden>No agents match these filters.</p></section>
+<section><h2>Capability coverage</h2><p>Coverage across the selected environment, independent of other inventory filters.</p><div id="coverage" class="coverage"></div></section>
+<section id="detail" hidden aria-live="polite"><h2 id="detail-title">Agent details</h2><pre id="detail-data"></pre><h3>Incident &amp; evidence readiness</h3><p id="evidence"></p><p>Incident detection, investigation, approval and remediation workflows are planned. No actions are available in this console.</p></section>
+</div>
+</main><footer>Inventory first. Evidence before conclusions.</footer>
+</body></html>

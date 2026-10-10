@@ -4,31 +4,64 @@
 > review of what in this roadmap is actually implemented versus aspirational.
 > Read it alongside this document.
 
+## Product Vision: AI-Native Operations Command Center
+
+**OPERATE:** A central control plane for discovering, monitoring, configuring,
+and operating agents and DeepAgentLabs capabilities across environments, and
+an AI-native operations command center for autonomous agents. It combines live
+traces and telemetry, human approval gates, AI-assisted troubleshooting through
+MCP and an operations copilot, and automated runbooks to detect, diagnose,
+remediate and verify recovery in real time.
+
+This is the intended product, not a description of features already shipped.
+Today's registry, inventory, status and native artifact readers are its foundation.
+The copilot is a planned Tower capability; no particular third-party Copilot
+product is required by this roadmap.
+
+The core operator workflow is:
+
+```mermaid
+flowchart LR
+    D[Detect agent failure] --> E[Collect Lens telemetry and linked evidence]
+    E --> I[Copilot investigation through MCP]
+    I --> R[Evidence-backed cause and remediation proposal]
+    R --> A[Human approval]
+    A --> X[Execute bounded runbook]
+    X --> V[Verify recovery]
+    V --> O[Resolve or escalate incident]
+```
+
+Tower owns the incident lifecycle and investigation workflow. Lens owns trace
+capture and analysis, Evals owns scoring and release gates, Sidecar supervises
+agent actions, and Chaos supplies controlled resilience scenarios. MCP exposes
+real tools and APIs to the copilot; it does not supply causal reasoning by itself.
+AIOS remains the draft shared-semantics authority.
+
+Root-cause findings must cite the traces, tool calls, prompt versions, dependency
+errors and timeline that support them. Distinguish confirmed causes from
+hypotheses, state confidence and missing evidence, and never present an
+unsupported explanation as an exact RCA.
+
 ## Release Status
 
-- **v0.1** 🏗️ Partial — in-memory registry, heartbeat, capability discovery,
-  a Python API facade, and a real HTTP-reachable API (`agenticops-control-tower
-  serve`, optional `api` extra) all exist with tests and CI; still no
-  persistence across restarts and no auth — see the audit's v0.1 section for
-  the full gap list
-- **v0.2** 🏗️ Partial — a real CLI (`agenticops-control-tower agents
-  register|heartbeat|list|get`, `capabilities list`) talks to the HTTP API;
-  no health rollups or version-inventory filters yet
-- **v0.3** 🚧 Planned — AgenticOps Console (read-only dashboard)
+- **v0.1** ✅ Implemented locally (merge/release pending) — registration, heartbeat, metadata, capability discovery,
+  HTTP API, optional SQLite persistence, and reader/writer bearer authorization
+- **v0.2** ✅ Implemented locally (merge/release pending) — HTTP and snapshot CLI, shared health rollups,
+  capability coverage and version inventory, and agent filters
+- **v0.3** ✅ Implemented locally (merge/release pending) — AgenticOps Console (read-only dashboard)
 - **v0.4** 🚧 Planned — Configuration Model and Controlled Write Operations
-- **v0.5** 🚧 Planned — Lens, Sidecar, and Chaos Surface Integration
-- **v0.6** 🚧 Planned — Agentic MCP Connector for Control Tower
+- **v0.5** 🏗️ Partial — Lens, Evals, Sidecar, and Chaos artifact readers; remote collection and operator surfaces remain planned
+- **v0.6** 🚧 Planned — Agentic MCP Connector and Investigation Copilot
+- **v0.6.x** 🚧 Planned — First Approved Incident-to-Recovery Scenario
 - **v0.7** 🚧 Planned — Multi-Agent Operations and Bulk Actions
-- **v0.8** 🚧 Planned — Alerts, Audit Trails, and Incident Views
+- **v0.8** 🚧 Planned — Live Detection, Alerts, Audit Trails, and Incident Views
+- **v0.9** 🚧 Planned — Automated Runbooks and Recovery Workflows
 - **v1.0** 🚧 Planned — Stable Control Plane and Published Capability Contract
 
-v0.1 and v0.2 now have a real, tested, CI-wired HTTP API and CLI
-(`src/agenticops_control_tower/api/http.py`, `cli/main.py`) behind the
-optional `api` extra, in addition to the underlying in-memory registry and
-discovery scaffold. v0.3-v1.0 remain correctly marked Planned — no console,
-persistence, auth, configuration, MCP connector, or bulk-operation code
-exists yet. See [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md) for exactly what exists
-versus what is still aspirational text.
+v0.1 and v0.2 share a tested Python control model, optional SQLite registry,
+authenticated HTTP API and operator CLI. The read-only console ships in v0.3. Later milestones remain planned or partial:
+configuration, ecosystem adapters, MCP connector, bulk operations, and incident
+workflows. See [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md) for implementation evidence.
 
 ## Design Constraints
 
@@ -44,7 +77,7 @@ These should shape the build order from the start, not be rediscovered later.
    same control model, not become the place where the actual behavior lives.
 4. **Capability adapters should stay thin.** Control Tower should reuse
    sibling project contracts and metadata rather than re-implement Lens,
-   Sidecar, or Chaos logic locally.
+   Evals, Sidecar, or Chaos logic locally.
 5. **Runtime-agnostic means avoiding runtime assumptions in v0.1.** Do not
    build the first version around Kubernetes-specific or cloud-specific
    registration mechanics.
@@ -54,14 +87,25 @@ These should shape the build order from the start, not be rediscovered later.
    necessary.** The architecture should prefer discovery, but not block the
    product on perfect autodetection across every environment.
 
+8. **Evidence before causal claims.** Copilot findings cite source artifacts;
+   absent evidence stays absent, and hypotheses remain explicit.
+9. **Approval before remediation.** The first incident loop requires a human
+   approval bound to the exact target and action parameters. MCP or copilot
+   access never bypasses authorization.
+10. **Execution is not recovery.** Successful commands do not resolve incidents;
+    recovery requires recorded checks against telemetry and explicit criteria.
+
 ## Cross-Project Dependencies
 
 `agenticops-control-tower` is the ecosystem control plane, so its roadmap is
 mostly about coordinating with sibling projects without absorbing them.
 
+- `agentic-evals`
+  Coordinate with: evaluation reports, metric/tag summaries, and release-gate
+  decisions; scoring and gate computation remain owned by Evals.
 - `agenticlens`
-  Coordinate with: how Control Tower reads summarized observability,
-  evaluation, and readiness signals without replacing Lens as the engine.
+  Coordinate with: how Control Tower reads summarized observability and readiness signals without replacing Lens
+  analysis or duplicating Evals scoring.
 - `agentic-sidecar`
   Coordinate with: how governance posture, decision summaries, and risk
   signals are surfaced centrally once Sidecar exposes stable runtime output.
@@ -107,7 +151,8 @@ DeepAgentLabs stack:
 Control Tower = OPERATE
 Agentic MCP   = CONNECT
 AgenticLens   = OBSERVE
-Agentic Sidecar = GOVERN
+Agentic Evals = EVALUATE
+Agentic Sidecar = SUPERVISE
 Agentic Chaos = TEST
 AI Operations Specification = STANDARDIZE
 ```
@@ -138,7 +183,7 @@ agenticops-control-tower
 ├── config/          # central configuration model and safe write paths
 ├── cli/             # operator CLI
 ├── console/         # AgenticOps Console / dashboard
-└── adapters/        # thin ecosystem adapters (Lens, Sidecar, Chaos, MCP)
+└── adapters/        # thin ecosystem adapters (Lens, Evals, Sidecar, Chaos, MCP)
 ```
 
 This is a proposed shape, not a committed implementation layout.
@@ -159,7 +204,7 @@ Over time, the control plane should grow around a few clear domains:
 Contributors should be able to ask:
 
 `Is this feature helping operators understand or safely control deployed
-agents, or is it really work that belongs in Lens, Sidecar, Chaos, MCP, or the
+agents, or is it really work that belongs in Lens, Evals, Sidecar, Chaos, MCP, or the
 spec repo instead?`
 
 ---
@@ -173,7 +218,7 @@ Status: complete
 Goals:
 
 - define what Control Tower is and is not
-- keep boundaries clear against Lens, Sidecar, Chaos, MCP, and AIOS
+- keep boundaries clear against Lens, Evals, Sidecar, Chaos, MCP, and AIOS
 - narrow the first implementation into a believable control-plane core
 
 Deliverables:
@@ -185,11 +230,11 @@ Deliverables:
 
 ## Phase 1: Registry and Discovery Core (`v0.1`)
 
-Status: **partial** — see [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md#v01-registry-and-discovery-core).
+Status: **implemented locally** (merge/release pending) — see [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md#v01-registry-and-discovery-core).
 
 Goals:
 
-- create a minimal agent registry — done, in-memory only
+- create a minimal agent registry — done, memory or durable SQLite
 - accept explicit agent registration and heartbeats — done
 - record runtime, framework, environment, and package metadata — done
 - expose a read-only API for listing agents and capabilities — done, plus
@@ -212,11 +257,14 @@ Success criteria:
       (`examples/sample_agent_registration.json`,
       `examples/sample_agent_registration_kubernetes.json`)
 
-Still open: no persistence across process restarts, no auth/authorization.
+SQLite persistence is enabled with `serve --database registry.sqlite`. Reader and
+writer bearer tokens are configured with `AGENTICOPS_READ_TOKEN` and
+`AGENTICOPS_WRITE_TOKEN`. Anonymous in-memory mode remains available for local use.
 
 Delivered in `v0.1`:
 
-- in-memory registry with explicit registration payloads
+- thread-safe registry with explicit registration payloads and optional SQLite storage
+- reader/writer authorization on every inventory and mutation HTTP route
 - heartbeat updates with last-seen tracking and metadata merging
 - aggregated capability inventory across known agents
 - runtime-agnostic examples for Lambda-style and container-style agents
@@ -224,15 +272,15 @@ Delivered in `v0.1`:
 
 ## Phase 2: CLI and Status Model (`v0.2`)
 
-Status: **partial** — see [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md#v02-cli-and-status-model).
+Status: **implemented locally** (merge/release pending) — see [ROADMAP_AUDIT.md](ROADMAP_AUDIT.md#v02-cli-and-status-model).
 
 Goals:
 
 - ship a first operator CLI — done (`agenticops-control-tower`, optional
   `api` extra)
-- add health rollups and version inventory summaries — not done
+- add health rollups and version inventory summaries — done
 - expose useful filters such as unhealthy agents or agents missing a
-  capability — not done
+  capability — done
 
 Suggested commands (shipped as `agenticops-control-tower <command>`, not
 `deepagent <command>` -- no `deepagent` binary exists in this ecosystem):
@@ -240,7 +288,7 @@ Suggested commands (shipped as `agenticops-control-tower <command>`, not
 - [x] `agents list`
 - [x] `agents get <agent-id>`
 - [x] `capabilities list`
-- [ ] `status` (health rollup) — not implemented
+- [x] `status` (health rollup and capability coverage)
 
 Success criteria:
 
@@ -248,23 +296,30 @@ Success criteria:
       HTTP client of `api/http.py`, which wraps the same `ControlTowerAPI`
       facade used directly by tests)
 - [x] a user can answer basic inventory questions without touching raw JSON
-- [ ] health state is computed consistently rather than ad hoc per interface
-      — no health-rollup computation exists yet
+- [x] health rollups use the same reported status buckets across Python, HTTP and CLI
 
 Delivered in `v0.2`:
 
-- published `deepagent` console script for operator workflows
+- `agenticops-control-tower` console script for operator workflows
 - status rollups shared between CLI and Python API
 - agent filters for health status, environment, present capability, and missing capability
 - capability coverage summaries and fleet status views
-- snapshot-based CLI input for local inspection before a future API server exists
+- snapshot-based CLI input for offline read-only inspection
 
 ## Phase 3: Read-Only Console (`v0.3`)
+
+Status: **implemented locally** (merge/release pending). `/console/` is served
+by the optional HTTP app with packaged HTML/CSS/JS. It consumes authenticated
+read APIs for health, filtered inventory, capability coverage, explicit minimum
+version assessments and agent details. The evidence-readiness view states that
+collection/persistence and incident workflows are unavailable; no remediation
+controls are exposed. See `tests/test_console.py`.
 
 Goals:
 
 - ship the first AgenticOps Console
 - visualize inventory, health, versions, and capability presence
+- prepare a read-only incident/evidence view without implying remediation is available
 - keep the dashboard read-only at first
 
 Success criteria:
@@ -280,6 +335,10 @@ Goals:
 - define a central configuration model for supported capabilities
 - add controlled write paths for safe updates
 - document which configuration is authoritative versus merely mirrored
+- define reusable authorization, action preview, approval and audit contracts
+  for later remediation; include target, parameters, impact and expiry
+- reject execution when approval is denied, expired, or no longer matches the
+  proposed action; capture partial failure and rollback/reconciliation results
 
 Potential operations:
 
@@ -301,15 +360,27 @@ Success criteria:
 
 ## Phase 5: Ecosystem Surface Integration (`v0.5`)
 
+Status: **partial**. Native JSON readers and a Tower-local evidence-link contract
+are implemented for Lens, Evals, Sidecar and Chaos, with optional tests against
+actual sibling models. Remote collection, persistent evidence, HTTP/CLI posture
+views, and console integration remain planned. See
+[ecosystem-alignment.md](docs/ecosystem-alignment.md).
+
+
 Goals:
 
-- surface Lens, Sidecar, and Chaos summaries in the control plane
+- surface Lens, Evals, Sidecar, and Chaos summaries in the control plane
+- add live Lens trace/telemetry collection with explicit deployment, run and
+  runtime-participant attribution, observation times and freshness
+- correlate tool calls, prompt versions and dependency failures with linked
+  evidence; preserve source references and missing/unavailable data
 - keep adapters thin and contract-driven
 - avoid copying sibling project logic into Control Tower
 
 Examples:
 
-- Lens: evaluation summaries, health signals, recent findings
+- Lens: trace outcomes, operational evidence, recent findings
+- Evals: evaluation summaries and existing release-gate outcomes
 - Sidecar: decision summaries, risk posture, intervention counts
 - Chaos: experiment inventory, last run, resilience posture
 
@@ -321,11 +392,16 @@ Success criteria:
 - integration failures degrade to "unavailable" rather than crashing the
   control plane
 
-## Phase 6: Agentic MCP Connector (`v0.6`)
+## Phase 6: Agentic MCP Connector and Investigation Copilot (`v0.6`)
 
 Goals:
 
 - expose Control Tower to AI operators through Agentic MCP
+- add an operations copilot over authorized evidence-query tools
+- investigate incidents by correlating traces, tools, prompts, dependencies,
+  deployment changes and sibling outcomes into a causal timeline
+- produce a cited diagnosis and a proposed runbook with prerequisites, target,
+  parameters, expected impact, rollback and recovery checks
 - support AI-native inventory and status queries first
 - add write-capable operations only after authorization and audit shape are
   clear
@@ -342,6 +418,43 @@ Success criteria:
 - MCP connects to a real control API rather than a demo surface
 - read and write operations have distinct authorization boundaries
 - examples exist showing MCP with and without Control Tower
+
+## Phase 6A: First Approved Incident-to-Recovery Scenario (`v0.6.x`)
+
+Status: **planned**. This is the first complete command-center demonstration,
+not a requirement to finish every fleet-wide alerting feature first.
+
+Depends on: v0.4 approval/authorization contracts, v0.5 live evidence collection,
+and v0.6 MCP investigation tools. Bulk operations in v0.7 are not a prerequisite.
+
+Scenario: a staging agent's tool dependency becomes unavailable. Use a controlled
+Chaos scenario or deterministic fault fixture; Lens records the failed run and
+dependency error. Tower detects the failure and opens a correlated incident.
+The copilot explains the causal timeline using the recorded evidence and proposes
+one supported remediation runbook. A human reviews and approves its exact target
+and parameters. Tower executes the approved action through a bounded connector,
+then runs a probe and verifies recovery using fresh Lens evidence and applicable
+Evals checks. Failure to verify recovery keeps the incident open and escalates it.
+
+Success criteria:
+
+- [ ] one supported staging runtime completes detect → investigate → recommend
+      → approve → execute → verify, through real API/tool paths
+- [ ] the incident retains linked trace, tool, prompt and dependency evidence;
+      unavailable evidence and uncertain causes remain explicit
+- [ ] the diagnosis cites source evidence and distinguishes a confirmed cause
+      from a hypothesis; contradictory evidence prevents an unsupported RCA
+- [ ] the remediation preview specifies scope, parameters, impact, rollback and
+      recovery criteria; approval is attributable and bound to that preview
+- [ ] denied, expired or modified approvals cause no remediation execution
+- [ ] actions have timeout and retry limits; duplicate requests cannot repeat
+      an unsafe action; partial execution is recorded and reconciled
+- [ ] fresh telemetry, a successful probe and applicable Evals results determine
+      recovery; a successful command alone cannot resolve the incident
+- [ ] the incident timeline records detection, investigation, approval,
+      execution and verification, including failed-remediation paths
+- [ ] an end-to-end fixture and operator walkthrough demonstrate both verified
+      recovery and escalation when recovery fails
 
 ## Phase 7: Multi-Agent Operations (`v0.7`)
 
@@ -363,11 +476,15 @@ Success criteria:
 - rollback or reconciliation behavior is documented
 - targeting semantics are deterministic
 
-## Phase 8: Alerts, Audit, and Incident Views (`v0.8`)
+## Phase 8: Live Detection, Alerts, Audit, and Incident Views (`v0.8`)
 
 Goals:
 
 - add operator-facing alerts and warnings
+- expand the initial detection path into live telemetry-based rules with
+  freshness, deduplication and correlation across agents and environments
+- expose incident timelines, evidence, copilot findings, approval requests and
+  recovery checks in the console; keep stale evidence visibly distinct
 - add audit trails for configuration and operations
 - add incident-oriented views over agent and capability posture
 
@@ -376,7 +493,32 @@ Success criteria:
 - the system explains what changed, when, and by whom or by what control path
 - incident views join inventory, health, and recent changes coherently
 
-## Phase 9: Stable Capability Contract (`v1.0`)
+## Phase 9: Automated Runbooks and Recovery Workflows (`v0.9`)
+
+Status: **planned**. Builds on the approved v0.6.x scenario and the v0.8 incident
+surface, extending one supported action into reusable operational workflows.
+
+Goals:
+
+- provide versioned runbooks with prerequisites, scoped targets, ordered actions,
+  human approval gates, bounded retries/timeouts and rollback/reconciliation
+- let the copilot recommend supported runbooks without inventing executable
+  commands or extending an operator's authority
+- automate execution and verification after approval; support cancellation,
+  interruption recovery and escalation when actions or checks fail
+- validate runbooks against controlled Chaos scenarios and record applicable
+  Evals results, while leaving those engines in their owning packages
+
+Success criteria:
+
+- each execution records runbook version, evidence, approver, target, actions,
+  outputs and verification results in a durable incident timeline
+- permission and approval checks apply equally to console, CLI, API and MCP
+- tests cover denied approval, changed scope, unavailable dependencies, timeouts,
+  repeated requests, partial failure, failed recovery and successful recovery
+- no remediation is considered complete until declared recovery criteria pass
+
+## Phase 10: Stable Capability Contract (`v1.0`)
 
 Goals:
 
@@ -407,7 +549,8 @@ Success criteria:
 
 ## North Star
 
-The long-term goal is not "a nice dashboard." The goal is a **real control
-room** for agentic operations: one place where human operators and AI operators
-can understand, inspect, and safely operate the DeepAgentLabs ecosystem across
-many agents and environments.
+An AI-native operations command center where humans and AI operators can detect
+agent failures, investigate live evidence, explain supported causes, approve
+remediation, execute bounded runbooks and verify recovery across environments.
+Fleet inventory and configuration are the foundation of this unified operations
+workflow; the incident-to-recovery loop is a first-class product outcome.

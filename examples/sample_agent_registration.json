@@ -6,9 +6,10 @@
   "framework": "langgraph",
   "status": "unknown",
   "capabilities": {
-    "agenticlens": "0.8.1",
-    "agentic-sidecar": "0.4.0",
-    "agentic-chaos": "0.5.2",
+    "agenticlens": "0.5.0",
+    "agentic-evals": "0.7.0",
+    "agentic-sidecar": "0.6.0",
+    "agentic-chaos": "0.4.0",
     "deep-agentic-core-mcp": "0.2.0"
   },
   "runtime_metadata": {

@@ -24,6 +24,21 @@ wheels = [
 ]
 
 [[package]]
+name = "agentic-evals"
+version = "0.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "jsonschema" },
+    { name = "pydantic" },
+    { name = "pyyaml" },
+    { name = "referencing" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a5/9d/7dafcf0b6e9ee9ed95256980035a892091e4f2b1d2800192e456970c4a9a/agentic_evals-0.7.0.tar.gz", hash = "sha256:85e2605ebe83f40426af1a80e6c5b19c62d00f8e7103ae7de8f73bb74ef39418", size = 274337, upload-time = "2026-10-04T05:46:23.682Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/3d/e9ca6d9f91c76a6d549e6b99264daabb130ffd412e42261c9ba69cf373af/agentic_evals-0.7.0-py3-none-any.whl", hash = "sha256:06580bfb0587dfba49b9abf12d70de0d3c8a3a384fff92a0e1480ba097ec4b04", size = 73689, upload-time = "2026-10-04T05:46:22.2Z" },
+]
+
+[[package]]
 name = "agentic-sidecar"
 version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -55,15 +70,19 @@ wheels = [
 
 [[package]]
 name = "agenticops-control-tower"
-version = "0.0.1"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
+    { name = "packaging" },
     { name = "pydantic" },
 ]
 
 [package.optional-dependencies]
 agentic-chaos = [
     { name = "agentic-chaos" },
+]
+agentic-evals = [
+    { name = "agentic-evals" },
 ]
 agentic-sidecar = [
     { name = "agentic-sidecar" },
@@ -94,6 +113,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "agentic-chaos", marker = "extra == 'agentic-chaos'", specifier = ">=0.1" },
+    { name = "agentic-evals", marker = "extra == 'agentic-evals'", specifier = ">=0.7,<1" },
     { name = "agentic-sidecar", marker = "extra == 'agentic-sidecar'", specifier = ">=0.0.1" },
     { name = "agenticlens", marker = "extra == 'agenticlens'", specifier = ">=0.1.3" },
     { name = "build", marker = "extra == 'dev'", specifier = ">=1.2" },
@@ -103,6 +123,7 @@ requires-dist = [
     { name = "httpx", marker = "extra == 'api'", specifier = ">=0.27,<1" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27,<1" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.10" },
+    { name = "packaging", specifier = ">=24" },
     { name = "pydantic", specifier = ">=2.0,<3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5.0" },
@@ -111,7 +132,7 @@ requires-dist = [
     { name = "uvicorn", marker = "extra == 'api'", specifier = ">=0.30,<1" },
     { name = "uvicorn", marker = "extra == 'dev'", specifier = ">=0.30,<1" },
 ]
-provides-extras = ["agenticlens", "agentic-sidecar", "agentic-chaos", "deep-agentic-core-mcp", "api", "dev"]
+provides-extras = ["agentic-evals", "agenticlens", "agentic-sidecar", "agentic-chaos", "deep-agentic-core-mcp", "api", "dev"]
 
 [[package]]
 name = "annotated-doc"
