@@ -330,6 +330,12 @@ nav .mega-pypi a:hover{opacity:1;background:var(--acid);border-color:var(--acid)
   #mega-docs .mega-grid,#mega-usecases .mega-grid{gap:14px 18px}
 }
 @media(min-width:821px) and (max-width:1100px){#mega-docs .mega-side-copy,#mega-usecases .mega-side-copy{display:none}}
+/* The Use cases dropdown is the dark card only (same rules as deepagentlabs.io nav.css). */
+#mega-usecases{grid-template-columns:minmax(0,1fr);left:auto;right:28px;width:420px;max-width:calc(100% - 56px)}
+#mega-usecases .mega-side{display:flex;min-width:0}
+#mega-usecases .mega-side-copy{display:block}
+@media(max-width:820px){#mega-usecases{width:100%;max-width:none;margin-bottom:16px}#mega-usecases .mega-side{padding:22px 18px}#mega-usecases .mega-label{display:block}}
+@media(min-width:821px){.nav-item:has(>#mega-usecases){position:relative}#mega-usecases{left:0;right:auto;max-width:calc(100vw - 56px);top:calc(100% + 10px)}}
 
 /* ---- dropdown arrow: a small chevron after Platform / Products / Docs / Use cases so visitors can see they open
    a menu; it flips while that menu is open. Desktop only (phones use the +/- boxes). ---- */
