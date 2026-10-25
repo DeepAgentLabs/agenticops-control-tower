@@ -22,14 +22,21 @@ Spreadsheets go stale and nobody trusts them.
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    F[my-fleet.json<br/>registrations + heartbeats] -->|--snapshot| CLI[agenticops-control-tower CLI]
-    CLI --> API[ControlTowerAPI<br/>in memory]
-    API --> O1[status: health + coverage]
-    API --> O2[agents list filters]
-    API --> O3[capabilities list: versions]
-```
+<figure class="ct-sim" data-ct-sim="fleet-health" aria-label="Interactive illustration">
+  <p class="ct-sim-fallback" style="padding:16px 22px;margin:0">research-bot is unhealthy; triage-bot is degraded, has no Agentic Sidecar and runs AgenticLens 0.9.0; checkout-agent is healthy.</p>
+  <figcaption>Interactive illustration of the walkthrough below. Click a step to see which agents each command returns. The agents and results are the same as in <em>Expected output</em>; nothing is called.</figcaption>
+</figure>
+
+??? note "Static diagram"
+
+    ```mermaid
+    flowchart LR
+        F[my-fleet.json<br/>registrations + heartbeats] -->|--snapshot| CLI[agenticops-control-tower CLI]
+        CLI --> API[ControlTowerAPI<br/>in memory]
+        API --> O1[status: health + coverage]
+        API --> O2[agents list filters]
+        API --> O3[capabilities list: versions]
+    ```
 
 The CLI loads the file into the same `ControlTowerAPI` the server uses and
 answers read commands directly. Nothing is written anywhere.

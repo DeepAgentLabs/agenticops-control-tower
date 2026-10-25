@@ -16,9 +16,10 @@ exact versions it was tested with.
 | [Find unhealthy agents and capability gaps in five minutes](fleet-health-snapshot.md) | Describe your fleet in a snapshot file and find unhealthy agents, missing guardrails and version drift with no server. | Beginner | [Fleet health](https://deepagentlabs.io/control-tower/docs/features/#fleet-health-and-filters), [Capability discovery](https://deepagentlabs.io/control-tower/docs/features/#capability-discovery-and-version-inventory), [Offline snapshots](https://deepagentlabs.io/control-tower/docs/features/#http-api-cli-and-offline-snapshots) | 0.8.0 |
 | [Turn a failed AgenticLens run into an acknowledged alert and incident timeline](lens-failure-to-incident.md) | Push a failed Lens run, get one deduplicated critical alert and an open incident, acknowledge it and read the timeline. | Intermediate | [Live detection and alerts](https://deepagentlabs.io/control-tower/docs/features/#live-detection-alerts-and-incident-views), [Evidence posture](https://deepagentlabs.io/control-tower/docs/features/#ecosystem-evidence-posture) | 0.8.0 |
 | [One posture view for AgenticLens, Evals, Sidecar and Chaos results](ecosystem-evidence-posture.md) | Push native results from all four sibling packages and read fresh / stale / missing posture with their native outcomes. | Intermediate | [Evidence posture](https://deepagentlabs.io/control-tower/docs/features/#ecosystem-evidence-posture), [Integrations](https://deepagentlabs.io/control-tower/docs/integrations/) | 0.8.0 |
+| [Change a setting on every staging agent, with a second person's approval](fleet-change-with-approval.md) | Preview one change for a whole environment, freeze the target list, require a different approver, execute and read the per-agent audit trail. | Intermediate | [Bulk fleet operations](https://deepagentlabs.io/control-tower/docs/features/#bulk-fleet-operations), [Controlled configuration](https://deepagentlabs.io/control-tower/docs/features/#controlled-configuration) | 0.8.0 |
 
-The three cover a quick-value check, an end-to-end incident workflow and a
-cross-package integration.
+The four cover a quick-value check, an end-to-end incident workflow, a
+cross-package integration and a reviewed fleet-wide change.
 
 ## Verified package version
 

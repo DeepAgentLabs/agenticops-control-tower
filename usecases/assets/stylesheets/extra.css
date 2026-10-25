@@ -1,23 +1,309 @@
-/* AgenticOps Control Tower docs: DeepAgentLabs lime accent, matching the
-   product page (site.css) and deepagentlabs.io. Material redefines its tokens
-   on [data-md-color-scheme], so the overrides are scoped to those selectors. */
-[data-md-color-scheme="default"] {
-  --md-primary-fg-color: #0f1b1e;
-  --md-primary-fg-color--light: #172a2e;
-  --md-primary-fg-color--dark: #0b1416;
-  --md-primary-bg-color: #ffffff;
-  --md-accent-fg-color: #4d7c0f;
-  --md-typeset-a-color: #3d6110;
-}
+/*
+ * AgenticOps Control Tower use cases — same layout as the Agentic Sidecar use
+ * cases, in the DeepAgentLabs teal + lime palette
+ *
+ * IMPORTANT: MkDocs Material redefines its --md-* tokens on the
+ * [data-md-color-scheme="..."] attribute (which lives on <body>). Declaring our
+ * tokens only on :root is NOT enough — they get overridden for everything under
+ * <body>. We therefore scope the token block to the same selectors so our values
+ * win by source order (extra.css loads after palette.min.css).
+ */
+:root,
+[data-md-color-scheme="default"],
 [data-md-color-scheme="slate"] {
-  --md-primary-fg-color: #0f1b1e;
-  --md-primary-fg-color--light: #172a2e;
-  --md-primary-fg-color--dark: #0b1416;
-  --md-primary-bg-color: #e6eeec;
-  --md-accent-fg-color: #b7f343;
-  --md-typeset-a-color: #c6f56e;
-  --md-default-bg-color: #0b1416;
-  --md-code-bg-color: #132327;
+  /* Brand palette */
+  --md-primary-fg-color: #b7f343;
+  --md-primary-fg-color--light: #d4fa8a;
+  --md-primary-fg-color--dark: #8fd12a;
+  --md-primary-bg-color: #071012; /* dark text on bright lime surfaces */
+  --md-accent-fg-color: #7be3a4;
+
+  /* Deep-teal design tokens */
+  --as-bg: #0b1416;
+  --as-bg-subtle: #0f1b1e;
+  --as-panel: #13242a;
+  --as-panel-hover: #1a3036;
+  --as-border: rgba(183, 243, 67, 0.16);
+  --as-line: rgba(255, 255, 255, 0.08);
+  --as-text: #e8f1ee;
+  --as-muted: #9fb5b0;
+  --as-lime: #b7f343;
+  --as-green2: #7be3a4;
+  --as-green: #4ade80;
+  --as-red: #ff5e7e;
+  --as-amber: #ffb84d;
+
+  /* Drive Material's own semantic tokens toward the landing look */
+  --md-default-bg-color: var(--as-bg);
+  --md-default-bg-color--light: var(--as-bg-subtle);
+  --md-default-bg-color--dark: #081012;
+  --md-default-fg-color: var(--as-text);
+  --md-default-fg-color--light: var(--as-muted);
+  --md-default-fg-color--lighter: rgba(159, 181, 176, 0.7);
+  --md-default-fg-color--lightest: rgba(159, 181, 176, 0.35);
+  --md-code-bg-color: #071012;
+  --md-code-fg-color: #d3e2dd;
+  --md-typeset-a-color: var(--as-lime);
+  --md-footer-bg-color: var(--as-bg-subtle);
+  --md-footer-bg-color--dark: #081012;
+  --md-shadow-z1: 0 0 2px rgba(0, 0, 0, 0.32), 0 1px 2px rgba(0, 0, 0, 0.44);
+  --md-shadow-z2: 0 0 2px rgba(0, 0, 0, 0.32), 0 1px 4px rgba(0, 0, 0, 0.5);
 }
-.md-header, .md-tabs { border-bottom: 1px solid rgba(183, 243, 67, 0.25); }
-.md-typeset table:not([class]) { font-size: 0.72rem; }
+
+/* ------------------------------------------------------------------ */
+/* Global chrome                                                       */
+/* ------------------------------------------------------------------ */
+body {
+  background:
+    radial-gradient(1100px 500px at 12% -8%, rgba(183, 243, 67, 0.10), transparent 60%),
+    radial-gradient(900px 480px at 100% 0%, rgba(123, 227, 164, 0.10), transparent 55%),
+    var(--as-bg) !important;
+}
+
+::selection { background: rgba(183, 243, 67, 0.30); color: #071012; }
+
+* { scrollbar-width: thin; scrollbar-color: rgba(183, 243, 67, 0.3) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(183, 243, 67, 0.22);
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(183, 243, 67, 0.4); background-clip: padding-box; }
+
+/* ------------------------------------------------------------------ */
+/* Header & navigation tabs — dark glass instead of a solid bar   */
+/* ------------------------------------------------------------------ */
+.md-header {
+  background: rgba(11, 20, 22, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--as-text);
+  border-bottom: 1px solid var(--as-line);
+  box-shadow: none;
+}
+.md-header__topic, .md-header__option { color: var(--as-text); }
+.md-header__button { color: var(--as-text); }
+.md-header__button:hover { color: var(--as-lime); }
+
+.md-tabs {
+  background: rgba(15, 27, 30, 0.72);
+  backdrop-filter: blur(16px);
+  color: var(--as-muted);
+  border-bottom: 1px solid var(--as-line);
+}
+.md-tabs__link { opacity: 0.9; font-weight: 500; }
+.md-tabs__link:hover, .md-tabs__item--active .md-tabs__link { color: var(--as-lime); opacity: 1; }
+.md-tabs__item--active { border-bottom: 2px solid var(--as-lime); }
+
+/* Header repo/source widget + search field legibility */
+.md-header__source { color: var(--as-muted); }
+.md-search__input { background: rgba(255, 255, 255, 0.06); border-radius: 8px; color: var(--as-text); }
+.md-search__input::placeholder { color: var(--as-muted); }
+.md-search__icon { color: var(--as-muted); }
+
+/* ------------------------------------------------------------------ */
+/* Sidebar, drawer & table-of-contents (fixes grey + white-on-lime)    */
+/* ------------------------------------------------------------------ */
+.md-sidebar, .md-sidebar__scrollwrap, .md-nav { background: var(--as-bg); }
+.md-nav { color: var(--as-text); }
+.md-nav__link { color: var(--as-muted); }
+.md-nav__link:hover { color: var(--as-lime); }
+.md-nav__link--active, .md-nav__item .md-nav__link--active { color: var(--as-lime); font-weight: 600; }
+.md-nav__title { background: var(--as-bg) !important; color: var(--as-text) !important; box-shadow: none; }
+
+/* The primary/drawer title and repo widget otherwise use a bright background */
+.md-nav--primary .md-nav__title,
+.md-nav__source {
+  background: var(--as-bg-subtle) !important;
+  color: var(--as-text) !important;
+}
+.md-nav__source { border-top: 1px solid var(--as-line); }
+
+/* Secondary (right) TOC title used to be a bright strip */
+.md-nav--secondary .md-nav__title { background: var(--as-panel) !important; color: var(--as-text) !important; }
+
+/* ------------------------------------------------------------------ */
+/* Content — typography & headings                                     */
+/* ------------------------------------------------------------------ */
+.md-content { background: transparent; }
+.md-typeset { line-height: 1.72; color: var(--as-text); }
+
+.md-typeset h1 {
+  font-size: 2.2em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--as-text);
+  margin: 0 0 0.5em;
+  padding-bottom: 0.35em;
+  border-bottom: 2px solid var(--as-border);
+}
+.md-typeset h2 {
+  position: relative;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--as-text);
+  margin-top: 2em;
+}
+/* Gradient accent sits in the left margin so heading text stays on the
+   body grid (x == 0) — earlier inline-block bar pushed it right. */
+.md-typeset h2::before {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 3px;
+  margin: 0 0 10px 0;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--as-lime), var(--as-green2));
+}
+.md-typeset h3, .md-typeset h4 { color: var(--as-text); font-weight: 600; }
+
+.md-typeset a { color: var(--as-lime); text-decoration: none; transition: color 0.15s ease; }
+.md-typeset a:hover { color: var(--as-green2); text-decoration: underline; }
+
+.md-typeset strong { color: #ffffff; }
+.md-typeset hr { border-color: var(--as-line); margin: 2.2em 0; }
+
+/* ------------------------------------------------------------------ */
+/* Code: inline + fenced blocks. Fenced blocks render as               */
+/* <div class="... highlight"><pre><code>…</code></pre></div> with     */
+/* Pygments token spans + line anchors. Style the .highlight container  */
+/* as the framed panel and neutralise the inline-code pill inside it.   */
+/* ------------------------------------------------------------------ */
+.md-typeset code {
+  background: rgba(183, 243, 67, 0.09);
+  color: var(--as-lime);
+  border-radius: 5px;
+  padding: 0.12em 0.4em;
+  font-size: 0.86em;
+}
+.md-typeset pre { margin: 0; background: transparent; }
+/* The framed panel is the .highlight container Material emits. */
+.md-typeset .highlight {
+  position: relative;
+  margin: 1.4em 0;
+  background: var(--md-code-bg-color);
+  border: 1px solid var(--as-line);
+  border-radius: 12px;
+  padding: 1em 1.25rem;
+  overflow-x: auto;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  tab-size: 4;
+}
+.md-typeset .highlight code {
+  /* neutralise the inline-code pill and let tokens keep their colors */
+  display: block;
+  background: transparent;
+  color: var(--md-code-fg-color);
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  white-space: pre;
+}
+/* Line-number anchors (anchor_linenums): keep them invisible unless a
+   fence explicitly enables visible line numbers. */
+.md-typeset .highlight [id^="__codelineno"] {
+  display: inline-block;
+  color: transparent;
+  pointer-events: none;
+  user-select: none;
+}
+/* Copy button: Material injects .md-clipboard (>=9: .md-code__button). */
+.md-typeset .md-clipboard, .md-typeset .md-code__button {
+  color: var(--as-muted);
+  opacity: 1;
+  z-index: 1;
+}
+.md-typeset .md-clipboard:hover, .md-typeset .md-code__button:hover { color: var(--as-lime); }
+
+/* ------------------------------------------------------------------ */
+/* Tables — framed panels with lime headers                            */
+/* ------------------------------------------------------------------ */
+.md-typeset table:not([class]) {
+  background: var(--as-panel);
+  border: 1px solid var(--as-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  font-size: 0.86rem;
+}
+.md-typeset table:not([class]) th {
+  background: var(--as-bg-subtle);
+  color: var(--as-lime);
+  font-weight: 600;
+  border-bottom: 1px solid var(--as-border);
+}
+.md-typeset table:not([class]) td { border-top: 1px solid var(--as-line); }
+.md-typeset table:not([class]) tr:hover td { background: var(--as-panel-hover); }
+/* Metadata tables have an empty header row (| | |) — hide the blank band */
+.md-typeset table:not([class]) thead:not(:has(th:not(:empty))) { display: none; }
+
+/* ------------------------------------------------------------------ */
+/* Images / diagrams — light card frame                                */
+/* ------------------------------------------------------------------ */
+.md-typeset img {
+  border-radius: 10px;
+  border: 1px solid var(--as-border);
+  background: var(--as-panel);
+  padding: 8px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+}
+/* Italic line immediately after an image acts as a caption */
+.md-typeset p > img + em,
+.md-typeset p > img + br + em { color: var(--as-muted); font-size: 0.82em; }
+
+/* ------------------------------------------------------------------ */
+/* Blockquotes, admonitions, marks, "back to top"                      */
+/* ------------------------------------------------------------------ */
+.md-typeset blockquote {
+  background: var(--as-panel);
+  border-left: 3px solid var(--as-lime);
+  border-radius: 0 10px 10px 0;
+  padding: 0.6em 1.1em;
+  color: var(--as-text);
+}
+.md-typeset .admonition {
+  background: var(--as-panel);
+  border: 1px solid var(--as-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.md-typeset mark, .md-search-result mark, .md-nav__link mark {
+  background: #b7f343;
+  color: #071012;
+  border-radius: 3px;
+}
+
+.md-top {
+  background: var(--as-panel);
+  color: var(--as-lime);
+  border: 1px solid var(--as-border);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* ------------------------------------------------------------------ */
+/* Search panel (expand) legibility                                    */
+/* ------------------------------------------------------------------ */
+.md-search__form, .md-search-result, .md-search-result__meta { background: var(--as-panel); }
+.md-search-result__meta { color: var(--as-muted); background: var(--as-bg-subtle); }
+.md-search-result__link:hover, .md-search-result__link:focus { background: var(--as-panel-hover); }
+
+/* ------------------------------------------------------------------ */
+/* Footer                                                              */
+/* ------------------------------------------------------------------ */
+.md-footer { border-top: 1px solid var(--as-line); }
+.md-footer-meta { background: var(--md-footer-bg-color--dark); }
+.md-footer-meta__inner { color: var(--as-muted); }
+.md-footer__link:hover .md-footer__direction { color: var(--as-lime); }
+
+/* ------------------------------------------------------------------ */
+/* Responsive polish                                                   */
+/* ------------------------------------------------------------------ */
+@media (max-width: 700px) {
+  .md-typeset h1 { font-size: 1.7em; }
+  .md-typeset pre > code { font-size: 0.78rem; }
+}

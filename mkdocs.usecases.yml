@@ -3,11 +3,28 @@ site_name: AgenticOps Control Tower Use Cases
 site_url: https://deepagentlabs.io/control-tower/usecases/
 edit_uri: edit/main/usecases/
 docs_dir: usecases
+repo_name: GitHub
+
+theme:
+  palette:
+    - scheme: slate
+      primary: custom
+      accent: custom
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+extra_css:
+  - assets/stylesheets/extra.css
+  - assets/stylesheets/ct-sim.css
+extra_javascript:
+  - assets/scripts/ct-sim.js
 
 nav:
   - Overview: index.md
-  - Find unhealthy agents and capability gaps: fleet-health-snapshot.md
-  - Failed AgenticLens run to incident timeline: lens-failure-to-incident.md
-  - One posture view for sibling results: ecosystem-evidence-posture.md
+  - Find unhealthy agents: fleet-health-snapshot.md
+  - Lens failure to incident: lens-failure-to-incident.md
+  - One posture view: ecosystem-evidence-posture.md
+  - Fleet change with approval: fleet-change-with-approval.md
   - Back to docs: https://deepagentlabs.io/control-tower/docs/
   - Back to Control Tower: https://deepagentlabs.io/control-tower/

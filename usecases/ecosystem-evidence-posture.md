@@ -23,15 +23,22 @@ fifth tool silently overriding their verdicts.
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    L[AgenticLens run] --> P
-    E[Evals report + gate] --> P
-    S[Sidecar decision] --> P
-    C[Chaos report] --> P
-    P[ingest_evidence<br/>EvidenceLink: agent, source,<br/>version, ref, observed_at] --> T[(Tower evidence store)]
-    T --> V[agent_posture:<br/>fresh / stale / missing<br/>+ native counts per producer]
-```
+<figure class="ct-sim" data-ct-sim="evidence-posture" aria-label="Interactive illustration">
+  <p class="ct-sim-fallback" style="padding:16px 22px;margin:0">AgenticLens, Evals and Sidecar evidence is fresh, Chaos is stale, a retry stores nothing twice, and reported health stays healthy.</p>
+  <figcaption>Interactive illustration of the walkthrough below. Freshness and native outcomes match <em>Expected output</em>; no producer or Tower server is called.</figcaption>
+</figure>
+
+??? note "Static diagram"
+
+    ```mermaid
+    flowchart LR
+        L[AgenticLens run] --> P
+        E[Evals report + gate] --> P
+        S[Sidecar decision] --> P
+        C[Chaos report] --> P
+        P[ingest_evidence<br/>EvidenceLink: agent, source,<br/>version, ref, observed_at] --> T[(Tower evidence store)]
+        T --> V[agent_posture:<br/>fresh / stale / missing<br/>+ native counts per producer]
+    ```
 
 Collection is push-only and idempotent. Tower stores a validated projection of
 each artifact, never fetches anything and never changes reported health.
