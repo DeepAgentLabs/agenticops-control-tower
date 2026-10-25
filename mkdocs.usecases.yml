@@ -19,6 +19,7 @@ extra_css:
   - assets/stylesheets/ct-sim.css
 extra_javascript:
   - assets/scripts/ct-sim.js
+  - https://deepagentlabs.io/assets/js/usecase-views.js
 
 nav:
   - Overview: index.md
