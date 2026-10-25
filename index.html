@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=Inter:wght@400;500;600;700&amp;family=Instrument+Serif:ital@1&amp;display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/fontawesome.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/brands.min.css">
-  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="site.css?v=2">
   <script src="site.js" defer></script>
   <link rel="stylesheet" href="https://deepagentlabs.github.io/assets/css/simulations.css">
   <script src="https://deepagentlabs.github.io/assets/js/simulations.js" defer></script>
@@ -104,21 +104,15 @@
           </div>
         </div>
       </div>
-      <!-- USE CASES MENU: content comes from assets/js/usecases-data.js (edit it there, not here).
-           assets/js/usecases.js fills the [data-uc-list] and [data-uc-most-asked] slots below. -->
+      <!-- USE CASES MENU: the dark card links to /usecases/ and Discord, as on deepagentlabs.io. -->
       <div class="nav-item has-mega">
         <button class="nav-trigger" type="button" aria-expanded="false" aria-controls="mega-usecases">Use cases</button>
         <div class="mega mega-usecases" id="mega-usecases">
-          <div class="mega-main">
-            <p class="mega-label">Use cases</p>
-            <ul class="mega-grid" data-uc-list></ul>
-          </div>
           <div class="mega-side mega-side-static">
             <span class="mega-label">Start here</span>
             <strong>See it on a real agent.</strong>
-            <span class="mega-side-copy">Each use case walks through the problem, the setup and the result, step by step.</span>
-            <span class="mega-label mega-pypi-label">Most asked</span>
-            <div class="mega-pypi" data-uc-most-asked></div>
+            <span class="mega-side-copy">Explore illustrative agent workflows, step by step.</span>
+            <a class="mega-side-cta" href="https://deepagentlabs.io/usecases/">View all use cases <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
             <a class="mega-side-cta" href="https://discord.gg/fEqPFWgcDG" target="_blank" rel="noopener noreferrer">Share your use case <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           </div>
         </div>
