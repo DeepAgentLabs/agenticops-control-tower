@@ -629,6 +629,15 @@ without judge scores. The producer's gate
 decision is carried unchanged, and judge or target outcomes are not deployment
 health. See [the compatibility note](docs/evals-0.9-judge-reliability.md).
 
+## Evals 0.10.0 evaluation evidence
+
+Evals 0.10.0 exports reports as AIOS `0.4-draft` `evaluation` evidence merged
+into a Run. Tower's native report and gate validation is unchanged (the
+schemas are identical), and Tower does not read AIOS Runs. An aligned Run is
+not fleet health or a passing gate. The development pin moves to 0.10.0, and the
+`agentic-evals>=0.7.2,<1` extra already admits it. No Tower release is needed.
+See [the compatibility note](docs/evals-0.10-aios-evidence.md).
+
 ## Chaos 0.7.0 interoperability
 
 Chaos 0.7.0 adds sequential fault cascades, deterministic monotonic breaking-point
