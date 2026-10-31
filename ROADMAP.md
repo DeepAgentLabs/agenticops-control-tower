@@ -925,3 +925,9 @@ containment. No new shared schema, automatic adapter or hosted execution
 capability is introduced.
 
 Tower's native artifact reader summarizes scored reports and still projects only the native event count. The existing `agentic-chaos>=0.5,<1` extra admits 0.9. The resilience score, probe results and trends stay Chaos-native evidence that Tower does not interpret: Tower does not turn a score into deployment health, alerts or incident state, and it does not run probes. No dependency change or Tower patch release is needed.
+
+## AIOS v0.6.1 provenance and conformance suite
+
+See [AIOS v0.6.1 compatibility](docs/aios-0.6.1.md) for the new `0.6-draft` provenance
+records, portable conformance suite and naming conventions. Exports stay
+`0.4-draft`; no runtime dependency bump or package release is required.

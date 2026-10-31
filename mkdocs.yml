@@ -84,9 +84,11 @@ nav:
       - Ecosystem alignment: ecosystem-alignment.md
       - Tower 0.8 compatibility: tower-0.8-compatibility.md
       - AIOS v0.6: aios-v0.6.md
+      - AIOS v0.6.1: aios-0.6.1.md
       - Evals report contract: evals-report-contract.md
       - Evals 0.8 CLI: evals-0.8-cli.md
       - Evals 0.9 judge reliability: evals-0.9-judge-reliability.md
+      - Evals 0.10 AIOS evidence: evals-0.10-aios-evidence.md
       - Lens 0.10 routing: lens-0.10-routing.md
       - Lens 0.11 optimization: lens-0.11-optimization.md
       - Chaos 0.7: chaos-0.7.md
