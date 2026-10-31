@@ -214,7 +214,7 @@ Detection never executes recovery and never changes reported health.
 
 **Status: experimental.** Since 0.9.0.
 
-Versioned, immutable runbooks with typed parameters, prerequisites and ordered
+Versioned, immutable runbooks with named string parameters, prerequisites and ordered
 steps, each with its own timeout, retry limit and optional rollback action. The
 copilot recommends only installed versions. A writer previews an exact digest, a
 separate approver approves it, and execution claims each step before dispatch.
