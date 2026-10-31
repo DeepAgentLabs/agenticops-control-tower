@@ -85,6 +85,7 @@ nav:
       - Tower 0.8 compatibility: tower-0.8-compatibility.md
       - AIOS v0.6: aios-v0.6.md
       - AIOS v0.6.1: aios-0.6.1.md
+      - MCP 0.5 hosted access control: mcp-0.5-access-control.md
       - Evals report contract: evals-report-contract.md
       - Evals 0.8 CLI: evals-0.8-cli.md
       - Evals 0.9 judge reliability: evals-0.9-judge-reliability.md
