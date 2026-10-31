@@ -88,3 +88,13 @@ for host-installed stop/revoke adapters, audit and interruption handling.
 Run `uv run python examples/live_operations.py` for a standalone native-JSON
 demo of detection, deduplication, acknowledgement and joined incident/audit views.
 No optional siblings or network required. See [operator guide](../docs/live-operations.md).
+
+## Runbook recovery (0.9.0)
+
+Run `uv run python examples/runbook_recovery.py` for a standalone walkthrough of
+the versioned `staging.dependency_recovery` runbook through real HTTP routes:
+recommendation, exact preview, separate human approval, bounded drain/restore/resume
+steps and evidence-based verification. Pass `--fail-step` to exhaust a clean-failure
+retry and observe drain compensation, or `--fail-verification` to observe escalation
+after every step succeeded. No optional siblings or network required. See
+[runbooks](../docs/runbooks.md).

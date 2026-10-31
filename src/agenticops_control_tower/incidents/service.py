@@ -153,7 +153,11 @@ class IncidentService:
         with self._transaction() as db:
             incident = self._load(db, incident_id)
             self._authorize(operator, incident.agent_id, "writer")
-            if incident.state != "open" or incident.plan is not None:
+            if (
+                incident.state != "open"
+                or incident.plan is not None
+                or incident.runbook_execution_id is not None
+            ):
                 raise IncidentError("Investigation is closed once a plan is previewed")
             run_id = incident.detection.summary.details.get("run_id")
             records = self.evidence.history(incident.agent_id, limit=500)
@@ -209,6 +213,7 @@ class IncidentService:
             if (
                 incident.state != "open"
                 or incident.plan is not None
+                or incident.runbook_execution_id is not None
                 or incident.investigation is None
                 or incident.investigation.certainty == "contradictory"
                 or agent.environment != "staging"
@@ -307,23 +312,27 @@ class IncidentService:
             self._save(db, incident)
             return incident
 
-    def verify(self, incident_id: str, lens_id: str, evals_id: str, operator: Operator) -> Incident:
-        # The bounded probe runs outside the storage transaction.
-        incident = self.get(incident_id, operator)
-        self._authorize(operator, incident.agent_id, "writer")
-        if incident.state != "awaiting_verification" or incident.plan is None:
-            raise IncidentError("Incident is not awaiting verification")
+    def recovery_evidence(
+        self,
+        incident: Incident,
+        lens_id: str,
+        evals_id: str,
+        start: datetime | None,
+        freshness_seconds: int = 300,
+    ) -> bool:
+        """Shared recovery criteria: fresh same-run Lens success and passing Evals gate.
+
+        Unknown record IDs raise; stale, mismatched, failed or future evidence is False.
+        """
         lens = self._record(incident.agent_id, lens_id)
         evals = self._record(incident.agent_id, evals_id)
-        start = incident.execution_started_at
         now = utcnow()
-        records = (lens, evals)
         fresh = start is not None and all(
             start < as_utc(r.summary.link.observed_at) <= now
             and start < as_utc(r.ingested_at) <= now
-            and now - as_utc(r.summary.link.observed_at) <= timedelta(minutes=5)
+            and now - as_utc(r.summary.link.observed_at) <= timedelta(seconds=freshness_seconds)
             and r.summary.availability == "available"
-            for r in records
+            for r in (lens, evals)
         )
         run_id = lens.summary.details.get("run_id")
         valid = (
@@ -345,7 +354,15 @@ class IncidentService:
             and r.summary.details.get("status") == "failed"
             for r in self.evidence.history(incident.agent_id, limit=500)
         )
-        valid = valid and not contradictory
+        return bool(valid and not contradictory)
+
+    def verify(self, incident_id: str, lens_id: str, evals_id: str, operator: Operator) -> Incident:
+        # The bounded probe runs outside the storage transaction.
+        incident = self.get(incident_id, operator)
+        self._authorize(operator, incident.agent_id, "writer")
+        if incident.state != "awaiting_verification" or incident.plan is None:
+            raise IncidentError("Incident is not awaiting verification")
+        valid = self.recovery_evidence(incident, lens_id, evals_id, incident.execution_started_at)
         connector = self.connectors.get(incident.agent_id)
         try:
             probe = connector is not None and connector.probe(incident.plan)
@@ -407,6 +424,8 @@ class IncidentService:
             self._authorize(operator, incident.agent_id, "writer")
             if incident.state != "executing":
                 raise IncidentError("Only unknown interrupted execution requires reconciliation")
+            if incident.runbook_execution_id is not None:
+                raise IncidentError("Reconcile runbook executions through their execution lease")
             incident.state = "escalated"
             self._event(
                 incident,

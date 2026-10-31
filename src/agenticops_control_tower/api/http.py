@@ -52,6 +52,14 @@ from agenticops_control_tower.models import (
 from agenticops_control_tower.models.evidence import EvidenceSource
 from agenticops_control_tower.models.version import VersionAssessment
 from agenticops_control_tower.registry import AgentRegistry
+from agenticops_control_tower.runbooks import CatalogError
+from agenticops_control_tower.runbooks.models import (
+    RunbookDecisionRequest,
+    RunbookExecuteRequest,
+    RunbookPreviewRequest,
+    RunbookValidationRequest,
+    RunbookVerificationRequest,
+)
 
 MAX_EVIDENCE_BYTES = 1024 * 1024
 
@@ -526,6 +534,127 @@ def create_app(
         try:
             return control_api.incidents.reconcile(incident_id, operator)
         except IncidentError as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    runbook_errors = (IncidentError, EvidenceIngestError, AgentNotFoundError)
+
+    @app.get("/runbooks", dependencies=[Depends(read_access)])
+    def runbook_catalog() -> object:
+        return control_api.runbooks.definitions()
+
+    @app.get("/runbooks/{runbook_id}/{version}/validations", dependencies=[Depends(read_access)])
+    def runbook_validations(runbook_id: str, version: str) -> object:
+        try:
+            control_api.runbooks.catalog.get(runbook_id, version)
+        except CatalogError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        return control_api.runbooks.validations(runbook_id, version)
+
+    @app.post("/runbooks/{runbook_id}/{version}/validations")
+    def runbook_record_validation(
+        runbook_id: str,
+        version: str,
+        request: RunbookValidationRequest,
+        operator: Operator = Depends(configuration_operator),
+    ) -> object:
+        try:
+            return control_api.runbooks.record_validation(runbook_id, version, request, operator)
+        except CatalogError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except runbook_errors as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    @app.get("/incidents/{incident_id}/runbooks")
+    def runbook_recommendations(
+        incident_id: str, operator: Operator = Depends(configuration_operator)
+    ) -> object:
+        try:
+            return control_api.runbooks.recommend(incident_id, operator)
+        except runbook_errors as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    @app.get("/incidents/{incident_id}/runbook-executions")
+    def runbook_executions(
+        incident_id: str, operator: Operator = Depends(configuration_operator)
+    ) -> object:
+        try:
+            return control_api.runbooks.list(incident_id, operator)
+        except runbook_errors as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    @app.post("/incidents/{incident_id}/runbooks/preview")
+    def runbook_preview(
+        incident_id: str,
+        request: RunbookPreviewRequest,
+        operator: Operator = Depends(configuration_operator),
+    ) -> object:
+        try:
+            return control_api.runbooks.preview(incident_id, request, operator)
+        except CatalogError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        except runbook_errors as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    @app.get("/runbook-executions/{execution_id}")
+    def runbook_execution(
+        execution_id: str, operator: Operator = Depends(configuration_operator)
+    ) -> object:
+        try:
+            return control_api.runbooks.get(execution_id, operator)
+        except runbook_errors as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    @app.post("/runbook-executions/{execution_id}/approval")
+    def runbook_decide(
+        execution_id: str,
+        request: RunbookDecisionRequest,
+        operator: Operator = Depends(configuration_operator),
+    ) -> object:
+        try:
+            return control_api.runbooks.decide(
+                execution_id, request.preview_digest, request.approved, operator
+            )
+        except runbook_errors as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    @app.post("/runbook-executions/{execution_id}/execute")
+    def runbook_execute(
+        execution_id: str,
+        request: RunbookExecuteRequest,
+        operator: Operator = Depends(configuration_operator),
+    ) -> object:
+        try:
+            return control_api.runbooks.execute(execution_id, request.preview_digest, operator)
+        except runbook_errors as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    @app.post("/runbook-executions/{execution_id}/verify")
+    def runbook_verify(
+        execution_id: str,
+        request: RunbookVerificationRequest,
+        operator: Operator = Depends(configuration_operator),
+    ) -> object:
+        try:
+            return control_api.runbooks.verify(
+                execution_id, request.lens_evidence_id, request.evals_evidence_id, operator
+            )
+        except runbook_errors as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    @app.post("/runbook-executions/{execution_id}/{transition}")
+    def runbook_transition(
+        execution_id: str, transition: str, operator: Operator = Depends(configuration_operator)
+    ) -> object:
+        handlers = {
+            "revoke": control_api.runbooks.revoke,
+            "cancel": control_api.runbooks.cancel,
+            "reconcile": control_api.runbooks.reconcile,
+        }
+        if transition not in handlers:
+            raise HTTPException(404, "Unknown runbook transition")
+        try:
+            return handlers[transition](execution_id, operator)
+        except runbook_errors as exc:
             raise HTTPException(409, str(exc)) from exc
 
     @app.get("/console", include_in_schema=False)

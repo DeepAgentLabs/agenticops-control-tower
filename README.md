@@ -11,7 +11,7 @@
 
 ## Status
 
-**Current version: 0.8.0. Phase 8 adds live detection, durable alerts, joined audit timelines and incident console views.** The registry,
+**Current version: 0.9.0. Phase 9 adds versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery.** The registry,
 HTTP API and CLI support SQLite persistence, reader/writer bearer authorization,
 shared fleet health and capability coverage, agent filters, and offline snapshots.
 Tower-owned configuration uses approved actions, and pushed Lens, Evals, Sidecar
@@ -19,6 +19,42 @@ and Chaos evidence is stored and shown as posture. The read-only web console is
 served at `/console/`. See [ROADMAP.md](ROADMAP.md) for published milestone status,
 [implementation evidence and operational limits](ROADMAP.md#implementation-evidence-and-operational-limits),
 and the build plan.
+
+## Automated runbooks and recovery workflows (0.9.0)
+
+Versioned, immutable runbooks turn the single approved staging action into
+reusable recovery workflows. Each definition declares prerequisites, typed
+parameters and ordered steps with per-step timeouts, clean-failure retry limits
+and optional rollback actions. Recommendations come only from installed versions,
+so a copilot cannot invent commands. A writer previews an exact digest, a separate
+human approves it, and Tower claims each step before dispatching it to a
+host-installed connector by action name.
+
+- Clean failures retry within the step limit, then compensate completed steps in
+  reverse order and escalate.
+- Partial, timed-out or unknown outcomes stop immediately for host reconciliation;
+  nothing is replayed.
+- Cancellation stops before the next step; interrupted runs are reconciled after a
+  lease.
+- Recovery still requires a connector probe, a fresh successful Lens run and a
+  passing same-run Evals gate.
+- Completed Chaos reports and passing Evals gates can be recorded as validation
+  for a runbook version.
+
+```bash
+agenticops-control-tower --token reader-token runbooks recommend INCIDENT_ID
+agenticops-control-tower --token writer-token runbooks preview INCIDENT_ID preview.json
+agenticops-control-tower --token approver-token runbooks approval EXECUTION_ID approval.json
+agenticops-control-tower --token writer-token runbooks execute EXECUTION_ID execute.json
+agenticops-control-tower --token writer-token runbooks verify EXECUTION_ID verify.json
+uv run python examples/runbook_recovery.py --fail-step
+```
+
+The built-in `staging.dependency_recovery` 1.0.0 drains, restores and resumes one
+dependency on the deterministic `StagingRunbookRuntime`. Production runtime
+connectors are not included. MCP 0.5.1 exposes local `tower.runbook*` tools; approval
+stays human-only. See the [operator guide](docs/runbooks.md) and
+[sibling compatibility](docs/tower-0.9-compatibility.md).
 
 ## Live detection and incident views (0.8.0)
 
@@ -169,7 +205,7 @@ Tower owns incident coordination; the sibling packages retain their engines.
 
 The first complete loop ships in 0.6.0 for the deterministic staging runtime.
 Live detection, alerts and incident views ship in 0.8.0;
-reusable automated runbooks remain v0.9 work. See [the command-center roadmap](ROADMAP.md#product-vision-ai-native-operations-command-center).
+reusable automated runbooks ship in 0.9.0. See [the command-center roadmap](ROADMAP.md#product-vision-ai-native-operations-command-center).
 
 ## Quickstart
 
@@ -457,6 +493,7 @@ The package currently exposes:
 - `summarize_evidence(link, artifact, gate=...)` (no storage)
 - `ingest_evidence(request)`, `evidence_history(agent_id, ...)`
 - `agent_posture(agent_id, ...)`, `fleet_posture(...)`
+- `incidents`, `operations`, `bulk` and `runbooks` services (0.6–0.9)
 
 The operator CLI is now available as:
 
@@ -467,6 +504,7 @@ The operator CLI is now available as:
 - `agenticops-control-tower config|audit|actions ...`
 - `agenticops-control-tower evidence ingest|ingest-manifest|ingest-sidecar-journal|history|posture ...`
 - `agenticops-control-tower posture`
+- `agenticops-control-tower incidents|alerts|bulk|runbooks ...`
 
 The CLI talks to the HTTP API or reads a fleet snapshot with `--snapshot`.
 Both paths use the same status and inventory model.

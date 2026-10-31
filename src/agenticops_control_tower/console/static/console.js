@@ -86,7 +86,7 @@ async function operations(signal, requestGeneration, environment) {
           byId("incident-view").hidden = false;
         } catch(error) {if (generation === requestGeneration && error.name !== "AbortError") byId("message").textContent = error.message;}
       });
-      card.append(button, node("p", `Approval: ${incident.approval} · Recovery: ${incident.outcome || "not executed"}`));
+      card.append(button, node("p", `Approval: ${incident.approval} · Recovery: ${incident.outcome || "not executed"}`), node("small", incident.runbook_execution_id ? `Runbook execution ${incident.runbook_execution_id}` : "No runbook previewed"));
       byId("incidents").append(card);
     }
     if (!byId("incidents").children.length) byId("incidents").append(node("p", "No incidents in this view."));

@@ -55,7 +55,9 @@ v0.5 ecosystem evidence posture is complete: pushed producer evidence is stored
 and shown as freshness and native tallies. v0.6 combines Phase 6 and 6A: local MCP investigation, durable incidents and
 approved deterministic staging recovery. See docs/incident-recovery.md. v0.7 adds frozen fleet previews, approvals, desired settings and bounded
 stop/revoke coordination; see docs/fleet-operations.md. v0.8 adds periodic local detection, alerts and incident console views; see
-docs/live-operations.md. Production runbooks remain planned.
+docs/live-operations.md. v0.9 adds versioned runbooks with exact-digest approval, bounded steps,
+compensation, cancellation and verified recovery; see docs/runbooks.md. Production runbook
+connectors remain planned.
 
 ### Before You Build Here
 
@@ -69,7 +71,7 @@ docs/live-operations.md. Production runbooks remain planned.
 
 ## Status
 
-The v0.1–v0.8 milestones are **implemented**. Package layout, docs, tests, and
+The v0.1–v0.9 milestones are **implemented**. Package layout, docs, tests, and
 CI/release workflows exist; a registry with optional SQLite persistence,
 discovery, HTTP API, and CLI exist today — see
 [ROADMAP.md](ROADMAP.md) for published milestone status, implementation evidence,
@@ -129,6 +131,10 @@ These are load-bearing, not preferences — see
 | `src/agenticops_control_tower/config/` | Central configuration models and safe write paths | v0.4 |
 | `src/agenticops_control_tower/adapters/` | Native artifact readers and Sidecar journal extraction; MCP integration planned | v0.5 |
 | `src/agenticops_control_tower/evidence/` | Idempotent evidence store and read-only posture rollups | v0.5 |
+| `src/agenticops_control_tower/incidents/` | Incident investigation and approved single-action staging recovery | v0.6 |
+| `src/agenticops_control_tower/bulk/` | Frozen fleet targets and approved bulk actions | v0.7 |
+| `src/agenticops_control_tower/operations/` | Periodic detection, alerts and joined incident views | v0.8 |
+| `src/agenticops_control_tower/runbooks/` | Versioned runbook catalog, connectors, staging fixture and approved bounded execution | v0.9 |
 | `examples/` | Sample registration and capability payloads | ongoing |
 | `tests/` | Pytest test suite | ongoing |
 | `Makefile` | Local dev automation | — |

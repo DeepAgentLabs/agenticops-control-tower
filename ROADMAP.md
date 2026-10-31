@@ -1,6 +1,6 @@
 # agenticops-control-tower — Roadmap & Architecture
 
-**Current package version: 0.8.0.** Phase 8 adds periodic detection, durable alerts and incident console views. v0.5 persists pushed Lens, Evals,
+**Current package version: 0.9.0.** Phase 9 adds versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery. Phase 8 added periodic detection, durable alerts and incident console views. v0.5 persists pushed Lens, Evals,
 Sidecar and Chaos evidence and surfaces its freshness and native outcomes as
 posture across the Python API, HTTP, CLI, offline snapshots and console.
 0.5.1 adds AgenticLens 0.7.0 diagnosis reports as native Lens evidence
@@ -18,7 +18,8 @@ remediate and verify recovery in real time.
 This is the intended product, not a description of features already shipped.
 Today's registry, inventory, status and native artifact readers are its foundation.
 The investigation prompt and authorized tools ship in 0.6.0; the MCP host supplies
-the model. No particular third-party Copilot product is required.
+the model. Versioned staging runbooks ship in 0.9.0; production runtime connectors
+remain planned. No particular third-party Copilot product is required.
 
 The core operator workflow is:
 
@@ -56,13 +57,14 @@ unsupported explanation as an exact RCA.
 - **v0.6.0** ✅ Implemented — Phase 6 MCP investigation and Phase 6A approved staging recovery (one release)
 - **v0.7.0** ✅ Implemented — Multi-Agent Operations and Bulk Actions
 - **v0.8.0** ✅ Implemented — Live Detection, Alerts, Audit Trails, and Incident Views
-- **v0.9** 🚧 Planned — Automated Runbooks and Recovery Workflows
+- **v0.9.0** ✅ Implemented — Automated Runbooks and Recovery Workflows
 - **v1.0** 🚧 Planned — Stable Control Plane and Published Capability Contract
 
 v0.1 and v0.2 share a tested Python control model, optional SQLite registry,
 authenticated HTTP API and operator CLI. The read-only console ships in v0.3; controlled desired configuration ships in
 v0.4; ecosystem evidence posture ships in v0.5. Pull-based remote collection,
-production runtime adapters remain planned; live detection and incident console views ship in v0.8.0.
+production runtime adapters remain planned; live detection and incident console views ship in v0.8.0;
+versioned runbooks over host-installed connectors ship in v0.9.0.
 
 ## Implementation Evidence and Operational Limits
 
@@ -71,6 +73,7 @@ The implementation lives under `src/agenticops_control_tower/`:
 | Capability | Implementation | Acceptance tests |
 | --- | --- | --- |
 | Phase 6/6A incidents, investigation, approval and verified staging recovery | `incidents/`, `adapters/containment.py`, `api/http.py`, `cli/main.py` | `tests/test_incidents.py`, `examples/incident_recovery.py` |
+| Phase 9 versioned runbooks, bounded execution, compensation, reconciliation and validation | `runbooks/`, `api/http.py`, `cli/main.py`, `operations/service.py`, `console/static/` | `tests/test_runbooks.py`, `tests/test_runbook_example.py`, `tests/console_ui.cjs`, `examples/runbook_recovery.py` |
 | Registry, discovery and persistence | `registry/service.py`, `discovery/service.py` | `tests/test_registry.py`, `tests/test_milestones.py` |
 | Shared status, HTTP API and CLI | `status/service.py`, `api/surface.py`, `api/http.py`, `cli/main.py`, `snapshot.py` | `tests/test_http_api.py`, `tests/test_cli.py` |
 | Read-only console and minimum-version assessments | `console/static/`, `models/version.py`, `ControlTowerAPI.assess_versions` | `tests/test_console.py` |
@@ -91,8 +94,8 @@ file. Authentication uses deployment-configured reader/writer bearer tokens;
 per-agent identities and tenant isolation are not implemented. Without tokens,
 the API allows anonymous local development. Health is agent-reported;
 timeout-based health, automatic package detection and distributed storage remain
-planned. Pull-based remote evidence collection and remote configuration application,
-production runbooks remain planned. Periodic latest-observation incident detection ships in v0.8.0.
+planned. Pull-based remote evidence collection, remote configuration application and
+production runbook connectors remain planned. Periodic latest-observation incident detection ships in v0.8.0.
 Phase 6/6A delivers explicit detection, investigation and approved verified recovery
 for the deterministic staging fixture; see docs/incident-recovery.md.
 
@@ -600,8 +603,20 @@ Success criteria:
 
 ## Phase 9: Automated Runbooks and Recovery Workflows (`v0.9`)
 
-Status: **planned**. Builds on the approved v0.6.0 scenario and the v0.8 incident
-surface, extending one supported action into reusable operational workflows.
+Status: **implemented in 0.9.0**. `runbooks/` provides an immutable versioned
+catalog, a named-action connector protocol, the deterministic
+`StagingRunbookRuntime` and `RunbookService`. Recommendations come only from
+installed versions; previews bind incident, deployment, environment, definition
+digest, parameters and expiry; a separate approver approves the exact digest.
+Execution claims the approval and every step before dispatch, bounds each call,
+retries only clean failures, compensates on clean failure or cancellation, and
+stops partial, timed-out or unknown outcomes for reconciliation. Interrupted runs
+are reconciled after a lease without replay. Verification reuses the 0.6 evidence
+criteria plus a bounded probe. Chaos reports with passing same-run Evals gates
+can be recorded as validation. HTTP, CLI, the console incident view and MCP 0.5.1
+tools share the same checks. See [runbooks](docs/runbooks.md),
+`tests/test_runbooks.py` and `examples/runbook_recovery.py`. Production runtime
+connectors, multi-deployment runbooks and automatic approval are not provided.
 
 Goals:
 
@@ -616,12 +631,12 @@ Goals:
 
 Success criteria:
 
-- each execution records runbook version, evidence, approver, target, actions,
+- [x] each execution records runbook version, evidence, approver, target, actions,
   outputs and verification results in a durable incident timeline
-- permission and approval checks apply equally to console, CLI, API and MCP
-- tests cover denied approval, changed scope, unavailable dependencies, timeouts,
+- [x] permission and approval checks apply equally to console, CLI, API and MCP
+- [x] tests cover denied approval, changed scope, unavailable dependencies, timeouts,
   repeated requests, partial failure, failed recovery and successful recovery
-- no remediation is considered complete until declared recovery criteria pass
+- [x] no remediation is considered complete until declared recovery criteria pass
 
 ## Phase 10: Stable Capability Contract (`v1.0`)
 
@@ -936,3 +951,17 @@ records, portable conformance suite and naming conventions. Exports stay
 
 [MCP 0.5.0](https://github.com/DeepAgentLabs/mcp-server/releases/tag/v0.5.0) completes MCP Phase 5 with hosted access control. Each hosted key can carry allow and deny tool globs, an expiry and a task scope. The server enforces them at dispatch, outside the model: before each hosted handler runs, it re-authenticates the key and reloads its policy. Revocation, a narrower policy or expiry therefore stops queued calls, retries and calls on existing connections. Calls already running finish. Allowed calls log a `dispatch` and a `completion` record. Denied calls instead return and log a `denial` or `revocation_acknowledged` record and never reach the handler. Every record uses the MCP-local `mcp.access-decision.v1` shape, and the records of one call share a `correlation_id`. They are not AIOS artifacts. `core.access_status` reports a key's effective policy, and operators use `deep-agentic-core-mcp-admin` to narrow or revoke a key by user ID.
 See [the compatibility guide](docs/mcp-0.5-access-control.md).
+
+## Phase 9 automated runbooks — Control Tower 0.9.0
+
+Tower 0.9.0 ships versioned runbooks and recovery workflows (see Phase 9 above
+and [runbooks](docs/runbooks.md)). Sibling coordination:
+
+- MCP 0.5.1 (patch) adds local `tower.runbook*` read and writer tools over the new
+  HTTP routes; approval remains human-only and hosted MCP still rejects Tower tools.
+- Chaos reports and Evals gates are read as validation evidence only; neither
+  engine is invoked by Tower. Lens and Evals evidence criteria for recovery are
+  unchanged from 0.6.
+- Lens, Evals, Chaos, Sidecar, AIOS and the organization profile receive
+  documentation-only compatibility notes; their dependency ranges are unchanged.
+  See [Tower 0.9 compatibility](docs/tower-0.9-compatibility.md).

@@ -11,8 +11,8 @@ The supported first runtime is `StagingDependencyRuntime`, a deterministic local
 SQLite dependency fixture. It restores one host-allowlisted dependency, records a
 transactional idempotency receipt and bounds lock waits to the plan timeout (five
 seconds, one attempt). It runs no shell commands. This deliberately controlled
-fixture meets the first staging scenario; production runtime adapters, fleet
-orchestration and reusable multi-step runbooks remain later milestones.
+fixture meets the first staging scenario. Reusable multi-step runbooks ship in
+0.9.0 (see [runbooks](runbooks.md)); production runtime adapters remain planned.
 
 ```bash
 uv sync --extra dev
@@ -112,7 +112,7 @@ execution/probe timeout, return accurate partial outcomes and use incident IDs a
 durable idempotency keys. Tower cannot kill an arbitrary Python callback. Automatic
 retries and rollback of external side effects are not claimed. Denial, revocation,
 execution, verification and failed control acknowledgements remain in the timeline.
-The console remains read-only; full incident views are Phase 8.
+The console remains read-only; incident views ship in 0.8.0 ([live operations](live-operations.md)).
 
 ## Emergency braking and explicit restart
 

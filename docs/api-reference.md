@@ -3,7 +3,7 @@
 Control Tower has two programmatic surfaces: the **HTTP API** served by
 `agenticops-control-tower serve` (or `create_app()`), and the **Python API**
 (`ControlTowerAPI`), which the HTTP layer and CLI both use. The routes below are
-taken from `api/http.py` in 0.8.0. While the server runs, FastAPI's generated
+taken from `api/http.py` in 0.9.0. While the server runs, FastAPI's generated
 OpenAPI page at `/docs` lists the exact request and response schemas.
 
 ## Authentication
@@ -67,6 +67,21 @@ Errors: `401` missing or invalid token, `403` wrong role, `404` unknown agent,
 | `GET /incidents`, `GET /incidents/{id}`, `GET /incidents/{id}/view` | operator | Read incidents; `view` is the joined timeline. |
 | `POST /incidents/detect`, `POST /incidents/{id}/investigate`, `/preview`, `/approval`, `/revoke`, `/execute`, `/verify`, `/control/{action}`, `/reconcile` | operator | Approved staging recovery; see [incident recovery](incident-recovery.md). |
 
+### Runbooks
+
+| Method and path | Role | Purpose |
+| --- | --- | --- |
+| `GET /runbooks` | read | Installed runbook definitions. |
+| `GET /runbooks/{id}/{version}/validations`, `POST` the same path | read / operator (writer) | Read or record Chaos and Evals validation for a version. |
+| `GET /incidents/{id}/runbooks`, `GET /incidents/{id}/runbook-executions` | operator | Recommendations with unmet prerequisites; execution history. |
+| `POST /incidents/{id}/runbooks/preview` | operator (writer) | Preview an exact digest for one catalog version and its parameters. |
+| `GET /runbook-executions/{id}` | operator | Read one execution with step results and events. |
+| `POST /runbook-executions/{id}/approval`, `/revoke` | operator (approver) | Approve, deny or revoke the exact preview. |
+| `POST /runbook-executions/{id}/execute`, `/verify`, `/reconcile` | operator (writer) | Run bounded steps, verify recovery, reconcile an interrupted run. |
+| `POST /runbook-executions/{id}/cancel` | operator (writer or approver) | Cancel before or between steps. |
+
+See [runbooks](runbooks.md) for request bodies and outcomes.
+
 ### Console
 
 | Method and path | Purpose |
@@ -109,9 +124,11 @@ print(api.get_status().degraded_agents)
 
 Further services hang off the facade: `api.config` (controlled configuration),
 `api.bulk` (fleet operations), `api.operations` (detection, alerts, incident
-views) and `api.incidents` (investigation and recovery). Their usage is shown in
+views), `api.incidents` (investigation and recovery) and `api.runbooks`
+(versioned runbooks). Their usage is shown in
 `examples/controlled_configuration.py`, `examples/fleet_operations.py`,
-`examples/live_operations.py` and `examples/incident_recovery.py`.
+`examples/live_operations.py`, `examples/incident_recovery.py` and
+`examples/runbook_recovery.py`.
 
 Models are importable from `agenticops_control_tower.models`, including
 `AgentRegistrationPayload`, `HeartbeatPayload`, `AgentRecord`, `AgentStatus`,

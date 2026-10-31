@@ -81,6 +81,20 @@ preview payload.
 
 See [live operations](live-operations.md).
 
+## Runbooks
+
+| Command | Role | Description |
+| --- | --- | --- |
+| `runbooks catalog`, `runbooks validations RUNBOOK VERSION` | reader | Installed definitions and their validation records. |
+| `runbooks recommend INCIDENT_ID`, `runbooks history INCIDENT_ID`, `runbooks get EXECUTION_ID` | configured credentials | Recommendations, execution history and one execution. |
+| `runbooks preview INCIDENT_ID FILE.json`, `execute ID FILE.json`, `verify ID FILE.json`, `reconcile ID` | writer | Preview, run, verify and reconcile. |
+| `runbooks approval ID FILE.json`, `revoke ID` | approver | Approve, deny or revoke the exact preview. |
+| `runbooks cancel ID` | writer or approver | Cancel before or between steps. |
+| `runbooks validate RUNBOOK VERSION FILE.json` | writer | Record Chaos and Evals validation evidence. |
+
+`execute` and `verify` exit 1 unless the runbook is awaiting verification or
+resolved. See [runbooks](runbooks.md) for request files.
+
 ## Offline snapshot mode
 
 With `--snapshot FILE`, these read commands are answered from the file with no

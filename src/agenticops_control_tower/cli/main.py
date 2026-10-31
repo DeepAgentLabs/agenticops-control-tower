@@ -187,6 +187,42 @@ def _cmd_bulk(args: argparse.Namespace, client: httpx.Client) -> int:
     )
 
 
+def _cmd_runbooks(args: argparse.Namespace, client: httpx.Client) -> int:
+    operation = args.runbook_command
+    if operation == "catalog":
+        response = client.get("/runbooks")
+    elif operation == "recommend":
+        response = client.get(f"/incidents/{args.incident_id}/runbooks")
+    elif operation == "history":
+        response = client.get(f"/incidents/{args.incident_id}/runbook-executions")
+    elif operation == "preview":
+        response = client.post(
+            f"/incidents/{args.incident_id}/runbooks/preview",
+            json=_load_payload(args.payload_file),
+        )
+    elif operation == "validations":
+        response = client.get(f"/runbooks/{args.runbook_id}/{args.version}/validations")
+    elif operation == "validate":
+        response = client.post(
+            f"/runbooks/{args.runbook_id}/{args.version}/validations",
+            json=_load_payload(args.payload_file),
+        )
+    elif operation == "get":
+        response = client.get(f"/runbook-executions/{args.execution_id}")
+    else:
+        payload = _load_payload(args.payload_file) if hasattr(args, "payload_file") else {}
+        response = client.post(
+            f"/runbook-executions/{args.execution_id}/{operation}", json=payload, timeout=180
+        )
+    _raise_for_status(response)
+    payload = response.json()
+    _print_json(payload)
+    return int(
+        operation in ("execute", "verify")
+        and payload["status"] not in ("awaiting_verification", "resolved")
+    )
+
+
 def _cmd_configuration(args: argparse.Namespace, client: httpx.Client) -> int:
     if args.command == "config":
         response = client.get(f"/agents/{args.agent_id}/config/{args.capability}")
@@ -435,6 +471,33 @@ def _build_parser() -> argparse.ArgumentParser:
             command.add_argument("payload_file", help="Exact request JSON; see incident docs")
         command.set_defaults(handler=_cmd_incidents, needs_client=True)
 
+    runbooks = subparsers.add_parser(
+        "runbooks", help="Recommend, approve, execute and verify versioned runbooks"
+    )
+    runbook_sub = runbooks.add_subparsers(dest="runbook_command", required=True)
+    for operation, arguments in (
+        ("catalog", ()),
+        ("recommend", ("incident_id",)),
+        ("history", ("incident_id",)),
+        ("preview", ("incident_id", "payload_file")),
+        ("validations", ("runbook_id", "version")),
+        ("validate", ("runbook_id", "version", "payload_file")),
+        ("get", ("execution_id",)),
+        ("approval", ("execution_id", "payload_file")),
+        ("revoke", ("execution_id",)),
+        ("execute", ("execution_id", "payload_file")),
+        ("cancel", ("execution_id",)),
+        ("verify", ("execution_id", "payload_file")),
+        ("reconcile", ("execution_id",)),
+    ):
+        command = runbook_sub.add_parser(operation)
+        for argument in arguments:
+            command.add_argument(
+                argument,
+                help="Exact request JSON; see runbook docs" if argument == "payload_file" else None,
+            )
+        command.set_defaults(handler=_cmd_runbooks, needs_client=True)
+
     from agenticops_control_tower.evidence import (
         DEFAULT_STALE_AFTER_SECONDS,
         MAX_HISTORY_LIMIT,
@@ -522,7 +585,8 @@ def main(argv: list[str] | None = None, *, client: httpx.Client | None = None) -
         from agenticops_control_tower.snapshot import load_snapshot, read_snapshot
 
         if (
-            args.command in ("serve", "config", "audit", "actions", "incidents", "bulk", "alerts")
+            args.command
+            in ("serve", "config", "audit", "actions", "incidents", "bulk", "alerts", "runbooks")
             or (args.command == "agents" and args.agents_command in ("register", "heartbeat"))
             or (args.command == "evidence" and args.evidence_command.startswith("ingest"))
         ):

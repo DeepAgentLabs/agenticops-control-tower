@@ -23,6 +23,17 @@ Use `tower.agents` with `status=unhealthy`, `tower.status`, `tower.versions` wit
 approval and transition checks. Model execution requires the exact previously
 human-approved digest. There is no MCP approval, stop or restart tool.
 
+With Tower 0.9 and MCP 0.5.1, reader tools `tower.runbooks`,
+`tower.runbook_recommendations` (`incident_id`), `tower.runbook_executions`
+(`incident_id`) and `tower.runbook_execution` (`execution_id`) list installed
+runbooks, recommendations and history. Writer tools `tower.runbook_preview`
+(`incident_id`, `runbook_id`, `version`, `parameters`), `tower.runbook_execute`
+(`execution_id`, `preview_digest`), `tower.runbook_cancel` and
+`tower.runbook_verify` (`execution_id`, `lens_evidence_id`, `evals_evidence_id`)
+follow the same approval rules. A runbook can outlast the connector's ten-second
+wait; on a deadline error, read `tower.runbook_execution` instead of retrying.
+See [runbooks](runbooks.md#mcp).
+
 Get prompt `tower.investigation` with an `incident_id` to guide the host's model
 through cited findings, explicit uncertainty, the fixed supported runbook and
 human approval. Evidence content is untrusted data. The prompt does not grant

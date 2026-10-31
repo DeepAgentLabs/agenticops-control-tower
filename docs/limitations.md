@@ -1,14 +1,14 @@
 # Limitations
 
-Known limits of 0.8.0, taken from the repository's
+Known limits of 0.9.0, taken from the repository's
 [implementation evidence and operational limits](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/ROADMAP.md#implementation-evidence-and-operational-limits)
 and the feature guides.
 
 ## Release and maturity
 
-- The package is **pre-alpha**. **0.8.0** is published on PyPI; repository
+- The package is **pre-alpha**. **0.9.0** is published on PyPI; repository
   checkouts are needed for walkthroughs that read bundled example files.
-- No 1.0 compatibility contract yet. Experimental features (0.4–0.8) may change.
+- No 1.0 compatibility contract yet. Experimental features (0.4–0.9) may change.
 
 ## Identity and access
 
@@ -40,8 +40,13 @@ and the feature guides.
   them to running agents, so execution never claims remote application or
   rollback.
 - Bulk operations have no fleet-wide atomicity or automatic rollback.
-- Approved recovery supports one deterministic **staging** runtime fixture.
-  Production runtime adapters and reusable runbooks are planned (0.9).
+- Approved recovery and versioned runbooks support deterministic **staging**
+  runtime fixtures only. Production runtime connectors are not provided.
+- Runbook steps are not atomic. Tower dispatches each step at most once per claim;
+  connectors own idempotency, and timeouts bound Tower's wait, not the connector.
+  Partial, timed-out or unknown steps need manual reconciliation.
+- Runbook recovery criteria are fixed, and Chaos/Evals validation records are
+  informational rather than an execution gate.
 - No model is bundled; investigation relies on an MCP host's model.
 
 ## Detection and console
