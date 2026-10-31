@@ -424,6 +424,8 @@ class IncidentService:
             self._authorize(operator, incident.agent_id, "writer")
             if incident.state != "executing":
                 raise IncidentError("Only unknown interrupted execution requires reconciliation")
+            if incident.runbook_execution_id is not None:
+                raise IncidentError("Reconcile runbook executions through their execution lease")
             incident.state = "escalated"
             self._event(
                 incident,
