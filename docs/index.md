@@ -13,16 +13,16 @@ Python service provides the HTTP API, the CLI backend and a read-only web
 console.
 
 !!! info "Verified version"
-    These docs describe the published **0.8.0** release, available on
-    [PyPI](https://pypi.org/project/agenticops-control-tower/0.8.0/) since
-    20 October 2026. Install `agenticops-control-tower[api]==0.8.0` for the HTTP
+    These docs describe the published **0.9.0** release, available on
+    [PyPI](https://pypi.org/project/agenticops-control-tower/0.9.0/) since
+    31 October 2026. Install `agenticops-control-tower[api]==0.9.0` for the HTTP
     server and console. Examples using `examples/` files also need a repository
     checkout. The package is **pre-alpha**; no 1.0 compatibility promise is made.
 
 
 ## What it does today
 
-| Capability | Added in | In PyPI 0.8.0 | Status |
+| Capability | Added in | In PyPI 0.9.0 | Status |
 | --- | --- | --- | --- |
 | [Agent registry and heartbeats](features.md#agent-registry-and-heartbeats) | 0.2.0 | Yes | Stable |
 | [Capability discovery and version inventory](features.md#capability-discovery-and-version-inventory) | 0.2.0 | Yes | Stable |
@@ -35,10 +35,11 @@ console.
 | [Incident investigation and approved staging recovery](features.md#incident-investigation-and-approved-staging-recovery) | 0.6.0 | Yes | Experimental |
 | [Bulk fleet operations](features.md#bulk-fleet-operations) | 0.7.0 | Yes | Experimental |
 | [Live detection, alerts and incident views](features.md#live-detection-alerts-and-incident-views) | 0.8.0 | Yes | Experimental |
+| [Automated runbooks and recovery workflows](features.md#automated-runbooks-and-recovery-workflows) | 0.9.0 | Yes | Experimental |
 
 **Stable** means the surface has existed since 0.3 or earlier and is covered by
 the test suite; it is not yet a 1.0 compatibility promise. **Experimental**
-means it was added in 0.4–0.8, may change before 1.0, even though it is included in the 0.8.0 release.
+means it was added in 0.4–0.9, may change before 1.0, even though it is included in the 0.9.0 release.
 Planned work appears only in the [roadmap](roadmap.md).
 
 ## Where to go next

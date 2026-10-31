@@ -1,6 +1,6 @@
 # Features
 
-Every capability below exists in 0.8.0. Each section says what it does, its
+Every capability below exists in 0.9.0. Each section says what it does, its
 status, how to use it, and where the detailed guide is. Planned work is only in
 the [roadmap](roadmap.md). For release-by-release availability, see the table on
 the [home page](index.md#what-it-does-today).
@@ -209,3 +209,21 @@ Detection never executes recovery and never changes reported health.
 - **CLI:** `alerts list|evaluate|acknowledge`, `incidents view ID`.
 - **Example:** `examples/live_operations.py`.
 - **Guide:** [Live operations](live-operations.md).
+
+## Automated runbooks and recovery workflows
+
+**Status: experimental.** Since 0.9.0.
+
+Versioned, immutable runbooks with typed parameters, prerequisites and ordered
+steps, each with its own timeout, retry limit and optional rollback action. The
+copilot recommends only installed versions. A writer previews an exact digest, a
+separate approver approves it, and execution claims each step before dispatch.
+Clean failures retry within limits and then compensate; partial, timed-out or
+unknown outcomes stop for reconciliation. Cancellation, lease-based interruption
+handling and Chaos/Evals validation records are included. Recovery still requires
+a probe, a fresh successful Lens run and a passing same-run Evals gate. Only the
+deterministic staging runtime is supported.
+
+- **CLI:** `runbooks catalog|recommend|preview|approval|execute|cancel|verify|reconcile|validate`.
+- **Example:** `examples/runbook_recovery.py`.
+- **Guide:** [Runbooks](runbooks.md).
