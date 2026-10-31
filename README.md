@@ -755,3 +755,38 @@ native decisions/correlation stay compatible; no new normative schema is claimed
 See [AIOS v0.6 compatibility](docs/aios-v0.6.md) for canonical examples,
 namespace rules and native contract boundaries. AIOS artifacts remain
 `0.4-draft`; no runtime dependency bump or package release is required.
+
+## Chaos 0.9.0 interoperability
+
+Chaos 0.9.0 adds:
+
+- resilience probes: `HttpProbe`, `ResponseQualityProbe`, `LatencyProbe` and
+  `FunctionProbe` check steady state before chaos, while faults are active and
+  after recovery. By default no fault is injected when a pre-chaos probe
+  fails; `require_steady_state=False` runs the chaos anyway and leaves the
+  score inconclusive
+- a 0-100 resilience score built from recovery, probe, latency,
+  retry-efficiency and cost evidence, with per-fault verdicts. Components a
+  run cannot show (for example latency without a baseline) are left out and
+  the remaining weights renormalized. The score is inconclusive (`null`) after
+  a failed pre-chaos probe, for dry runs, when no fault fired, or when no
+  component can be computed
+- a local run-history store for score trends, with `max_runs` and
+  `max_age_days` retention, and a `--min-score` CI gate
+- probes and scoring on chaos workflows, experiment files and the pytest marker
+
+Native event IDs and fault types are unchanged. `ChaosReport.probes`,
+`ChaosReport.resilience` and the matching `WorkflowReport` fields are optional
+and additive. When a score was computed, AIOS exports add a derived
+`resilience_score` measurement; inconclusive runs export none. Probe results
+and the score breakdown stay in the `io.deepagentlabs.agentic-chaos`
+producer extension.
+
+See the [v0.9 guide](https://github.com/DeepAgentLabs/agentic-chaos/blob/v0.9.0/docs/v0.9.md)
+and the [offline demo](https://github.com/DeepAgentLabs/agentic-chaos/blob/v0.9.0/examples/chaos_resilience_demo.py).
+The resilience score summarizes the evidence of one chaos run. It is not an
+Evals score, a release-gate decision, a deployment health signal or proof of
+containment. No new shared schema, automatic adapter or hosted execution
+capability is introduced.
+
+Tower's native artifact reader summarizes scored reports and still projects only the native event count. The existing `agentic-chaos>=0.5,<1` extra admits 0.9. The resilience score, probe results and trends stay Chaos-native evidence that Tower does not interpret: Tower does not turn a score into deployment health, alerts or incident state, and it does not run probes. No dependency change or Tower patch release is needed.
