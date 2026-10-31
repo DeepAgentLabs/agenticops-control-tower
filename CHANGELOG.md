@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Development dependency pins `agentic-evals==0.10.0`. Native report and gate
+  schemas are unchanged, so bundled copies stay exact; AIOS evaluation evidence
+  Runs are not a Tower input. See `docs/evals-0.10-aios-evidence.md`.
+
 ## 0.8.0
 
 Released 2026-10-20.
