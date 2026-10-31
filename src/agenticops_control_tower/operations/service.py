@@ -267,6 +267,7 @@ class OperationsService:
             )
             for r in linked
         ]
+        runbooks = self.api.runbooks.list(incident_id, operator)
         timeline.sort(key=lambda e: (as_utc(e["at"]), e["source"], e["event"]))
         return dict(
             incident=incident,
@@ -275,6 +276,7 @@ class OperationsService:
             evidence=linked,
             evidence_truncated=evidence_truncated,
             evidence_limit=100,
+            runbooks=runbooks,
             timeline=timeline,
             lens_integrity="not_verified",
             lens_coverage="not_assessed",
