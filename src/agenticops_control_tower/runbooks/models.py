@@ -14,7 +14,6 @@ from pydantic import AwareDatetime, Field, field_validator, model_validator
 
 from agenticops_control_tower.config.models import Contract
 
-RunbookId = str
 _IDENTIFIER = r"^[a-z][a-z0-9_.-]{0,99}$"
 _VERSION = r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$"
 MAX_RUNBOOK_SECONDS = 120
@@ -25,6 +24,12 @@ Prerequisite = Literal[
     "investigation.not_contradictory",
     "connector.installed",
 ]
+DEFAULT_PREREQUISITES: tuple[Prerequisite, ...] = (
+    "incident.open",
+    "incident.investigated",
+    "investigation.not_contradictory",
+    "connector.installed",
+)
 StepOutcome = Literal[
     "pending", "succeeded", "failed", "partial_failure", "timed_out", "unknown", "skipped"
 ]
@@ -73,18 +78,13 @@ class RecoveryCriteria(Contract):
 
 
 class RunbookDefinition(Contract):
-    runbook_id: RunbookId = Field(pattern=_IDENTIFIER)
+    runbook_id: str = Field(pattern=_IDENTIFIER)
     version: str = Field(pattern=_VERSION)
     title: str = Field(min_length=1, max_length=200)
     description: str = Field(min_length=1, max_length=2000)
     environments: list[str] = Field(min_length=1, max_length=20)
     prerequisites: list[Prerequisite] = Field(
-        default_factory=lambda: [
-            "incident.open",
-            "incident.investigated",
-            "investigation.not_contradictory",
-            "connector.installed",
-        ]
+        default_factory=lambda: list(DEFAULT_PREREQUISITES), max_length=4
     )
     parameters: dict[str, ParameterSpec] = Field(default_factory=dict, max_length=20)
     steps: list[RunbookStep] = Field(min_length=1, max_length=10)
