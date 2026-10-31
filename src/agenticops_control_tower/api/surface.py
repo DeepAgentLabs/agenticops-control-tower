@@ -39,6 +39,7 @@ from agenticops_control_tower.models.evidence import (
 from agenticops_control_tower.models.version import VersionAssessment
 from agenticops_control_tower.operations import OperationsService
 from agenticops_control_tower.registry import AgentRegistry
+from agenticops_control_tower.runbooks import RunbookService
 from agenticops_control_tower.status import StatusService
 
 
@@ -53,11 +54,15 @@ class ControlTowerAPI:
         configuration_service: ConfigurationService | None = None,
         evidence_store: EvidenceStore | None = None,
         incident_service: IncidentService | None = None,
+        runbook_service: RunbookService | None = None,
     ) -> None:
         self.config = configuration_service or ConfigurationService(registry)
         self.bulk = BulkService(self.config)
         self.evidence = evidence_store or EvidenceStore(registry)
         self.incidents = incident_service or IncidentService(registry, self.evidence)
+        if runbook_service is not None and runbook_service.incidents is not self.incidents:
+            raise ValueError("Runbook service must share the API's incident service")
+        self.runbooks = runbook_service or RunbookService(self.incidents)
         self._posture = PostureService(self.evidence)
         self._registry = registry
         self._discovery = discovery
