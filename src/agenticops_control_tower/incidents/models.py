@@ -53,6 +53,8 @@ class Incident(Contract):
     state: Literal["open", "executing", "awaiting_verification", "resolved", "escalated"] = "open"
     investigation: Investigation | None = None
     plan: RecoveryPlan | None = None
+    # Set once a versioned runbook is previewed; the single-action plan is then closed.
+    runbook_execution_id: str | None = None
     preview_digest: str | None = None
     expires_at: AwareDatetime | None = None
     approval: Literal["pending", "approved", "denied", "revoked", "consumed"] = "pending"
