@@ -178,7 +178,7 @@ def test_preview_rejects_undeclared_or_unsupported_parameters(tower, parameters)
     request = RunbookPreviewRequest(**RUNBOOK, parameters=parameters)
     with pytest.raises(RunbookError):
         api.runbooks.preview(incident.incident_id, request, WRITER)
-    with pytest.raises(RunbookError, match="Unknown runbook"):
+    with pytest.raises(CatalogError, match="Unknown runbook"):
         api.runbooks.preview(
             incident.incident_id, REQUEST.model_copy(update={"version": "2.0.0"}), WRITER
         )
@@ -728,3 +728,42 @@ def test_connectors_install_only_for_registered_deployments(tower):
     assert api.runbooks.connectors == {"staging": runtime}
     with pytest.raises(RunbookError, match="Unknown runbook execution"):
         api.runbooks.get("missing", READER)
+
+
+def test_legacy_reconcile_cannot_override_a_running_runbook(tower):
+    api, runtime, _ = tower
+    execution = approved(api)
+    api.runbooks._claim(execution.execution_id, execution.preview_digest, WRITER)
+    with pytest.raises(IncidentError, match="execution lease"):
+        api.incidents.reconcile(execution.incident_id, WRITER)
+    assert api.runbooks.get(execution.execution_id, READER).status == "running"
+    assert api.incidents.get(execution.incident_id, READER).state == "executing"
+
+
+def test_parameter_values_are_length_bounded_and_previews_need_open_incidents(tower):
+    from agenticops_control_tower.runbooks.models import ParameterSpec
+
+    spec = ParameterSpec(description="x", pattern=r"^.*$", max_length=5)
+    assert spec.accepts("abcde") and not spec.accepts("abcdef")
+    api, _, _ = tower
+    lax = STAGING_DEPENDENCY_RECOVERY.model_copy(
+        update={"version": "1.1.0", "prerequisites": ["connector.installed"]}
+    )
+    api.runbooks.catalog.install(lax)
+    incident = investigated(api)
+    with api.incidents._transaction() as db:
+        stored = api.incidents._load(db, incident.incident_id)
+        stored.state = "escalated"
+        api.incidents._save(db, stored)
+    with pytest.raises(RunbookError, match="incident.open"):
+        api.runbooks.preview(
+            incident.incident_id, REQUEST.model_copy(update={"version": "1.1.0"}), WRITER
+        )
+
+
+def test_http_preview_returns_404_for_unknown_versions(client):
+    http, api, _ = client
+    incident = investigated(api)
+    body = REQUEST.model_copy(update={"version": "9.0.0"}).model_dump()
+    route = f"/incidents/{incident.incident_id}/runbooks/preview"
+    assert http.post(route, json=body, headers=auth("w")).status_code == 404
