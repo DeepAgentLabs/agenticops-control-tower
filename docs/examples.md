@@ -12,6 +12,7 @@ or `python examples/NAME.py` inside an environment where the package is installe
 | `push_ecosystem_evidence.py` | base package | Pushes the four sample producer artifacts and prints per-producer posture. | Yes |
 | `controlled_configuration.py` | base package | Declare a Tower-owned setting, preview, approve as another operator, execute. | Yes |
 | `fleet_operations.py` | base package | Approved bulk configuration with one stale target failing. | Yes |
+| `runbook_recovery.py` | base package, `api` | Versioned runbook through HTTP: recommend, preview, separate approval, bounded steps and verification. `--fail-step` shows compensation; `--fail-verification` shows escalation. | Yes |
 | `inspect_ecosystem_evidence.py` | base package | Reads native evidence with explicit attribution, without storing it. | Yes |
 | `inspect_sidecar_journal.py` | base package | `python examples/inspect_sidecar_journal.py JOURNAL.json --source-version V`: read decisions from a Sidecar journal export. | No (needs your own journal file) |
 | `incident_recovery.py` | `agenticlens`, `agentic-evals`, `api` | Phase 6/6A staging recovery through the HTTP routes; `--fail-verification` shows escalation. | No (needs sibling packages) |
@@ -21,8 +22,9 @@ or `python examples/NAME.py` inside an environment where the package is installe
 | `bulk_tracing.json` | — | Preview payload for `bulk preview`. | No |
 | `hosting/nginx.conf` | — | HTTPS reverse-proxy template for a VM. | No |
 
-"Verified" means the command ran against the 0.8.0 source (commit `36c5eb6`) on
-Python 3.13 with only the base dependencies installed.
+"Verified" means the command ran against the 0.9.0 source on Python 3.12 with the
+development dependencies installed (`runbook_recovery.py` also needs the `api`
+extra for FastAPI's test client).
 
 ## Expected output: `live_operations.py`
 

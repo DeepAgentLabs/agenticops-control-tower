@@ -10,8 +10,8 @@ reconfigures or recomputes the verdicts of another package.
 | **AgenticLens** | Run and diagnosis reports pushed as `agenticlens` evidence. A fresh failed run raises a `lens.failed` alert. | Push into Tower | [Evidence posture](evidence-posture.md), [Live operations](live-operations.md) |
 | **Agentic Evals** | Evaluation reports plus an existing `GateDecision`, pushed as `agentic-evals` evidence. | Push into Tower | [Evals report contract](evals-report-contract.md) |
 | **Agentic Sidecar** | Decisions, or a whole journal export via `evidence ingest-sidecar-journal`. | Push into Tower | [Evidence posture](evidence-posture.md), [Sidecar 0.9](sidecar-0.9.md) |
-| **Agentic Chaos** | Chaos reports pushed as `agentic-chaos` evidence. | Push into Tower | [Chaos 0.9](chaos-0.9.md) (earlier: [0.8](chaos-0.8.md)) |
-| **Agentic MCP** (`deep-agentic-core-mcp`) | `tower.*` tools call Tower's HTTP API with a reader (and optionally writer) token. Local only; the hosted MCP endpoint rejects Tower tools. From MCP 0.5.0, `MCPAccessRevoker` revocation also stops queued hosted calls ([MCP 0.5](mcp-0.5-access-control.md)). | MCP → Tower | [MCP connector](mcp-connector.md) |
+| **Agentic Chaos** | Chaos reports pushed as `agentic-chaos` evidence. A completed report plus a passing same-run Evals gate can be recorded as runbook validation. | Push into Tower | [Chaos 0.9](chaos-0.9.md) (earlier: [0.8](chaos-0.8.md)), [Runbooks](runbooks.md#chaos-and-evals-validation) |
+| **Agentic MCP** (`deep-agentic-core-mcp`) | `tower.*` tools call Tower's HTTP API with a reader (and optionally writer) token. Local only; the hosted MCP endpoint rejects Tower tools. From MCP 0.5.0, `MCPAccessRevoker` revocation also stops queued hosted calls ([MCP 0.5](mcp-0.5-access-control.md)). MCP 0.5.1 adds `tower.runbook*` tools for Tower 0.9 runbooks. | MCP → Tower | [MCP connector](mcp-connector.md) |
 | **AI Operations Specification** | Shared semantics reference; Tower's fleet and bulk contracts are Tower-local, not AIOS schemas. | Reference | [AIOS v0.6](aios-v0.6.md), [AIOS v0.6.1](aios-0.6.1.md) |
 
 ## Optional extras
@@ -51,4 +51,5 @@ heartbeat body is:
 
 Compatibility with specific sibling releases is recorded per release under
 **Ecosystem compatibility** in the navigation, starting with
-[Tower 0.8 compatibility](tower-0.8-compatibility.md).
+[Tower 0.9 compatibility](tower-0.9-compatibility.md) (earlier:
+[Tower 0.8](tower-0.8-compatibility.md)).
