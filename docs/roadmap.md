@@ -21,7 +21,7 @@ is **planned** and does not work today.
 
 ## 0.9: automated runbooks (implemented)
 
-- Versioned, immutable runbooks with prerequisites, typed parameters, ordered
+- Versioned, immutable runbooks with prerequisites, named string parameters, ordered
   steps, exact-digest human approval, bounded retries and timeouts, and
   compensation or reconciliation.
 - Recommendations come only from installed versions, so the copilot cannot invent

@@ -23,8 +23,8 @@ and the build plan.
 ## Automated runbooks and recovery workflows (0.9.0)
 
 Versioned, immutable runbooks turn the single approved staging action into
-reusable recovery workflows. Each definition declares prerequisites, typed
-parameters and ordered steps with per-step timeouts, clean-failure retry limits
+reusable recovery workflows. Each definition declares prerequisites, named
+string parameters and ordered steps with per-step timeouts, clean-failure retry limits
 and optional rollback actions. Recommendations come only from installed versions,
 so a copilot cannot invent commands. A writer previews an exact digest, a separate
 human approves it, and Tower claims each step before dispatching it to a

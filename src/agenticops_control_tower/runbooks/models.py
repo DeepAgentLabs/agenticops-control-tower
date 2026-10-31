@@ -1,7 +1,7 @@
 """Tower-local versioned runbook contracts (not AIOS schemas).
 
 Definitions are host-installed data. Callers choose a catalog entry and supply
-typed parameters; they never supply commands, endpoints, credentials or steps.
+bounded string parameters; they never supply commands, endpoints, credentials or steps.
 """
 
 from __future__ import annotations
