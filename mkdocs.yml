@@ -77,11 +77,13 @@ nav:
       - MCP connector: mcp-connector.md
       - Fleet operations: fleet-operations.md
       - Live operations: live-operations.md
+      - Runbooks: runbooks.md
   - API reference: api-reference.md
   - CLI reference: cli-reference.md
   - Integrations: integrations.md
   - Ecosystem compatibility:
       - Ecosystem alignment: ecosystem-alignment.md
+      - Tower 0.9 compatibility: tower-0.9-compatibility.md
       - Tower 0.8 compatibility: tower-0.8-compatibility.md
       - AIOS v0.6: aios-v0.6.md
       - AIOS v0.6.1: aios-0.6.1.md
