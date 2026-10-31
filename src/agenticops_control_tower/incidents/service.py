@@ -362,9 +362,7 @@ class IncidentService:
         self._authorize(operator, incident.agent_id, "writer")
         if incident.state != "awaiting_verification" or incident.plan is None:
             raise IncidentError("Incident is not awaiting verification")
-        valid = self.recovery_evidence(
-            incident, lens_id, evals_id, incident.execution_started_at
-        )
+        valid = self.recovery_evidence(incident, lens_id, evals_id, incident.execution_started_at)
         connector = self.connectors.get(incident.agent_id)
         try:
             probe = connector is not None and connector.probe(incident.plan)
