@@ -16,7 +16,7 @@ flowchart LR
     subgraph Tower["Control Tower service (serve)"]
         H[HTTP API<br/>bearer tokens]
         F[ControlTowerAPI facade]
-        R[(SQLite or memory:<br/>registry, evidence,<br/>config, alerts, incidents)]
+        R[(SQLite or memory:<br/>registry, evidence,<br/>config, alerts, incidents,<br/>runbook executions)]
         D[Detector<br/>every 30 s]
         U[Console /console/<br/>read-only]
     end
@@ -35,8 +35,11 @@ flowchart LR
 - **Push, never pull.** Sibling results arrive as attributed native artifacts.
   Tower stores projections and never recomputes their verdicts.
 - **Read-only surfaces, approved writes.** The console only reads. Configuration,
-  bulk and recovery changes need a preview, a separate approval and an audit
-  record.
+  bulk, recovery and runbook changes need a preview, a separate approval and an
+  audit record.
+- **Named actions, not commands.** Runbooks call host-installed connectors by
+  action name with validated parameters; steps are claimed before dispatch and
+  never replayed.
 
 ## Package layout
 
@@ -51,6 +54,7 @@ The package separates the following control-plane domains:
 - `adapters/` for thin ecosystem integration boundaries
 - `evidence/` for pushed evidence storage and freshness posture
 - `incidents/` for incident investigation and approved recovery, `bulk/` for fleet operations, and `operations/` for live detection and alerts
+- `runbooks/` for the versioned runbook catalog, connectors, staging fixture and approved bounded execution
 - `status/` for fleet health and capability coverage rollups
 
 See [README.md](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/README.md) and [ROADMAP.md](roadmap.md) for the product
