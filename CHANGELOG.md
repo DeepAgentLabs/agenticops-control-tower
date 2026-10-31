@@ -2,11 +2,45 @@
 
 ## [Unreleased]
 
+## 0.9.0
+
+Released 2026-10-31. Pairs with MCP 0.5.1 local `tower.runbook*` tools.
+
+### Added
+
+- Versioned, immutable runbook catalog with prerequisites, typed parameters,
+  ordered steps, per-step timeouts, clean-failure retry limits, declared rollback
+  actions, fixed recovery criteria and a 120-second worst-case budget. The built-in
+  `staging.dependency_recovery` 1.0.0 drains, restores and resumes one dependency.
+- `RunbookConnector` named-action protocol and the deterministic
+  `StagingRunbookRuntime` fixture with durable idempotency receipts and fault hooks.
+- `RunbookService` recommendations limited to installed versions, exact-digest
+  previews, separate human approval, revocation, claim-before-dispatch execution,
+  compensation on clean failure or cancellation, stop-for-reconciliation on
+  partial, timed-out or unknown outcomes, lease-based interruption reconciliation
+  and evidence-based verification.
+- Chaos and Evals validation records for runbook versions, reported in
+  recommendations without becoming an execution gate.
+- Runbook HTTP routes, `runbooks` CLI commands, runbook history in incident views
+  and timelines, and runbook links on console incident cards.
+- `examples/runbook_recovery.py`, `docs/runbooks.md` and
+  `docs/tower-0.9-compatibility.md`.
+
 ### Changed
 
+- Recovery evidence criteria are shared by the 0.6 single-action plan and
+  runbooks (`IncidentService.recovery_evidence`). Previewing a runbook closes
+  investigation and the single-action plan for that incident.
 - Development dependency pins `agentic-evals==0.10.0`. Native report and gate
   schemas are unchanged, so bundled copies stay exact; AIOS evaluation evidence
   Runs are not a Tower input. See `docs/evals-0.10-aios-evidence.md`.
+
+### Compatibility
+
+- Existing evidence, incident, fleet and alert contracts are unchanged; stored
+  incidents gain an optional `runbook_execution_id`. Optional sibling ranges are
+  unchanged. Only the staging fixture is a supported runbook runtime; production
+  connectors are not included.
 
 ## 0.8.0
 
