@@ -32,7 +32,7 @@ must match its digest, so an approval can never run a changed definition.
 | --- | --- |
 | `environments` | Deployment environments the runbook may target. |
 | `prerequisites` | Any of `incident.open`, `incident.investigated`, `investigation.not_contradictory`, `connector.installed`. |
-| `parameters` | Named string parameters, each with a regex `pattern` and optional `allowed` list. Preview must supply exactly these names. |
+| `parameters` | Named string parameters, each with a regex `pattern`, a `max_length` (default 100) and an optional `allowed` list. Preview must supply exactly these names. |
 | `steps` | 1–10 ordered steps. Each names an `action`, a `timeout_seconds` (1–30), `max_attempts` (1–3) and an optional `rollback_action`. |
 | `impact`, `rollback` | Operator-facing text retained in every preview. |
 | `recovery` | Fixed criteria: connector probe, fresh successful Lens run, passing Evals gate, and a freshness window (default 300 s). |

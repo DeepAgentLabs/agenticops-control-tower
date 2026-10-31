@@ -44,6 +44,7 @@ class ParameterSpec(Contract):
     description: str = Field(min_length=1, max_length=500)
     pattern: str = Field(default=r"^[A-Za-z0-9_.-]{1,100}$", max_length=200)
     allowed: list[str] | None = Field(default=None, min_length=1, max_length=100)
+    max_length: int = Field(default=100, ge=1, le=1000)
 
     @field_validator("pattern")
     @classmethod
@@ -52,8 +53,10 @@ class ParameterSpec(Contract):
         return value
 
     def accepts(self, value: str) -> bool:
-        return bool(re.fullmatch(self.pattern, value)) and (
-            self.allowed is None or value in self.allowed
+        return (
+            len(value) <= self.max_length
+            and bool(re.fullmatch(self.pattern, value))
+            and (self.allowed is None or value in self.allowed)
         )
 
 
