@@ -590,6 +590,8 @@ def create_app(
     ) -> object:
         try:
             return control_api.runbooks.preview(incident_id, request, operator)
+        except CatalogError as exc:
+            raise HTTPException(404, str(exc)) from exc
         except runbook_errors as exc:
             raise HTTPException(409, str(exc)) from exc
 

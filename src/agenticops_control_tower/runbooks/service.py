@@ -279,10 +279,8 @@ class RunbookService:
     def preview(
         self, incident_id: str, request: RunbookPreviewRequest, operator: Operator
     ) -> RunbookExecution:
-        try:
-            definition = self.catalog.get(request.runbook_id, request.version)
-        except CatalogError as exc:
-            raise RunbookError(str(exc)) from exc
+        # Unknown versions raise CatalogError so HTTP can return 404.
+        definition = self.catalog.get(request.runbook_id, request.version)
         if set(request.parameters) != set(definition.parameters) or not all(
             spec.accepts(request.parameters[name]) for name, spec in definition.parameters.items()
         ):
@@ -295,6 +293,11 @@ class RunbookService:
                     raise RunbookError("Incident already has a live or dispatched runbook")
                 incident.runbook_execution_id = None
             unmet = self._unmet(definition, incident)
+            # Claim requires an open incident, whatever the definition declares.
+            if (incident.state != "open" or incident.plan is not None) and (
+                "incident.open" not in unmet
+            ):
+                unmet.append("incident.open")
             connector = self.connectors.get(incident.agent_id)
             if unmet or connector is None:
                 raise RunbookError("Runbook prerequisites unmet: " + "; ".join(unmet))
