@@ -56,6 +56,20 @@ def native_tallies(source: EvidenceSource, records: list[EvidenceRecord]) -> dic
             "status_counts": _count(
                 (str(d.get("status") or d.get("run_status")) for d in details), _LENS_STATUSES
             ),
+            **(
+                {
+                    "verification_counts": _count(
+                        (
+                            r.summary.details.get("verification", {}).get("status", "unknown")
+                            for r in records
+                            if r.summary.link.artifact_type == "execution_bundle"
+                        ),
+                        ("verified", "failed", "unknown", "incomplete"),
+                    )
+                }
+                if any(r.summary.link.artifact_type == "execution_bundle" for r in records)
+                else {}
+            ),
             "attribution_counts": _count(
                 (d["attribution"]["status"] for d in diagnoses), _LENS_ATTRIBUTIONS
             ),
