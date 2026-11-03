@@ -129,7 +129,9 @@ class ControlTowerAPI:
         to record history and posture.
         """
         self._registry.get(link.agent_id)
-        return summarize_evidence(link, artifact, gate=gate)
+        return summarize_evidence(
+            link, artifact, gate=gate, trusted_lens_keys=self.evidence.trusted_lens_keys
+        )
 
     def ingest_evidence(
         self, request: EvidenceIngestRequest, *, ingested_by: str = "python"

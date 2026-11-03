@@ -47,6 +47,9 @@ unsupported explanation as an exact RCA.
 
 ## Release Status
 
+Current package release: **0.9.1** (2026-11-02), adding optional Lens 0.12
+execution verification without changing deployment health or recovery rules.
+
 - **v0.1** ✅ Implemented and published — registration, heartbeat, metadata, capability discovery,
   HTTP API, optional SQLite persistence, and reader/writer bearer authorization
 - **v0.2** ✅ Implemented and published — HTTP and snapshot CLI, shared health rollups,
@@ -965,3 +968,10 @@ and [runbooks](docs/runbooks.md)). Sibling coordination:
 - Lens, Evals, Chaos, Sidecar, AIOS and the organization profile receive
   documentation-only compatibility notes; their dependency ranges are unchanged.
   See [Tower 0.9 compatibility](docs/tower-0.9-compatibility.md).
+
+## Lens execution evidence (0.9.1)
+
+Authenticated AIOS execution bundles now integrate through Lens-owned verification.
+Host-configured trust preserves verified/failed/unknown/incomplete results and
+redacted causal IDs. No deployment health or containment verdict is inferred.
+See [the integration guide](docs/lens-execution-evidence.md).

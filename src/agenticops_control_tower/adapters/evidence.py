@@ -139,13 +139,15 @@ ARTIFACT_TYPES: dict[str, str] = {
 
 ACCEPTED_ARTIFACT_TYPES: dict[str, tuple[str, ...]] = {
     **{source: (artifact_type,) for source, artifact_type in ARTIFACT_TYPES.items()},
-    "agenticlens": ("run", "diagnosis_report"),
+    "agenticlens": ("run", "diagnosis_report", "execution_bundle"),
 }
 """Every native artifact type Tower reads per source."""
 
 
 def artifact_type_for(source: str, artifact: dict[str, Any] | None) -> str:
     """The native type of `artifact`: Lens diagnosis reports carry `engine_version`."""
+    if source == "agenticlens" and isinstance(artifact, dict) and "manifest" in artifact:
+        return "execution_bundle"
     if source == "agenticlens" and isinstance(artifact, dict) and "engine_version" in artifact:
         return "diagnosis_report"
     return ARTIFACT_TYPES[source]
@@ -177,6 +179,7 @@ def summarize_evidence(
     artifact: dict[str, Any] | None,
     *,
     gate: dict[str, Any] | None = None,
+    trusted_lens_keys: dict[str, bytes] | None = None,
 ) -> EvidenceSummary:
     """Project validated producer fields, or return an honest unavailable result.
 
@@ -187,6 +190,25 @@ def summarize_evidence(
         return EvidenceSummary(link=link, availability="unavailable", reason="No artifact supplied")
     if link.artifact_type not in ACCEPTED_ARTIFACT_TYPES[link.source]:
         return EvidenceSummary(link=link, availability="unavailable", reason="Source/type mismatch")
+    if link.source == "agenticlens" and link.artifact_type == "execution_bundle":
+        from agenticops_control_tower.adapters.lens_execution import summarize_execution
+
+        if not link.run_id or link.spec_version not in (None, "0.4-draft"):
+            return EvidenceSummary(
+                link=link,
+                availability="unavailable",
+                reason="Execution evidence requires run_id and supported AIOS version",
+            )
+        execution_details = summarize_execution(
+            artifact, trusted_keys=trusted_lens_keys or {}, expected_run_id=link.run_id
+        )
+        verified = execution_details["verification"]["status"] == "verified"
+        return EvidenceSummary(
+            link=link,
+            availability="available" if verified else "unavailable",
+            reason=None if verified else "Execution evidence is not verified",
+            details=execution_details,
+        )
     if link.spec_version is not None:
         return EvidenceSummary(
             link=link,

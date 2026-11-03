@@ -44,7 +44,14 @@ def _sort_key(value: datetime) -> str:
 
 
 class EvidenceStore:
-    def __init__(self, registry: AgentRegistry, database_path: str | None = None) -> None:
+    def __init__(
+        self,
+        registry: AgentRegistry,
+        database_path: str | None = None,
+        *,
+        trusted_lens_keys: dict[str, bytes] | None = None,
+    ) -> None:
+        self.trusted_lens_keys = dict(trusted_lens_keys or {})
         self.registry = registry
         self._lock = RLock()
         self._memory = sqlite3.connect(":memory:", check_same_thread=False)
@@ -110,7 +117,12 @@ class EvidenceStore:
                 record_id=record_id,
                 ingested_at=now,
                 ingested_by=ingested_by,
-                summary=summarize_evidence(link, request.artifact, gate=request.gate),
+                summary=summarize_evidence(
+                    link,
+                    request.artifact,
+                    gate=request.gate,
+                    trusted_lens_keys=self.trusted_lens_keys,
+                ),
             )
             db.execute(
                 "INSERT INTO tower_evidence(record_id, agent_id, source, observed_at, body) "

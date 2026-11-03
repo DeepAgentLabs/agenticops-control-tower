@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager, suppress
+from pathlib import Path
 from secrets import compare_digest
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Response
@@ -72,6 +74,7 @@ def create_app(
     write_token: str | None = None,
     approval_token: str | None = None,
     detection_interval_seconds: float = 30,
+    trusted_lens_keys: dict[str, bytes] | None = None,
 ) -> FastAPI:
     """Configure SQLite and reader/writer bearer tokens via arguments or environment.
 
@@ -84,9 +87,22 @@ def create_app(
     approval_token = approval_token or os.environ.get("AGENTICOPS_APPROVAL_TOKEN")
     if approval_token and approval_token in (read_token, write_token):
         raise ValueError("Approval token must differ from reader and writer tokens")
+    if api is not None and trusted_lens_keys is not None:
+        raise ValueError("Configure Lens trust on the supplied API's evidence store")
     if api is None:
+        trust_path = os.environ.get("AGENTICOPS_LENS_TRUST_STORE")
+        if trusted_lens_keys is None and trust_path:
+            try:
+                configured = json.loads(Path(trust_path).read_text())
+                trusted_lens_keys = {
+                    name: bytes.fromhex(value) for name, value in configured.items()
+                }
+                if any(len(key) < 32 for key in trusted_lens_keys.values()):
+                    raise ValueError("Short key")
+            except (OSError, ValueError, TypeError, AttributeError):
+                raise ValueError("Invalid host Lens trust store") from None
         registry = AgentRegistry(database_path)
-        evidence = EvidenceStore(registry, database_path)
+        evidence = EvidenceStore(registry, database_path, trusted_lens_keys=trusted_lens_keys)
         api = ControlTowerAPI(
             registry,
             CapabilityDiscoveryService(),

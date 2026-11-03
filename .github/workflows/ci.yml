@@ -52,6 +52,8 @@ jobs:
       - name: Set up Python
         run: uv python install 3.12
       - name: Test with published siblings
+        env:
+          TOWER_REQUIRE_LENS_EXECUTION: "1"
         run: >-
           uv run --python 3.12 --extra dev --extra agenticlens --extra agentic-evals
           --extra agentic-sidecar --extra agentic-chaos --extra deep-agentic-core-mcp python -m pytest
