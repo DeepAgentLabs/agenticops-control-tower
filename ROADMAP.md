@@ -978,7 +978,7 @@ See [the integration guide](docs/lens-execution-evidence.md).
 
 ## MCP Phase 6 coordinated delivery — 2026-11-02
 
-The MCP 0.6.0 / Chaos 0.10.0 / Sidecar 0.9.2 candidate includes live task-scoped
+The MCP 0.6.0 / Chaos 0.10.0 / Sidecar 0.9.2 release includes live task-scoped
 stop/revoke, hosted Tower user bindings and authenticated native assertions.
 See the [tested matrix, limitations and commands](docs/phase6-containment.md).
 Release acceptance requires CI and publication of the paired wheels. Evals
