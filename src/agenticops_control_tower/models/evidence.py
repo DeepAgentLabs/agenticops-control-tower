@@ -22,7 +22,12 @@ class EvidenceLink(BaseModel):
     source: EvidenceSource
     source_version: str = Field(min_length=1)
     artifact_type: Literal[
-        "run", "diagnosis_report", "evaluation_report", "decision", "chaos_report"
+        "run",
+        "diagnosis_report",
+        "execution_bundle",
+        "evaluation_report",
+        "decision",
+        "chaos_report",
     ]
     artifact_ref: str = Field(min_length=1)
     observed_at: datetime
