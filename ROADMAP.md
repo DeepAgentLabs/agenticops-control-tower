@@ -965,3 +965,10 @@ and [runbooks](docs/runbooks.md)). Sibling coordination:
 - Lens, Evals, Chaos, Sidecar, AIOS and the organization profile receive
   documentation-only compatibility notes; their dependency ranges are unchanged.
   See [Tower 0.9 compatibility](docs/tower-0.9-compatibility.md).
+
+## Lens execution evidence (0.9.1)
+
+Authenticated AIOS execution bundles now integrate through Lens-owned verification.
+Host-configured trust preserves verified/failed/unknown/incomplete results and
+redacted causal IDs. No deployment health or containment verdict is inferred.
+See [the integration guide](docs/lens-execution-evidence.md).
