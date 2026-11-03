@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## 0.9.1
+
+Released 2026-11-02. Uses Lens 0.12.0 for optional execution verification.
+
+- Add Lens execution-bundle verification with host-owned trust, redacted causal
+  links and distinct verification states. See docs/lens-execution-evidence.md.
+
 ## 0.9.0
 
 Released 2026-10-31. Pairs with MCP 0.5.1 local `tower.runbook*` tools.

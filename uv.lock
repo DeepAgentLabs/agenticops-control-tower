@@ -56,7 +56,7 @@ wheels = [
 
 [[package]]
 name = "agenticlens"
-version = "0.7.0"
+version = "0.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "agentic-evals" },
@@ -67,14 +67,14 @@ dependencies = [
     { name = "rich" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/de/bb/918b0ae104cd72809b8092ce8f24391d04bdc367084809696ce8ec0908a6/agenticlens-0.7.0.tar.gz", hash = "sha256:6dcfac47528c6899116a296666e33e5931d4d38374ea242c627f64f2368d9372", size = 2089388, upload-time = "2026-10-13T23:46:17.918Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/dc/34/d476f832283c0930ba7b1dfde24b0f1df015a0d98e8e7ad97c6afa53f298/agenticlens-0.12.0.tar.gz", hash = "sha256:4fbd8777b45933cb6f3ee2f0910d4ebc7cfe2e67a7515a8f9b7c802e4837b65a", size = 11761034, upload-time = "2026-11-03T00:26:05.089Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6d/35/e0970a539f23b3a1ff27f1954779ff963bb86a44e2afdebfd7c162362aa3/agenticlens-0.7.0-py3-none-any.whl", hash = "sha256:cb23e70ea99ccc65ccccb3b25b798007b88363735cb4cc82fe755e8329d4670a", size = 219595, upload-time = "2026-10-13T23:46:16.184Z" },
+    { url = "https://files.pythonhosted.org/packages/2c/04/8382ac95ccea505c412db60d85000e22dbda899e448346cc4b5e5e3317fc/agenticlens-0.12.0-py3-none-any.whl", hash = "sha256:114078943bb30efa37606c9f4577d6af083acc2cb1603e25fa535d810f0a2c8e", size = 360490, upload-time = "2026-11-03T00:26:03.1Z" },
 ]
 
 [[package]]
 name = "agenticops-control-tower"
-version = "0.9.0"
+version = "0.9.1"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
@@ -126,7 +126,7 @@ requires-dist = [
     { name = "agentic-evals", marker = "extra == 'agentic-evals'", specifier = ">=0.7.2,<1" },
     { name = "agentic-evals", marker = "extra == 'dev'", specifier = "==0.10.0" },
     { name = "agentic-sidecar", marker = "extra == 'agentic-sidecar'", specifier = ">=0.7,<1" },
-    { name = "agenticlens", marker = "extra == 'agenticlens'", specifier = ">=0.7,<1" },
+    { name = "agenticlens", marker = "extra == 'agenticlens'", specifier = ">=0.12,<1" },
     { name = "build", marker = "extra == 'dev'", specifier = ">=1.2" },
     { name = "deep-agentic-core-mcp", marker = "extra == 'deep-agentic-core-mcp'", specifier = ">=0.3.6,<1" },
     { name = "fastapi", marker = "extra == 'api'", specifier = ">=0.115,<1" },
