@@ -1,5 +1,14 @@
 # agenticops-control-tower — Roadmap & Architecture
 
+## Release sequencing
+
+The final package-local roadmap phase uses **v0.10**, followed by further
+minor releases as needed. **v1.0 is reserved for one coordinated DeepAgentLabs
+ecosystem release**, after the shared readiness and compatibility gates pass.
+Completing this minor milestone does not independently declare stable APIs or
+AIOS conformance. Existing acceptance criteria remain required. See the
+[ecosystem release policy](https://github.com/DeepAgentLabs/.github/blob/main/profile/RELEASE_POLICY.md).
+
 **Current package version: 0.9.0.** Phase 9 adds versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery. Phase 8 added periodic detection, durable alerts and incident console views. v0.5 persists pushed Lens, Evals,
 Sidecar and Chaos evidence and surfaces its freshness and native outcomes as
 posture across the Python API, HTTP, CLI, offline snapshots and console.
@@ -61,7 +70,7 @@ execution verification without changing deployment health or recovery rules.
 - **v0.7.0** ✅ Implemented — Multi-Agent Operations and Bulk Actions
 - **v0.8.0** ✅ Implemented — Live Detection, Alerts, Audit Trails, and Incident Views
 - **v0.9.0** ✅ Implemented — Automated Runbooks and Recovery Workflows
-- **v1.0** 🚧 Planned — Stable Control Plane and Published Capability Contract
+- **v0.10** 🚧 Planned — Control Plane and Capability Contract Readiness
 
 v0.1 and v0.2 share a tested Python control model, optional SQLite registry,
 authenticated HTTP API and operator CLI. The read-only console ships in v0.3; controlled desired configuration ships in
@@ -641,11 +650,11 @@ Success criteria:
   repeated requests, partial failure, failed recovery and successful recovery
 - [x] no remediation is considered complete until declared recovery criteria pass
 
-## Phase 10: Stable Capability Contract (`v1.0`)
+## Phase 10: Capability Contract Readiness (`v0.10`)
 
 Goals:
 
-- publish a stable capability discovery contract
+- prepare a stable capability discovery contract for the coordinated ecosystem v1.0 release
 - lock the core control-plane API semantics
 - document supported runtime and framework integration patterns
 
@@ -722,8 +731,8 @@ context must not be copied into fleet views without reader authorization.
 Sidecar 0.8 provides Shared/Exclusive context-only, guardrails-only or combined
 configuration, explicit host context delivery and mandatory guardrail composition.
 Exclusive rules cannot weaken shared restrictions. Cross-framework privacy,
-revocation and delegated authority remain v0.9 validation; stable schemas remain
-v1.0. Native correlated Lens readback requires Lens 0.7.1. All sibling packages
+revocation and delegated authority remain v0.9 validation; contract readiness continues in v0.10; the stable freeze is reserved for
+the coordinated ecosystem v1.0 release. Native correlated Lens readback requires Lens 0.7.1. All sibling packages
 stay optional; no dependency floor is increased without a runtime requirement.
 See the [Sidecar integration contract](https://github.com/DeepAgentLabs/agentic-sidecar/blob/main/docs/integrations.md).
 
