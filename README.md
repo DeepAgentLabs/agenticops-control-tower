@@ -852,3 +852,8 @@ See [the integration guide](docs/lens-execution-evidence.md).
 Compatibility, ownership, dependency ranges and reproducible containment acceptance
 for MCP 0.6.0 / Chaos 0.10.0 / Sidecar 0.9.2 are documented in the
 [Phase 6 guide](docs/phase6-containment.md).
+
+## Evals 0.11 containment scoring
+
+Tower reads the unchanged native report and GateDecision schemas. Use a zero-violation containment gate when publishing recovery evidence. Tower preserves producer verdicts and never recomputes scores; a passing containment gate is not deployment health.
+See [the compatibility matrix and operator example](docs/evals-0.11-containment.md).
