@@ -1,5 +1,14 @@
 # agenticops-control-tower
 
+## Release sequencing
+
+The final package-local roadmap phase uses **v0.10**, followed by further
+minor releases as needed. **v1.0 is reserved for one coordinated DeepAgentLabs
+ecosystem release**, after the shared readiness and compatibility gates pass.
+Completing this minor milestone does not independently declare stable APIs or
+AIOS conformance. Existing acceptance criteria remain required. See the
+[ecosystem release policy](https://github.com/DeepAgentLabs/.github/blob/main/profile/RELEASE_POLICY.md).
+
 **An AI-native operations command center and unified control plane for autonomous agents and the DeepAgentLabs ecosystem.**
 
 > AgenticLens observes. Agentic Evals evaluates. Agentic Sidecar supervises. Agentic Chaos tests. Agentic
@@ -593,8 +602,8 @@ context must not be copied into fleet views without reader authorization.
 Sidecar 0.8 provides Shared/Exclusive context-only, guardrails-only or combined
 configuration, explicit host context delivery and mandatory guardrail composition.
 Exclusive rules cannot weaken shared restrictions. Cross-framework privacy,
-revocation and delegated authority remain v0.9 validation; stable schemas remain
-v1.0. Native correlated Lens readback requires Lens 0.7.1. All sibling packages
+revocation and delegated authority remain v0.9 validation; contract readiness continues in v0.10; the stable freeze is reserved for
+the coordinated ecosystem v1.0 release. Native correlated Lens readback requires Lens 0.7.1. All sibling packages
 stay optional; no dependency floor is increased without a runtime requirement.
 See the [Sidecar integration contract](https://github.com/DeepAgentLabs/agentic-sidecar/blob/main/docs/integrations.md).
 
