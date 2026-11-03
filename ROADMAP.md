@@ -983,3 +983,8 @@ stop/revoke, hosted Tower user bindings and authenticated native assertions.
 See the [tested matrix, limitations and commands](docs/phase6-containment.md).
 Release acceptance requires CI and publication of the paired wheels. Evals
 v0.11 reusable containment scoring remains the following milestone.
+
+## Evals 0.11 containment scoring
+
+Tower reads the unchanged native report and GateDecision schemas. Use a zero-violation containment gate when publishing recovery evidence. Tower preserves producer verdicts and never recomputes scores; a passing containment gate is not deployment health.
+See [the compatibility matrix and operator example](docs/evals-0.11-containment.md).
