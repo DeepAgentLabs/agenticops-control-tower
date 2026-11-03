@@ -29,6 +29,7 @@ and expected scope belong to the host, never the evaluated sample.
 
 Native report/gate schema 1.0 is unchanged. Existing optional ranges remain
 sufficient except MCP's exact pin, which requires its 0.6.1 patch release.
-Documentation alignment alone requires no other package release.
+Lens 0.12.1 raises its Evals floor to 0.11.0 for the synchronized embedded schema.
+Lens 0.12.1 also refreshes embedded Evals schemas/examples and preserves failed live-target trials. Other documentation alignment needs no package release.
 
 Tower reads the unchanged native report and GateDecision schemas. Use a zero-violation containment gate when publishing recovery evidence. Tower preserves producer verdicts and never recomputes scores; a passing containment gate is not deployment health.
