@@ -1,7 +1,9 @@
 """Push-based execution evidence: optional Lens verification and durable redaction."""
 
 import builtins
+import importlib
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -22,7 +24,10 @@ FIXTURE = Path(__file__).parent / "fixtures" / "lens-execution-bundle.json"
 @pytest.fixture
 def lens(monkeypatch):
     monkeypatch.syspath_prepend(str(Path(__file__).parents[2] / "agenticlens" / "src"))
-    pytest.importorskip("agenticlens.integrity.execution")
+    if os.environ.get("TOWER_REQUIRE_LENS_EXECUTION") == "1":
+        importlib.import_module("agenticlens.integrity.execution")
+    else:
+        pytest.importorskip("agenticlens.integrity.execution")
 
 
 def request():
@@ -140,3 +145,26 @@ def test_host_trust_store_from_environment(lens, monkeypatch, tmp_path):
     keys.write_text("invalid")
     with pytest.raises(ValueError, match="Invalid host Lens trust store"):
         create_app(detection_interval_seconds=0)
+
+
+def test_incomplete_coverage_persists_without_availability(lens, tmp_path):
+    from agenticlens.integrity import Coverage, seal
+
+    path = tmp_path / "incomplete.db"
+    agents = registry(path)
+    store = EvidenceStore(agents, str(path), trusted_lens_keys={"test": KEY})
+    observation = request()
+    artifact = observation.artifact["artifact"]
+    coverage = Coverage(stream_id="run-evidence", description="partial capture", complete=False)
+    observation.artifact["manifest"] = seal(
+        [artifact], coverage=coverage, key_id="test", key=KEY
+    ).model_dump()
+    stored = store.ingest(observation).record
+    assert stored.summary.availability == "unavailable"
+    assert stored.summary.details["verification"]["status"] == "incomplete"
+    assert stored.summary.details["verification"]["coverage"]["complete"] is False
+    assert stored.summary.details["causal_links"] == []
+    restored = EvidenceStore(agents, str(path)).get_record("payments", stored.record_id)
+    assert restored == stored
+    counts = native_tallies("agenticlens", [restored])["verification_counts"]
+    assert counts["incomplete"] == 1 and counts["verified"] == 0
