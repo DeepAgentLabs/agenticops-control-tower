@@ -47,6 +47,9 @@ unsupported explanation as an exact RCA.
 
 ## Release Status
 
+Current package release: **0.9.1** (2026-11-02), adding optional Lens 0.12
+execution verification without changing deployment health or recovery rules.
+
 - **v0.1** ✅ Implemented and published — registration, heartbeat, metadata, capability discovery,
   HTTP API, optional SQLite persistence, and reader/writer bearer authorization
 - **v0.2** ✅ Implemented and published — HTTP and snapshot CLI, shared health rollups,

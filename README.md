@@ -11,7 +11,7 @@
 
 ## Status
 
-**Current version: 0.9.0. Phase 9 adds versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery.** The registry,
+**Current version: 0.9.1. Optional Lens 0.12 execution evidence adds host-trusted verification and redacted causal links. Phase 9 introduced versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery.** The registry,
 HTTP API and CLI support SQLite persistence, reader/writer bearer authorization,
 shared fleet health and capability coverage, agent filters, and offline snapshots.
 Tower-owned configuration uses approved actions, and pushed Lens, Evals, Sidecar
