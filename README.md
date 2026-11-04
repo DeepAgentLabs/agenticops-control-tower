@@ -879,3 +879,6 @@ no package patch release is needed. See [compatibility and offline example](docs
 See [the candidate API, unchanged native schema and support matrix](docs/evals-0.12.md).
 Existing compatible dependency ranges remain sufficient; coordinated ecosystem
 v1.0 acceptance remains open.
+
+0.9.2 advances the exact Evals validation pin to 0.12.0 after publication.
+The optional runtime range remains compatible; no required sibling is added.
