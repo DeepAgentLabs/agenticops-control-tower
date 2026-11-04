@@ -896,3 +896,12 @@ See [compatibility, boundaries and offline operator example](docs/lens-0.13.md).
 ## Tower 0.10 capability contract readiness
 
 Read the [versioned candidate contract, runtime examples and migration rules](docs/capability-contract.md). Authenticated `GET /contracts/capabilities` describes existing inventory semantics; Python and Node.js workers are validated over live HTTP with durable readback. Siblings remain optional and deployment health remains independent of producer evidence. The coordinated ecosystem v1.0 freeze remains open.
+
+## MCP 0.6.5 capability discovery
+
+MCP 0.6.5 adds read-only `tower.capability_contract` with `{}` over Tower 0.10's
+`GET /contracts/capabilities`. It preserves `tower.capabilities.v1` candidate
+maturity and schemas, reuses reader credentials and requires per-user binding
+plus dispatch permission for hosted access. Tower needs no code, dependency or
+patch release. Publishing MCP does not deploy the hosted service.
+See the [MCP operator guide](https://github.com/DeepAgentLabs/mcp-server/blob/main/docs/tower-0.10-compatibility.md).
