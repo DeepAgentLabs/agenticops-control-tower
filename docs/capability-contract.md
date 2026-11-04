@@ -81,3 +81,12 @@ stable freeze remain open. This phase makes Tower's implemented control-plane
 behavior reviewable; it does not declare those gates passed.
 
 See the [Phase 10 validation record](phase10-validation.md) for release evidence.
+
+## MCP 0.6.5 capability discovery
+
+MCP 0.6.5 adds read-only `tower.capability_contract` with `{}` over Tower 0.10's
+`GET /contracts/capabilities`. It preserves `tower.capabilities.v1` candidate
+maturity and schemas, reuses reader credentials and requires per-user binding
+plus dispatch permission for hosted access. Tower needs no code, dependency or
+patch release. Publishing MCP does not deploy the hosted service.
+See the [MCP operator guide](https://github.com/DeepAgentLabs/mcp-server/blob/main/docs/tower-0.10-compatibility.md).
