@@ -905,3 +905,8 @@ maturity and schemas, reuses reader credentials and requires per-user binding
 plus dispatch permission for hosted access. Tower needs no code, dependency or
 patch release. Publishing MCP does not deploy the hosted service.
 See the [MCP operator guide](https://github.com/DeepAgentLabs/mcp-server/blob/main/docs/tower-0.10-compatibility.md).
+
+## Chaos 0.11 ChaosHub compatibility — 2026-11-04
+
+Tower 0.10.0 reads the resulting native Chaos reports through its existing artifact reader and `<1` optional dependency. It does not execute registry recipes or reinterpret resilience as deployment health. Attach producer evidence to the existing evidence ingestion path. No Tower release is needed.
+See [the compatibility guide and offline operator example](docs/chaos-0.11-chaoshub.md).
