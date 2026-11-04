@@ -23,7 +23,7 @@ reads only the JSON.
 | Extra | Installs |
 | --- | --- |
 | `api` | `fastapi`, `uvicorn`, `httpx` (server, server-mode CLI, console) |
-| `agenticlens` | `agenticlens>=0.7,<1` |
+| `agenticlens` | `agenticlens>=0.12,<1` |
 | `agentic-evals` | `agentic-evals>=0.7.2,<1` |
 | `agentic-sidecar` | `agentic-sidecar>=0.7,<1` |
 | `agentic-chaos` | `agentic-chaos>=0.5,<1` |
