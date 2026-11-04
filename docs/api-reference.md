@@ -136,3 +136,7 @@ Models are importable from `agenticops_control_tower.models`, including
 
 To serve HTTP from your own process, see
 [server settings → Python hosts](settings.md#python-hosts).
+
+## Versioned capability discovery
+
+`GET /contracts/capabilities` requires inventory reader access and returns the `tower.capabilities.v1` candidate descriptor. Python: `api.get_capability_contract()`. See [schemas, runtime examples and evolution policy](capability-contract.md).
