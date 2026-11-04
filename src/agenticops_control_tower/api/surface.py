@@ -26,6 +26,7 @@ from agenticops_control_tower.models import (
     FleetStatusSummary,
     HeartbeatPayload,
 )
+from agenticops_control_tower.models.contract import CapabilityContract
 from agenticops_control_tower.models.evidence import (
     AgentEvidencePosture,
     EvidenceIngestRequest,
@@ -68,6 +69,10 @@ class ControlTowerAPI:
         self._discovery = discovery
         self._status_service = status_service or StatusService(discovery)
         self.operations = OperationsService(self)
+
+    def get_capability_contract(self) -> CapabilityContract:
+        """Describe the candidate inventory contract without importing runtimes."""
+        return CapabilityContract()
 
     def register(self, agent: AgentRegistrationPayload | AgentRecord) -> AgentRecord:
         return self._registry.register(AgentRegistrationPayload.model_validate(agent.model_dump()))
