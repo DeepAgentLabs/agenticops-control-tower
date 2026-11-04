@@ -62,6 +62,8 @@ plugins:
 
 # A page missing from nav fails the strict build.
 nav:
+  - Phase 10 validation: phase10-validation.md
+  - Capability contract readiness: capability-contract.md
   - Lens 0.13 readiness: lens-0.13.md
   - Evals 0.12 compatibility: evals-0.12.md
   - MCP Phase 6 Containment: phase6-containment.md

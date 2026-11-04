@@ -61,3 +61,7 @@ Planned work appears only in the [roadmap](roadmap.md).
 - PyPI: [agenticops-control-tower](https://pypi.org/project/agenticops-control-tower/)
 - Changelog: [CHANGELOG.md](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/CHANGELOG.md)
 - DeepAgentLabs: [deepagentlabs.io](https://deepagentlabs.io/)
+
+## Capability contract readiness
+
+Tower 0.10 publishes the [versioned candidate discovery contract](capability-contract.md) and validates CPython and Node.js HTTP workers. Stable freezing remains reserved for the coordinated ecosystem v1.0 gate.

@@ -74,7 +74,7 @@ wheels = [
 
 [[package]]
 name = "agenticops-control-tower"
-version = "0.9.2"
+version = "0.10.0"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },

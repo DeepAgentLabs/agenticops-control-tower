@@ -37,6 +37,10 @@ jobs:
       - name: Type check (mypy)
         run: uv run mypy
 
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
       - name: Test (pytest)
         run: uv run pytest
 

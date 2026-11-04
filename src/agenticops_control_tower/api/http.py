@@ -51,6 +51,7 @@ from agenticops_control_tower.models import (
     FleetStatusSummary,
     HeartbeatPayload,
 )
+from agenticops_control_tower.models.contract import CapabilityContract
 from agenticops_control_tower.models.evidence import EvidenceSource
 from agenticops_control_tower.models.version import VersionAssessment
 from agenticops_control_tower.registry import AgentRegistry
@@ -209,6 +210,10 @@ def create_app(
             return control_api.get_agent(agent_id)
         except AgentNotFoundError as exc:
             raise HTTPException(404, f"unknown agent: {agent_id}") from exc
+
+    @app.get("/contracts/capabilities", dependencies=[Depends(read_access)])
+    def capability_contract() -> CapabilityContract:
+        return control_api.get_capability_contract()
 
     @app.get("/capabilities", dependencies=[Depends(read_access)])
     def list_capabilities() -> dict[str, list[str]]:

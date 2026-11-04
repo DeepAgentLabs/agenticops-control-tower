@@ -2,6 +2,26 @@
 
 ## [Unreleased]
 
+## 0.10.0
+
+Released 2026-11-04.
+
+### Added
+
+- Reader-authorized `/contracts/capabilities` and Python facade describing the
+  Tower-local `tower.capabilities.v1` candidate, JSON Schemas, metadata mutation
+  rules and independent reported status semantics.
+- CPython standard-library and Node.js native-fetch worker examples, live
+  authenticated HTTP interoperability tests and SQLite restart readback.
+- Contract snapshot, explicit Node CI setup, supported runtime patterns and
+  evolution/migration policy for coordinated ecosystem v1.0 readiness.
+
+### Compatibility
+
+- Existing inventory routes and payloads, optional sibling dependencies, native
+  evidence schemas and AIOS markers remain unchanged. Production runtime
+  connectors and the coordinated stable freeze remain open.
+
 ## 0.9.2
 
 Released 2026-11-04.

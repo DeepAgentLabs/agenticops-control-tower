@@ -1,12 +1,12 @@
 # Pre-Release Checklist
 
-Current target: `v0.9.2`. Keep this checklist aligned with the current API and
+Current target: `v0.10.0`. Keep this checklist aligned with the current API and
 release procedure in [AGENTS.md](AGENTS.md#release).
 
 ## Scope and metadata
 
 - Match `pyproject.toml`, `src/agenticops_control_tower/__init__.py` and `uv.lock`.
-- Use a plain `## 0.9.2` changelog heading with the release date in its body.
+- Use a plain `## 0.10.0` changelog heading with the release date in its body.
 - Align README/roadmap with implemented registry, SQLite persistence,
   authenticated API/CLI, controlled configuration approvals, evidence posture and
   read-only console. Evidence posture preserves producer outcomes independently
@@ -55,13 +55,13 @@ MCP tool approves. See `docs/runbooks.md`.
 make check
 make test-ecosystem-published
 NODE_PATH=/tmp/tower-console-qa/node_modules node tests/console_ui.cjs
-uv run python -m build --outdir /tmp/tower-0.9.2-dist
-uv run twine check /tmp/tower-0.9.2-dist/*
+uv run python -m build --outdir /tmp/tower-0.10.0-dist
+uv run twine check /tmp/tower-0.10.0-dist/*
 # Install and test the built wheel outside the editable checkout.
 tower_checkout="$PWD"
 tower_smoke_dir="$(mktemp -d)"
 uv venv "$tower_smoke_dir/venv"
-uv pip install --python "$tower_smoke_dir/venv/bin/python" "/tmp/tower-0.9.2-dist/agenticops_control_tower-0.9.2-py3-none-any.whl[api]"
+uv pip install --python "$tower_smoke_dir/venv/bin/python" "/tmp/tower-0.10.0-dist/agenticops_control_tower-0.10.0-py3-none-any.whl[api]"
 cd "$tower_smoke_dir"
 "$tower_smoke_dir/venv/bin/agenticops-control-tower" --help
 "$tower_smoke_dir/venv/bin/agenticops-control-tower" --snapshot "$tower_checkout/examples/sample_fleet_snapshot.json" agents list
@@ -73,7 +73,7 @@ from importlib.resources import files
 from agenticops_control_tower import __version__
 from agenticops_control_tower.adapters import summarize_evidence
 from agenticops_control_tower.models.evidence import EvidenceLink
-assert __version__ == "0.9.2"
+assert __version__ == "0.10.0"
 assert files("agenticops_control_tower.console").joinpath("static/index.html").is_file()
 link = EvidenceLink(agent_id="smoke", source="agentic-sidecar", source_version="0.7.0",
                     artifact_type="decision", artifact_ref="decision:smoke",
@@ -112,11 +112,11 @@ that merge commit. Extract the matching changelog section into a temporary file:
 uv run python - <<'PY'
 from pathlib import Path
 text = Path("CHANGELOG.md").read_text()
-section = text.split("## 0.9.2\n", 1)[1].split("\n## ", 1)[0].strip()
-Path("/tmp/tower-0.9.2-release-notes.md").write_text(section + "\n")
+section = text.split("## 0.10.0\n", 1)[1].split("\n## ", 1)[0].strip()
+Path("/tmp/tower-0.10.0-release-notes.md").write_text(section + "\n")
 PY
-git tag -a v0.9.2 -F /tmp/tower-0.9.2-release-notes.md --cleanup=verbatim
-git push origin v0.9.2
+git tag -a v0.10.0 -F /tmp/tower-0.10.0-release-notes.md --cleanup=verbatim
+git push origin v0.10.0
 ```
 
 The release workflow builds artifacts, publishes to PyPI through Trusted
@@ -127,10 +127,10 @@ Do not manually create a second release or publish unrelated tags.
 
 - Confirm publishing and GitHub release jobs succeeded.
 - Verify both wheel and source distribution on PyPI.
-- Install `agenticops-control-tower[api]==0.9.2` in a fresh environment and smoke
+- Install `agenticops-control-tower[api]==0.10.0` in a fresh environment and smoke
   the CLI/offline snapshot posture, native evidence reader and evidence store.
 
-## v0.9.2 execution evidence validation
+## v0.10.0 execution evidence validation
 
 Run `tests/test_lens_execution.py` with Lens 0.12 installed. Verify authenticated
 AIOS export ingestion, redaction, durable readback, unavailable/unknown handling,
@@ -141,3 +141,10 @@ a native Lens run in recovery verification.
 
 Run `tests/test_evals_contract.py` against Evals 0.12.0; verify bundled schemas
 remain identical and failing native gates remain failing.
+
+## Phase 10 candidate contract validation
+
+Run `uv run pytest tests/test_capability_contract.py` with Node.js 18+ installed.
+Require both HTTP runtime examples to pass, including reader authorization,
+schema validation, capability retention and SQLite restart readback. Compare the
+candidate snapshot and review any changes against docs/capability-contract.md.
