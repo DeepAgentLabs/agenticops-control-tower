@@ -2,8 +2,9 @@
 
 Evals 0.12.0 captures its public root API candidate and current report/gate
 schemas in compatibility fixtures, executes all registered offline Python
-examples, and publishes its CPython 3.10-3.14 support policy. The downstream
-workflow pins Lens 0.12.1, Tower 0.9.1 and MCP 0.6.1 and installs the candidate
+examples, and publishes its CPython 3.10-3.14 support policy. The Evals 0.12 producer downstream
+workflow intentionally retains the historical Lens 0.12.1, Tower 0.9.1 and MCP
+0.6.1 revisions used before publication; it installs the candidate
 distribution over each consumer's locked environment before testing it.
 
 Native report/gate schema 1.0, immutable schema IDs and AIOS `0.4-draft`
