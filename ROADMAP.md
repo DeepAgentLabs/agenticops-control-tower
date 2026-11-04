@@ -1043,3 +1043,12 @@ See the [MCP operator guide](https://github.com/DeepAgentLabs/mcp-server/blob/ma
 
 Tower 0.10.0 reads the resulting native Chaos reports through its existing artifact reader and `<1` optional dependency. It does not execute registry recipes or reinterpret resilience as deployment health. Attach producer evidence to the existing evidence ingestion path. No Tower release is needed.
 See [the compatibility guide and offline operator example](docs/chaos-0.11-chaoshub.md).
+
+
+## MCP 0.7 readiness alignment — 2026-11-04
+
+Documentation aligned with MCP 0.7.0's local readiness milestone and released
+sibling acceptance matrix. See [the integration note](docs/mcp-0.7-readiness.md).
+This does not close this project's independent production/stability gates or
+AIOS review gates. Native schemas and optional dependency ranges are unchanged;
+no package release is needed for this documentation-only alignment.
