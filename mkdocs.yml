@@ -103,6 +103,7 @@ nav:
       - Chaos 0.8: chaos-0.8.md
       - Chaos 0.9: chaos-0.9.md
       - Sidecar 0.8: sidecar-v0.8.md
+      - Sidecar 0.10 contracts: sidecar-0.10.md
       - Sidecar 0.9: sidecar-0.9.md
       - MCP 0.4 unified workflows: mcp-0.4-unified-workflows.md
   - Examples: examples.md
