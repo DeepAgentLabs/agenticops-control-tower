@@ -13,11 +13,15 @@ import time
 from pathlib import Path
 
 import pytest
-import uvicorn
-from fastapi.testclient import TestClient
-from jsonschema import Draft202012Validator
 
-from agenticops_control_tower.api.http import create_app
+pytest.importorskip("fastapi")
+pytest.importorskip("httpx")
+uvicorn = pytest.importorskip("uvicorn")
+
+from fastapi.testclient import TestClient  # noqa: E402
+from jsonschema import Draft202012Validator  # noqa: E402
+
+from agenticops_control_tower.api.http import create_app  # noqa: E402
 
 
 def test_contract_authorization_schemas_and_detached_response() -> None:
