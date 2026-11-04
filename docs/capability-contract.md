@@ -79,3 +79,5 @@ using existing Tower routes without adding a tool. Independent ecosystem v1.0
 acceptance, production runtime connectors, deployment hardening and the final
 stable freeze remain open. This phase makes Tower's implemented control-plane
 behavior reviewable; it does not declare those gates passed.
+
+See the [Phase 10 validation record](phase10-validation.md) for release evidence.
