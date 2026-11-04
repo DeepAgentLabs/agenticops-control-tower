@@ -882,3 +882,8 @@ v1.0 acceptance remains open.
 
 0.9.2 advances the exact Evals validation pin to 0.12.0 after publication.
 The optional runtime range remains compatible; no required sibling is added.
+
+## Sidecar 0.10 compatibility — 2026-11-04
+
+Tower 0.9.0 optional agentic-sidecar>=0.7,<1 already admits 0.10.0. Native evidence readers and containment adapters remain unchanged; deployment health is independent of BLOCK.
+See [candidate contracts, migration and operator example](docs/sidecar-0.10.md).
