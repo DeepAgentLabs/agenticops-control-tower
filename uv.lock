@@ -26,7 +26,7 @@ wheels = [
 
 [[package]]
 name = "agentic-evals"
-version = "0.10.0"
+version = "0.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jsonschema" },
@@ -34,9 +34,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "referencing" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ec/d2/64e8c0da2e570903c6bc283a182c191a7c5e4c7d1fab09e044b97e36ee42/agentic_evals-0.10.0.tar.gz", hash = "sha256:f7962cf80e379afb01577271e3a2e32d5ea99c1b3970fa817a31d6be03886fdc", size = 429728, upload-time = "2026-10-31T07:07:46.168Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9b/c5/04a88a66f38166f4da6beeee8e60a92bb65012f3e919ad6f2944e82abb13/agentic_evals-0.12.0.tar.gz", hash = "sha256:feaff8ee040f6ae1998d296723e808d079b1656fa8668bceb3849c5eae6b0c96", size = 468059, upload-time = "2026-11-04T06:24:42.994Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/70/73/157401c9ed46d0583d7976973b295acf40931768c5607ea11fbc330a403c/agentic_evals-0.10.0-py3-none-any.whl", hash = "sha256:085865a78cab729ac956635b39ca8f9b2b44707ad92bbdec1c6ff2e558593972", size = 115863, upload-time = "2026-10-31T07:07:44.634Z" },
+    { url = "https://files.pythonhosted.org/packages/95/0c/efcf38195c9d59a650727dfc28fd9d2d94276ed9cea1a9b9ddbba9a54d1d/agentic_evals-0.12.0-py3-none-any.whl", hash = "sha256:008590c100243fc22c2826f4838b16840bfb4f1ba9ddf1b3c555f9caa7be8062", size = 124132, upload-time = "2026-11-04T06:24:41.515Z" },
 ]
 
 [[package]]
@@ -74,7 +74,7 @@ wheels = [
 
 [[package]]
 name = "agenticops-control-tower"
-version = "0.9.1"
+version = "0.9.2"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
@@ -124,7 +124,7 @@ docs = [
 requires-dist = [
     { name = "agentic-chaos", marker = "extra == 'agentic-chaos'", specifier = ">=0.5,<1" },
     { name = "agentic-evals", marker = "extra == 'agentic-evals'", specifier = ">=0.7.2,<1" },
-    { name = "agentic-evals", marker = "extra == 'dev'", specifier = "==0.10.0" },
+    { name = "agentic-evals", marker = "extra == 'dev'", specifier = "==0.12.0" },
     { name = "agentic-sidecar", marker = "extra == 'agentic-sidecar'", specifier = ">=0.7,<1" },
     { name = "agenticlens", marker = "extra == 'agenticlens'", specifier = ">=0.12,<1" },
     { name = "build", marker = "extra == 'dev'", specifier = ">=1.2" },
