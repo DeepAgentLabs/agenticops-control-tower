@@ -9,7 +9,7 @@ Completing this minor milestone does not independently declare stable APIs or
 AIOS conformance. Existing acceptance criteria remain required. See the
 [ecosystem release policy](https://github.com/DeepAgentLabs/.github/blob/main/profile/RELEASE_POLICY.md).
 
-**Current package version: 0.9.2.** Phase 9 adds versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery. Phase 8 added periodic detection, durable alerts and incident console views. v0.5 persists pushed Lens, Evals,
+**Current package version: 0.10.0.** Phase 9 adds versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery. Phase 8 added periodic detection, durable alerts and incident console views. v0.5 persists pushed Lens, Evals,
 Sidecar and Chaos evidence and surfaces its freshness and native outcomes as
 posture across the Python API, HTTP, CLI, offline snapshots and console.
 0.5.1 adds AgenticLens 0.7.0 diagnosis reports as native Lens evidence
@@ -56,7 +56,7 @@ unsupported explanation as an exact RCA.
 
 ## Release Status
 
-Current package release: **0.9.2** (2026-11-04), validating Evals 0.12.0
+Current package release target: **0.10.0** (2026-11-04), validating Evals 0.12.0
 and retaining optional Lens 0.12 execution verification without changing deployment health or recovery rules.
 
 - **v0.1** ✅ Implemented and published — registration, heartbeat, metadata, capability discovery,
@@ -70,7 +70,7 @@ and retaining optional Lens 0.12 execution verification without changing deploym
 - **v0.7.0** ✅ Implemented — Multi-Agent Operations and Bulk Actions
 - **v0.8.0** ✅ Implemented — Live Detection, Alerts, Audit Trails, and Incident Views
 - **v0.9.0** ✅ Implemented — Automated Runbooks and Recovery Workflows
-- **v0.10** 🚧 Planned — Control Plane and Capability Contract Readiness
+- **v0.10** ✅ Implemented — Control Plane and Capability Contract Readiness (candidate; stable freeze reserved for ecosystem v1.0)
 
 v0.1 and v0.2 share a tested Python control model, optional SQLite registry,
 authenticated HTTP API and operator CLI. The read-only console ships in v0.3; controlled desired configuration ships in
@@ -660,10 +660,15 @@ Goals:
 
 Success criteria:
 
-- at least two materially different runtimes are validated end to end
-- capability metadata and status semantics are versioned
-- Control Tower can be described as a stable control-plane product rather than
-  a concept repo
+- [x] CPython and Node.js processes validated end to end over authenticated HTTP,
+  including SQLite restart readback
+- [x] capability metadata and status semantics are versioned as the Tower-local
+  `tower.capabilities.v1` candidate with JSON Schemas
+- [x] core control-plane behavior, integration patterns and migration rules are
+  documented and tested; final stable designation remains an ecosystem v1.0 gate
+
+See [contract readiness](docs/capability-contract.md) and
+`tests/test_capability_contract.py`. Production runtime connectors remain planned.
 
 ---
 

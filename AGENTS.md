@@ -56,8 +56,8 @@ and shown as freshness and native tallies. v0.6 combines Phase 6 and 6A: local M
 approved deterministic staging recovery. See docs/incident-recovery.md. v0.7 adds frozen fleet previews, approvals, desired settings and bounded
 stop/revoke coordination; see docs/fleet-operations.md. v0.8 adds periodic local detection, alerts and incident console views; see
 docs/live-operations.md. v0.9 adds versioned runbooks with exact-digest approval, bounded steps,
-compensation, cancellation and verified recovery; see docs/runbooks.md. Production runbook
-connectors remain planned.
+compensation, cancellation and verified recovery; see docs/runbooks.md. v0.10 adds a versioned candidate capability contract and Python/Node HTTP validation;
+see docs/capability-contract.md. Production runbook connectors remain planned.
 
 ### Before You Build Here
 
@@ -71,7 +71,7 @@ connectors remain planned.
 
 ## Status
 
-The v0.1–v0.9 milestones are **implemented**. Package layout, docs, tests, and
+The v0.1–v0.10 milestones are **implemented**. Package layout, docs, tests, and
 CI/release workflows exist; a registry with optional SQLite persistence,
 discovery, HTTP API, and CLI exist today — see
 [ROADMAP.md](ROADMAP.md) for published milestone status, implementation evidence,

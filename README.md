@@ -892,3 +892,7 @@ See [candidate contracts, migration and operator example](docs/sidecar-0.10.md).
 
 The optional Lens extra `>=0.12,<1` already admits 0.13.0. Tower keeps native evidence projection and independent deployment health. Lens project namespaces and local audit are not automatically imported as Tower inventory, incidents or verified evidence.
 See [compatibility, boundaries and offline operator example](docs/lens-0.13.md).
+
+## Tower 0.10 capability contract readiness
+
+Read the [versioned candidate contract, runtime examples and migration rules](docs/capability-contract.md). Authenticated `GET /contracts/capabilities` describes existing inventory semantics; Python and Node.js workers are validated over live HTTP with durable readback. Siblings remain optional and deployment health remains independent of producer evidence. The coordinated ecosystem v1.0 freeze remains open.

@@ -1,0 +1,239 @@
+{
+  "capabilities": "agent-reported; not verified installation",
+  "contract_version": "tower.capabilities.v1",
+  "health": "reported; no automatic heartbeat expiry",
+  "heartbeat": "merge metadata; replace status and last_seen",
+  "maturity": "candidate",
+  "registration": "replace record and reset heartbeat count",
+  "schemas": {
+    "agent": {
+      "$defs": {
+        "AgentStatus": {
+          "description": "High-level health states for the initial registry model.",
+          "enum": [
+            "healthy",
+            "degraded",
+            "unhealthy",
+            "unknown"
+          ],
+          "title": "AgentStatus",
+          "type": "string"
+        }
+      },
+      "description": "Inventory record for one known agent.",
+      "properties": {
+        "agent_id": {
+          "title": "Agent Id",
+          "type": "string"
+        },
+        "capabilities": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "object"
+        },
+        "environment": {
+          "title": "Environment",
+          "type": "string"
+        },
+        "framework": {
+          "title": "Framework",
+          "type": "string"
+        },
+        "heartbeat_count": {
+          "default": 0,
+          "title": "Heartbeat Count",
+          "type": "integer"
+        },
+        "last_seen": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Seen"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "package_metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Package Metadata",
+          "type": "object"
+        },
+        "registered_at": {
+          "format": "date-time",
+          "title": "Registered At",
+          "type": "string"
+        },
+        "runtime": {
+          "title": "Runtime",
+          "type": "string"
+        },
+        "runtime_metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Runtime Metadata",
+          "type": "object"
+        },
+        "status": {
+          "$ref": "#/$defs/AgentStatus",
+          "default": "unknown"
+        }
+      },
+      "required": [
+        "agent_id",
+        "name",
+        "environment",
+        "runtime",
+        "framework"
+      ],
+      "title": "AgentRecord",
+      "type": "object"
+    },
+    "heartbeat": {
+      "$defs": {
+        "AgentStatus": {
+          "description": "High-level health states for the initial registry model.",
+          "enum": [
+            "healthy",
+            "degraded",
+            "unhealthy",
+            "unknown"
+          ],
+          "title": "AgentStatus",
+          "type": "string"
+        }
+      },
+      "description": "Runtime-reported status snapshot for a registered agent.",
+      "properties": {
+        "capabilities": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "object"
+        },
+        "last_seen": {
+          "format": "date-time",
+          "title": "Last Seen",
+          "type": "string"
+        },
+        "package_metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Package Metadata",
+          "type": "object"
+        },
+        "runtime_metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Runtime Metadata",
+          "type": "object"
+        },
+        "status": {
+          "$ref": "#/$defs/AgentStatus",
+          "default": "unknown"
+        }
+      },
+      "title": "HeartbeatPayload",
+      "type": "object"
+    },
+    "registration": {
+      "$defs": {
+        "AgentStatus": {
+          "description": "High-level health states for the initial registry model.",
+          "enum": [
+            "healthy",
+            "degraded",
+            "unhealthy",
+            "unknown"
+          ],
+          "title": "AgentStatus",
+          "type": "string"
+        }
+      },
+      "description": "Explicit registration request for a runtime-agnostic agent.",
+      "properties": {
+        "agent_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+          "title": "Agent Id",
+          "type": "string"
+        },
+        "capabilities": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "object"
+        },
+        "environment": {
+          "title": "Environment",
+          "type": "string"
+        },
+        "framework": {
+          "title": "Framework",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "package_metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Package Metadata",
+          "type": "object"
+        },
+        "registered_at": {
+          "format": "date-time",
+          "title": "Registered At",
+          "type": "string"
+        },
+        "runtime": {
+          "title": "Runtime",
+          "type": "string"
+        },
+        "runtime_metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Runtime Metadata",
+          "type": "object"
+        },
+        "status": {
+          "$ref": "#/$defs/AgentStatus",
+          "default": "unknown"
+        }
+      },
+      "required": [
+        "agent_id",
+        "name",
+        "environment",
+        "runtime",
+        "framework"
+      ],
+      "title": "AgentRegistrationPayload",
+      "type": "object"
+    }
+  },
+  "statuses": [
+    "healthy",
+    "degraded",
+    "unhealthy",
+    "unknown"
+  ]
+}

@@ -100,3 +100,11 @@ def test_python_and_node_runtime_roundtrip(tmp_path: Path) -> None:
         ("cpython", "healthy"),
     ]
     assert restarted.get("/capabilities", headers=headers).json() == {"custom.worker": ["1.0"]}
+
+
+def test_candidate_contract_snapshot() -> None:
+    """Changes to the candidate baseline require an explicit compatibility review."""
+    from agenticops_control_tower.models.contract import CapabilityContract
+
+    baseline = Path(__file__).parent / "fixtures" / "capability-contract-v1.json"
+    assert CapabilityContract().model_dump() == json.loads(baseline.read_text())
