@@ -9,7 +9,7 @@ Completing this minor milestone does not independently declare stable APIs or
 AIOS conformance. Existing acceptance criteria remain required. See the
 [ecosystem release policy](https://github.com/DeepAgentLabs/.github/blob/main/profile/RELEASE_POLICY.md).
 
-**Current package version: 0.9.0.** Phase 9 adds versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery. Phase 8 added periodic detection, durable alerts and incident console views. v0.5 persists pushed Lens, Evals,
+**Current package version: 0.9.2.** Phase 9 adds versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery. Phase 8 added periodic detection, durable alerts and incident console views. v0.5 persists pushed Lens, Evals,
 Sidecar and Chaos evidence and surfaces its freshness and native outcomes as
 posture across the Python API, HTTP, CLI, offline snapshots and console.
 0.5.1 adds AgenticLens 0.7.0 diagnosis reports as native Lens evidence
@@ -56,8 +56,8 @@ unsupported explanation as an exact RCA.
 
 ## Release Status
 
-Current package release: **0.9.1** (2026-11-02), adding optional Lens 0.12
-execution verification without changing deployment health or recovery rules.
+Current package release: **0.9.2** (2026-11-04), validating Evals 0.12.0
+and retaining optional Lens 0.12 execution verification without changing deployment health or recovery rules.
 
 - **v0.1** ✅ Implemented and published — registration, heartbeat, metadata, capability discovery,
   HTTP API, optional SQLite persistence, and reader/writer bearer authorization
@@ -1005,3 +1005,12 @@ AIOS v0.7.0 publishes cumulative-layer migration guidance, a non-normative
 OpenTelemetry companion profile and a strict documentation site build.
 Existing draft markers, native evidence and runtime dependencies are unchanged;
 no package patch release is needed. See [compatibility and offline example](docs/aios-0.7.0.md).
+
+## Evals 0.12 readiness compatibility
+
+See [the candidate API, unchanged native schema and support matrix](docs/evals-0.12.md).
+Existing compatible dependency ranges remain sufficient; coordinated ecosystem
+v1.0 acceptance remains open.
+
+0.9.2 advances the exact Evals validation pin to 0.12.0 after publication.
+The optional runtime range remains compatible; no required sibling is added.

@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## 0.9.2
+
+Released 2026-11-04.
+
+- Validate against Evals 0.12.0 and document its candidate API, support policy
+  and coordinated-major acceptance boundaries. Native report/gate schema 1.0
+  and AIOS 0.4-draft exports are unchanged.
+- Advance the development Evals pin; the optional runtime range stays >=0.7.2,<1.
+
 ## 0.9.1
 
 Released 2026-11-02. Uses Lens 0.12.0 for optional execution verification.

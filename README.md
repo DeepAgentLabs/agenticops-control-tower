@@ -20,7 +20,7 @@ AIOS conformance. Existing acceptance criteria remain required. See the
 
 ## Status
 
-**Current version: 0.9.1. Optional Lens 0.12 execution evidence adds host-trusted verification and redacted causal links. Phase 9 introduced versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery.** The registry,
+**Current version: 0.9.2. Evals 0.12.0 validation preserves native schema 1.0. Optional Lens 0.12 execution evidence adds host-trusted verification and redacted causal links. Phase 9 introduced versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery.** The registry,
 HTTP API and CLI support SQLite persistence, reader/writer bearer authorization,
 shared fleet health and capability coverage, agent filters, and offline snapshots.
 Tower-owned configuration uses approved actions, and pushed Lens, Evals, Sidecar
@@ -873,3 +873,12 @@ AIOS v0.7.0 publishes cumulative-layer migration guidance, a non-normative
 OpenTelemetry companion profile and a strict documentation site build.
 Existing draft markers, native evidence and runtime dependencies are unchanged;
 no package patch release is needed. See [compatibility and offline example](docs/aios-0.7.0.md).
+
+## Evals 0.12 readiness compatibility
+
+See [the candidate API, unchanged native schema and support matrix](docs/evals-0.12.md).
+Existing compatible dependency ranges remain sufficient; coordinated ecosystem
+v1.0 acceptance remains open.
+
+0.9.2 advances the exact Evals validation pin to 0.12.0 after publication.
+The optional runtime range remains compatible; no required sibling is added.
