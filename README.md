@@ -887,3 +887,8 @@ The optional runtime range remains compatible; no required sibling is added.
 
 Tower 0.9.0 optional agentic-sidecar>=0.7,<1 already admits 0.10.0. Native evidence readers and containment adapters remain unchanged; deployment health is independent of BLOCK.
 See [candidate contracts, migration and operator example](docs/sidecar-0.10.md).
+
+## Lens 0.13 readiness compatibility — 2026-11-04
+
+The optional Lens extra `>=0.12,<1` already admits 0.13.0. Tower keeps native evidence projection and independent deployment health. Lens project namespaces and local audit are not automatically imported as Tower inventory, incidents or verified evidence.
+See [compatibility, boundaries and offline operator example](docs/lens-0.13.md).
