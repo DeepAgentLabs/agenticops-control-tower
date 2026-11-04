@@ -1029,3 +1029,12 @@ See [candidate contracts, migration and operator example](docs/sidecar-0.10.md).
 
 The optional Lens extra `>=0.12,<1` already admits 0.13.0. Tower keeps native evidence projection and independent deployment health. Lens project namespaces and local audit are not automatically imported as Tower inventory, incidents or verified evidence.
 See [compatibility, boundaries and offline operator example](docs/lens-0.13.md).
+
+## MCP 0.6.5 capability discovery
+
+MCP 0.6.5 adds read-only `tower.capability_contract` with `{}` over Tower 0.10's
+`GET /contracts/capabilities`. It preserves `tower.capabilities.v1` candidate
+maturity and schemas, reuses reader credentials and requires per-user binding
+plus dispatch permission for hosted access. Tower needs no code, dependency or
+patch release. Publishing MCP does not deploy the hosted service.
+See the [MCP operator guide](https://github.com/DeepAgentLabs/mcp-server/blob/main/docs/tower-0.10-compatibility.md).
