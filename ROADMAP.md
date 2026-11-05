@@ -1,13 +1,14 @@
 # agenticops-control-tower — Roadmap & Architecture
 
-## Release sequencing
+## Coordinated 1.0.0 milestone
 
-The current package-local readiness increment uses **v0.11**, following the
-v0.10 capability-contract candidate; further minor releases may follow. **v1.0 is reserved for one coordinated DeepAgentLabs
-ecosystem release**, after the shared readiness and compatibility gates pass.
-Completing this minor milestone does not independently declare stable APIs or
-AIOS conformance. Existing acceptance criteria remain required. See the
-[ecosystem release policy](https://github.com/DeepAgentLabs/.github/blob/main/profile/RELEASE_POLICY.md).
+Version 1.0.0 marks the coordinated DeepAgentLabs milestone on 2026-11-05.
+Development and roadmap delivery continue after this release. Existing draft
+and candidate schema markers retain their maturity; package versions do not
+certify AIOS conformance or production deployment readiness. Independent review,
+independent implementations, security/deployment acceptance, live-provider
+validation and the stable contract freeze remain tracked follow-up work.
+See the [ecosystem release policy](https://github.com/DeepAgentLabs/.github/blob/main/profile/RELEASE_POLICY.md).
 
 **Current package version: 0.11.0.** Native AIOS investigation projection is available. Phase 9 adds versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery. Phase 8 added periodic detection, durable alerts and incident console views. v0.5 persists pushed Lens, Evals,
 Sidecar and Chaos evidence and surfaces its freshness and native outcomes as
@@ -1064,5 +1065,5 @@ optional adoption guidance; no runtime dependency or patch release is required.
 
 See [the implementation and migration guide](docs/coordinated-v1-readiness.md)
 for the current candidate scope, interoperability evidence and remaining gates.
-Current version: 0.11.0. Internal tests do not close independent review,
+Current version: 1.0.0. Internal tests do not close independent review,
 live-provider/deployment acceptance or the coordinated stable freeze.
