@@ -2,8 +2,8 @@
 
 ## Release sequencing
 
-The final package-local roadmap phase uses **v0.10**, followed by further
-minor releases as needed. **v1.0 is reserved for one coordinated DeepAgentLabs
+The current package-local readiness increment uses **v0.11**, following the
+v0.10 capability-contract candidate; further minor releases may follow. **v1.0 is reserved for one coordinated DeepAgentLabs
 ecosystem release**, after the shared readiness and compatibility gates pass.
 Completing this minor milestone does not independently declare stable APIs or
 AIOS conformance. Existing acceptance criteria remain required. See the
@@ -20,7 +20,7 @@ AIOS conformance. Existing acceptance criteria remain required. See the
 
 ## Status
 
-**Current version: 0.10.0. Versioned candidate capability discovery and CPython/Node.js HTTP validation complete Phase 10 readiness. Evals 0.12.0 validation preserves native schema 1.0. Optional Lens 0.12 execution evidence adds host-trusted verification and redacted causal links. Phase 9 introduced versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery.** The registry,
+**Current version: 0.11.0. Source-preserving AIOS investigation exports are available. Versioned candidate capability discovery and CPython/Node.js HTTP validation complete Phase 10 readiness. Evals 0.12.0 validation preserves native schema 1.0. Optional Lens 0.12 execution evidence adds host-trusted verification and redacted causal links. Phase 9 introduced versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery.** The registry,
 HTTP API and CLI support SQLite persistence, reader/writer bearer authorization,
 shared fleet health and capability coverage, agent filters, and offline snapshots.
 Tower-owned configuration uses approved actions, and pushed Lens, Evals, Sidecar
@@ -925,3 +925,10 @@ See [the compatibility and adoption guide](docs/aios-0.8-operational-artifacts.m
 for the new exploratory verification, audit and investigation companions.
 Existing native contracts and supported AIOS markers are unchanged. This is
 optional adoption guidance; no runtime dependency or patch release is required.
+
+## Coordinated v1.0 engineering readiness
+
+See [the implementation and migration guide](docs/coordinated-v1-readiness.md)
+for the current candidate scope, interoperability evidence and remaining gates.
+Current version: 0.11.0. Internal tests do not close independent review,
+live-provider/deployment acceptance or the coordinated stable freeze.

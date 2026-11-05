@@ -62,6 +62,7 @@ plugins:
 
 # A page missing from nav fails the strict build.
 nav:
+  - Coordinated v1 readiness: coordinated-v1-readiness.md
   - MCP 0.7 readiness: mcp-0.7-readiness.md
   - Chaos 0.11 ChaosHub: chaos-0.11-chaoshub.md
   - Phase 10 validation: phase10-validation.md

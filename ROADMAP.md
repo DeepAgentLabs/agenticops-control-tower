@@ -2,14 +2,14 @@
 
 ## Release sequencing
 
-The final package-local roadmap phase uses **v0.10**, followed by further
-minor releases as needed. **v1.0 is reserved for one coordinated DeepAgentLabs
+The current package-local readiness increment uses **v0.11**, following the
+v0.10 capability-contract candidate; further minor releases may follow. **v1.0 is reserved for one coordinated DeepAgentLabs
 ecosystem release**, after the shared readiness and compatibility gates pass.
 Completing this minor milestone does not independently declare stable APIs or
 AIOS conformance. Existing acceptance criteria remain required. See the
 [ecosystem release policy](https://github.com/DeepAgentLabs/.github/blob/main/profile/RELEASE_POLICY.md).
 
-**Current package version: 0.10.0.** Phase 9 adds versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery. Phase 8 added periodic detection, durable alerts and incident console views. v0.5 persists pushed Lens, Evals,
+**Current package version: 0.11.0.** Native AIOS investigation projection is available. Phase 9 adds versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery. Phase 8 added periodic detection, durable alerts and incident console views. v0.5 persists pushed Lens, Evals,
 Sidecar and Chaos evidence and surfaces its freshness and native outcomes as
 posture across the Python API, HTTP, CLI, offline snapshots and console.
 0.5.1 adds AgenticLens 0.7.0 diagnosis reports as native Lens evidence
@@ -56,7 +56,7 @@ unsupported explanation as an exact RCA.
 
 ## Release Status
 
-Current package release target: **0.10.0** (2026-11-04), validating Evals 0.12.0
+Current package release target: **0.11.0** (2026-11-04), validating Evals 0.12.0
 and retaining optional Lens 0.12 execution verification without changing deployment health or recovery rules.
 
 - **v0.1** ✅ Implemented and published — registration, heartbeat, metadata, capability discovery,
@@ -1059,3 +1059,10 @@ See [the compatibility and adoption guide](docs/aios-0.8-operational-artifacts.m
 for the new exploratory verification, audit and investigation companions.
 Existing native contracts and supported AIOS markers are unchanged. This is
 optional adoption guidance; no runtime dependency or patch release is required.
+
+## Coordinated v1.0 engineering readiness
+
+See [the implementation and migration guide](docs/coordinated-v1-readiness.md)
+for the current candidate scope, interoperability evidence and remaining gates.
+Current version: 0.11.0. Internal tests do not close independent review,
+live-provider/deployment acceptance or the coordinated stable freeze.

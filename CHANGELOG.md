@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+## 0.11.0
+
+Released 2026-11-04.
+
+### Added
+
+- Export held native incidents as AIOS 0.8-draft investigation reports with incident context, attributed evidence and redacted summaries.
+- Keep closure independent of recovery verification, retain native states and reject unsupported citations or future observations.
+
+Independent review, live/deployment acceptance and the coordinated v1.0 freeze remain open.
+
+
 ## 0.10.0
 
 Released 2026-11-04.
