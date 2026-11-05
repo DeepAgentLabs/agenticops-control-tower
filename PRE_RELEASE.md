@@ -1,12 +1,12 @@
 # Pre-Release Checklist
 
-Current target: `v0.10.0`. Keep this checklist aligned with the current API and
+Current target: `v0.11.0`. Keep this checklist aligned with the current API and
 release procedure in [AGENTS.md](AGENTS.md#release).
 
 ## Scope and metadata
 
 - Match `pyproject.toml`, `src/agenticops_control_tower/__init__.py` and `uv.lock`.
-- Use a plain `## 0.10.0` changelog heading with the release date in its body.
+- Use a plain `## 0.11.0` changelog heading with the release date in its body.
 - Align README/roadmap with implemented registry, SQLite persistence,
   authenticated API/CLI, controlled configuration approvals, evidence posture and
   read-only console. Evidence posture preserves producer outcomes independently
@@ -148,3 +148,7 @@ Run `uv run pytest tests/test_capability_contract.py` with Node.js 18+ installed
 Require both HTTP runtime examples to pass, including reader authorization,
 schema validation, capability retention and SQLite restart readback. Compare the
 candidate snapshot and review any changes against docs/capability-contract.md.
+
+## Operational companion validation
+
+Run `tests/test_aios_investigation_export.py` and `examples/operational_artifacts.py`. Confirm redacted native attribution, explicit missing inputs, unknown recovery after closure alone, and citations to actual native verification events. No source fetch or recovery dispatch occurs during export.
