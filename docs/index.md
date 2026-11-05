@@ -65,3 +65,7 @@ Planned work appears only in the [roadmap](roadmap.md).
 ## Capability contract readiness
 
 Tower 0.10 publishes the [versioned candidate discovery contract](capability-contract.md) and validates CPython and Node.js HTTP workers. Stable freezing remains reserved for the coordinated ecosystem v1.0 gate.
+
+## AIOS 0.8 operational artifacts
+
+See [optional operational artifact adoption](aios-0.8-operational-artifacts.md) for verification signals, audit events and investigation reports. Native contracts and supported markers remain unchanged.
