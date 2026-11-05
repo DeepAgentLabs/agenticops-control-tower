@@ -1,13 +1,14 @@
 # agenticops-control-tower
 
-## Release sequencing
+## Coordinated 1.0.0 milestone
 
-The current package-local readiness increment uses **v0.11**, following the
-v0.10 capability-contract candidate; further minor releases may follow. **v1.0 is reserved for one coordinated DeepAgentLabs
-ecosystem release**, after the shared readiness and compatibility gates pass.
-Completing this minor milestone does not independently declare stable APIs or
-AIOS conformance. Existing acceptance criteria remain required. See the
-[ecosystem release policy](https://github.com/DeepAgentLabs/.github/blob/main/profile/RELEASE_POLICY.md).
+Version 1.0.0 marks the coordinated DeepAgentLabs milestone on 2026-11-05.
+Development and roadmap delivery continue after this release. Existing draft
+and candidate schema markers retain their maturity; package versions do not
+certify AIOS conformance or production deployment readiness. Independent review,
+independent implementations, security/deployment acceptance, live-provider
+validation and the stable contract freeze remain tracked follow-up work.
+See the [ecosystem release policy](https://github.com/DeepAgentLabs/.github/blob/main/profile/RELEASE_POLICY.md).
 
 **An AI-native operations command center and unified control plane for autonomous agents and the DeepAgentLabs ecosystem.**
 
@@ -20,7 +21,7 @@ AIOS conformance. Existing acceptance criteria remain required. See the
 
 ## Status
 
-**Current version: 0.11.0. Source-preserving AIOS investigation exports are available. Versioned candidate capability discovery and CPython/Node.js HTTP validation complete Phase 10 readiness. Evals 0.12.0 validation preserves native schema 1.0. Optional Lens 0.12 execution evidence adds host-trusted verification and redacted causal links. Phase 9 introduced versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery.** The registry,
+**Current version: 1.0.0. Source-preserving AIOS investigation exports are available. Versioned candidate capability discovery and CPython/Node.js HTTP validation complete Phase 10 readiness. Evals 0.12.0 validation preserves native schema 1.0. Optional Lens 0.12 execution evidence adds host-trusted verification and redacted causal links. Phase 9 introduced versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery.** The registry,
 HTTP API and CLI support SQLite persistence, reader/writer bearer authorization,
 shared fleet health and capability coverage, agent filters, and offline snapshots.
 Tower-owned configuration uses approved actions, and pushed Lens, Evals, Sidecar
@@ -930,5 +931,5 @@ optional adoption guidance; no runtime dependency or patch release is required.
 
 See [the implementation and migration guide](docs/coordinated-v1-readiness.md)
 for the current candidate scope, interoperability evidence and remaining gates.
-Current version: 0.11.0. Internal tests do not close independent review,
+Current version: 1.0.0. Internal tests do not close independent review,
 live-provider/deployment acceptance or the coordinated stable freeze.
