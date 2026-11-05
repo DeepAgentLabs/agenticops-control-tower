@@ -38,7 +38,7 @@ CLI and the console.
 === "PyPI (0.8.0)"
 
     ```bash
-    python -m pip install "agenticops-control-tower[api]==0.8.0"
+    python -m pip install "agenticops-control-tower[api]==0.11.0"
     ```
 
     This includes the snapshot CLI, tokens, SQLite, console, evidence posture
