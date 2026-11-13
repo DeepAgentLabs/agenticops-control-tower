@@ -1,0 +1,10 @@
+{
+  "agent_id": "support-demo",
+  "name": "Support demo",
+  "environment": "staging",
+  "runtime": "local-python",
+  "framework": "custom",
+  "status": "unknown",
+  "capabilities": {}
+}
+

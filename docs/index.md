@@ -1,73 +1,81 @@
-# AgenticOps Control Tower
+# Control Tower
 
-**Unified control plane and operations console for the DeepAgentLabs ecosystem.**
+## Control Tower overview
 
-> AgenticLens observes. Agentic Evals evaluates. Agentic Sidecar supervises.
-> Agentic Chaos tests. Agentic MCP connects. **Control Tower operates.**
+Which agents exist, what evidence do they have, and what needs attention?
 
-Control Tower keeps an inventory of the agents you run, where they run and
-which DeepAgentLabs capabilities each one has. It rolls their heartbeats up into
-fleet health, stores evidence pushed by the sibling packages, raises alerts when
-that evidence shows a failure, and coordinates approved, audited changes. One
-Python service provides the HTTP API, the CLI backend and a read-only web
-console.
+Registrations, heartbeats, explicit evidence links, and operator configuration. Fleet inventory, evidence posture, alerts, incident views, and approved operational workflows.
 
-!!! info "Verified version"
-    These docs describe the published **0.9.0** release, available on
-    [PyPI](https://pypi.org/project/agenticops-control-tower/0.9.0/) since
-    31 October 2026. Install `agenticops-control-tower[api]==0.9.0` for the HTTP
-    server and console. Examples using `examples/` files also need a repository
-    checkout. The package is **pre-alpha**; no 1.0 compatibility promise is made.
+**When to start here**
 
+Read a sample fleet offline; then start the local console.
 
-## What it does today
+## Inputs and outputs
 
-| Capability | Added in | In PyPI 0.9.0 | Status |
-| --- | --- | --- | --- |
-| [Agent registry and heartbeats](features.md#agent-registry-and-heartbeats) | 0.2.0 | Yes | Stable |
-| [Capability discovery and version inventory](features.md#capability-discovery-and-version-inventory) | 0.2.0 | Yes | Stable |
-| [HTTP API and CLI](features.md#http-api-cli-and-offline-snapshots) | 0.2.0 | Yes | Stable |
-| [Fleet health, filters and offline snapshots](features.md#fleet-health-and-filters) | 0.2.1 | Yes | Stable |
-| [SQLite persistence and reader/writer tokens](features.md#sqlite-persistence-and-bearer-tokens) | 0.2.1 | Yes | Stable |
-| [Read-only AgenticOps Console](features.md#read-only-agenticops-console) | 0.3.0 | Yes | Stable |
-| [Controlled configuration with approvals](features.md#controlled-configuration) | 0.4.0 | Yes | Experimental |
-| [Ecosystem evidence posture](features.md#ecosystem-evidence-posture) | 0.5.0 | Yes | Experimental |
-| [Incident investigation and approved staging recovery](features.md#incident-investigation-and-approved-staging-recovery) | 0.6.0 | Yes | Experimental |
-| [Bulk fleet operations](features.md#bulk-fleet-operations) | 0.7.0 | Yes | Experimental |
-| [Live detection, alerts and incident views](features.md#live-detection-alerts-and-incident-views) | 0.8.0 | Yes | Experimental |
-| [Automated runbooks and recovery workflows](features.md#automated-runbooks-and-recovery-workflows) | 0.9.0 | Yes | Experimental |
+| You provide | You receive |
+| --- | --- |
+| Registrations, heartbeats, explicit evidence links, and operator configuration. | Fleet inventory, evidence posture, alerts, incident views, and approved operational workflows. |
 
-**Stable** means the surface has existed since 0.3 or earlier and is covered by
-the test suite; it is not yet a 1.0 compatibility promise. **Experimental**
-means it was added in 0.4–0.9, may change before 1.0, even though it is included in the 0.9.0 release.
-Planned work appears only in the [roadmap](roadmap.md).
+## Execution boundary
 
-## Where to go next
+Fleet status does not turn a failed eval into a pass. Evidence ingestion and producer integrations must be configured explicitly.
 
-- **New here?** [Getting started](getting-started.md) installs Control Tower,
-  reads a sample fleet offline and runs the server with the console.
-- **Running it for a team?** [Server settings](settings.md),
-  [authentication](authentication.md) and [hosting](hosting.md).
-- **Connecting the other packages?** [Integrations](integrations.md) and
-  [evidence posture](evidence-posture.md).
-- **Looking for a task-based walkthrough?**
-  [Use cases](https://deepagentlabs.io/control-tower/usecases/).
-- **Reference:** [CLI](cli-reference.md), [HTTP and Python API](api-reference.md).
+[Start the Control Tower quickstart →](guide/quickstart.md)
 
-## Links
+<span id="what-it-does-today"></span>
 
-- Product page: [deepagentlabs.io/agenticops-control-tower](https://deepagentlabs.io/control-tower/)
-- Source: [github.com/DeepAgentLabs/agenticops-control-tower](https://github.com/DeepAgentLabs/agenticops-control-tower)
-- PyPI: [agenticops-control-tower](https://pypi.org/project/agenticops-control-tower/)
-- Changelog: [CHANGELOG.md](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/CHANGELOG.md)
-- DeepAgentLabs: [deepagentlabs.io](https://deepagentlabs.io/)
+## Capabilities
 
-## Capability contract readiness
+Use these capabilities to address operate tasks in your application.
 
-Tower 0.10 publishes the [versioned candidate discovery contract](capability-contract.md) and validates CPython and Node.js HTTP workers. Stable freezing remains reserved for the coordinated ecosystem v1.0 gate.
+| Capability | What it provides |
+| --- | --- |
+| Inventory and heartbeats | Register deployments and inspect their reported runtime status. |
+| Capability coverage | Identify installed and missing producer capabilities across registered agents. |
+| Evidence posture | Store attributed producer outcomes and show freshness without rewriting their verdicts. |
+| Operational console | Read fleet inventory and evidence through a local service and console. |
+| Controlled changes | Preview actions, collect authorization, execute bounded operations, and verify results. |
+| Detection and runbooks | Work with alerts, incidents, recovery workflows, and recorded operational evidence. |
 
-## AIOS 0.8 operational artifacts
+## Supported scope
 
-See [optional operational artifact adoption](aios-0.8-operational-artifacts.md) for verification signals, audit events and investigation reports. Native contracts and supported markers remain unchanged.
+Fleet status does not turn a failed eval into a pass. Evidence ingestion and producer integrations must be configured explicitly.
 
-See [coordinated v1.0 engineering readiness](coordinated-v1-readiness.md) for candidate scope, migration and remaining acceptance gates.
+## Core concepts
+
+| Concept | Meaning |
+| --- | --- |
+| Registration | Identifies an agent deployment and its declared runtime/capabilities. |
+| Heartbeat | A reported runtime status, not proof that every task succeeded. |
+| EvidenceLink | Attributes a producer artifact to a deployment and observation time. |
+| Posture | A view of freshness and native outcomes, separate from reported deployment health. |
+| Projection | Tower stores supported fields for operations; it does not reproduce every producer's raw trace. |
+| Approval and execution | A preview, authorization, dispatch, and verification are distinct steps. |
+
+## Recommended workflow
+
+## Register before sending evidence
+
+Define the deployment identity and runtime fields. Register it, then send periodic heartbeats from the runtime. A registration by itself does not prove current health.
+
+## Push native evidence
+
+Producer pipelines send a native artifact plus an EvidenceLink. Tower does not fetch an artifact merely because its reference looks like a URL. The deployment must already exist.
+
+## Read posture
+
+Inspect freshness, the latest available or unavailable record, and native outcomes. Missing evidence is not a healthy check or a failed quality score. A producer failure remains a producer failure even if the runtime heartbeat is healthy.
+
+## Handle incidents
+
+Review alerts and supporting evidence, preview a bounded action, obtain the required authorization, then execute and verify. Preserve the resulting audit trail.
+
+## Retain operations state
+
+Choose a persistent SQLite database when you need state after restart. Establish explicit retention for evidence; do not assume automatic cleanup.
+
+## Next steps
+
+Read a sample fleet offline; then start the local console.
+
+[Open the developer quickstart →](guide/quickstart.md)
