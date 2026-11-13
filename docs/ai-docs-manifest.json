@@ -1,0 +1,132 @@
+{
+  "product": "Control Tower",
+  "repository": "agenticops-control-tower",
+  "distribution": "agenticops-control-tower",
+  "document": "llms-full.txt",
+  "content_type": "text/markdown; charset=utf-8",
+  "sha256": "f07cfc9144d0976c0b77cafeeb7879a8d1965528b2c7cbfd51bbe78997094103",
+  "source_hash_normalization": "UTF-8 text with LF newlines",
+  "human_guide": "developer-guide.md",
+  "sources": [
+    {
+      "path": "pyproject.toml",
+      "kind": "package-metadata",
+      "sha256": "d5b89fcda2423700a5140b8c962c2c8464660fda1129ddde04440c851d7dfcba"
+    },
+    {
+      "path": "docs/ai-docs.json",
+      "kind": "source-selection",
+      "sha256": "d3b11a3c90eb153a467cd8b0dd6f1c7d00aafa0e164679a5a09bee25d49c2f7c"
+    },
+    {
+      "path": "docs/developer-guide.md",
+      "kind": "reference",
+      "sha256": "9f6b67d232ab7c56cc3ea63061fef483048765fcf483830d8a03177a24b92386"
+    },
+    {
+      "path": "docs/api-reference.md",
+      "kind": "reference",
+      "sha256": "52444508e37fed2c4755eb0cea26a08ec7e85fe149feafe9116e38e50ba617cc"
+    },
+    {
+      "path": "docs/cli-reference.md",
+      "kind": "reference",
+      "sha256": "2a27fc3a123ebd0e5aa1e3941c82041c008b915161a48b8ecd75def76a6da2c2"
+    },
+    {
+      "path": "docs/evidence-posture.md",
+      "kind": "reference",
+      "sha256": "4623aa0ef5136e799c8e33698b21d8057a10b641a0645ea45902808326829fd1"
+    },
+    {
+      "path": "docs/settings.md",
+      "kind": "reference",
+      "sha256": "698542356af26c8c64b441222f267a2b62e02dbff43ae5b90aa137a36c532fe5"
+    },
+    {
+      "path": "docs/authentication.md",
+      "kind": "reference",
+      "sha256": "e85d52f9e79b98d12b0434b251476086a21ba74070882bac6a0a24d906164961"
+    },
+    {
+      "path": "docs/capability-contract.md",
+      "kind": "reference",
+      "sha256": "2f7287ef0030596b502935229478b2e75e8d929cd81c83323ac1a0d82cf8a72e"
+    },
+    {
+      "path": "docs/runbooks.md",
+      "kind": "reference",
+      "sha256": "a16ded46eb4ee97876449f04357e49210ef94a4553571cd2f2f7ed859d68458a"
+    },
+    {
+      "path": "docs/fleet-operations.md",
+      "kind": "reference",
+      "sha256": "18ecced24ad6938677b0b8773a7cbd516f4f2c6db267345c46fc87150153b95a"
+    },
+    {
+      "path": "docs/live-operations.md",
+      "kind": "reference",
+      "sha256": "e12f6a972871a42c5f27aa4d834f95f0d935b57a7db8ba0203e8a75e4cd928af"
+    },
+    {
+      "path": "docs/limitations.md",
+      "kind": "reference",
+      "sha256": "734800e120d07c4a05d20e0bc638978e6db618b30675f087f56133f6641e59a9"
+    },
+    {
+      "path": "src/agenticops_control_tower/__init__.py",
+      "kind": "source-contract",
+      "sha256": "dc74c321e528049b7551387e0097f830d5930ded839680aeb444eb11b6deb18f"
+    },
+    {
+      "path": "src/agenticops_control_tower/models/__init__.py",
+      "kind": "source-contract",
+      "sha256": "c79731533bb338d2235475fbe78aa7210ec2b8e50abae4b4e35fa7dd97ea7d62"
+    },
+    {
+      "path": "src/agenticops_control_tower/models/agent.py",
+      "kind": "source-contract",
+      "sha256": "003a20d4d5f8d8ad8d39827513f09b74daf3644cf80d0da76373dedff8ff191e"
+    },
+    {
+      "path": "src/agenticops_control_tower/models/contract.py",
+      "kind": "source-contract",
+      "sha256": "f550e69d4cc186d0434f4abca007b60144f8d0b9cb4107fb3195f2e03a1816f8"
+    },
+    {
+      "path": "src/agenticops_control_tower/models/evidence.py",
+      "kind": "source-contract",
+      "sha256": "85f6a07dc6ccfcd9a871906cd250731a15313241cd40c27d61a898ee234ba1b0"
+    },
+    {
+      "path": "src/agenticops_control_tower/models/status.py",
+      "kind": "source-contract",
+      "sha256": "18a661b78c9c8bef0bb56cf67aca858c72c014fa4820d6a2cfa421bb89bf2c76"
+    },
+    {
+      "path": "src/agenticops_control_tower/models/version.py",
+      "kind": "source-contract",
+      "sha256": "a37ff6641899aef9df18f8ebe3dbc0d7c5f200fd569b223565845f7218c42d07"
+    },
+    {
+      "path": "src/agenticops_control_tower/api/surface.py",
+      "kind": "source-contract",
+      "sha256": "a953aa85001d0f42e014ee1dc59dd5a08b008958541b6dc2ce68add93143d12a"
+    },
+    {
+      "path": "docs/guide/examples/sample_fleet_snapshot.json",
+      "kind": "example",
+      "sha256": "fbfadb5b16de5f78d4126f7166bfd7adc17d3b28b3c09510202766e4f9c588d1"
+    },
+    {
+      "path": "docs/guide/examples/tower_heartbeat.json",
+      "kind": "example",
+      "sha256": "5c67d7fe0afa42bd8497ea54c526b833aea126acf192b4bc9c95e8a5f62aafa2"
+    },
+    {
+      "path": "docs/guide/examples/tower_registration.json",
+      "kind": "example",
+      "sha256": "742fb2c6bc0b6d7a4b1785a61c0e46e7cf6c2fa28a234f2c91051b9b00cb0963"
+    }
+  ]
+}

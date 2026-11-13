@@ -1,0 +1,56 @@
+{
+  "name": "Control Tower",
+  "scope": "Manage agent inventory, explicit evidence, and authorized operator workflows. Deployment health remains separate from producer evaluation, governance, and resilience outcomes.",
+  "references": [
+    {
+      "title": "Setup and task workflows",
+      "path": "docs/developer-guide.md"
+    },
+    {
+      "title": "Api Reference",
+      "path": "docs/api-reference.md"
+    },
+    {
+      "title": "Cli Reference",
+      "path": "docs/cli-reference.md"
+    },
+    {
+      "title": "Evidence Posture",
+      "path": "docs/evidence-posture.md"
+    },
+    {
+      "title": "Settings",
+      "path": "docs/settings.md"
+    },
+    {
+      "title": "Authentication",
+      "path": "docs/authentication.md"
+    },
+    {
+      "title": "Capability Contract",
+      "path": "docs/capability-contract.md"
+    },
+    {
+      "title": "Runbooks",
+      "path": "docs/runbooks.md"
+    },
+    {
+      "title": "Fleet Operations",
+      "path": "docs/fleet-operations.md"
+    },
+    {
+      "title": "Live Operations",
+      "path": "docs/live-operations.md"
+    },
+    {
+      "title": "Limitations",
+      "path": "docs/limitations.md"
+    }
+  ],
+  "contracts": [
+    "src/agenticops_control_tower/__init__.py",
+    "src/agenticops_control_tower/models/*.py",
+    "src/agenticops_control_tower/api/surface.py"
+  ],
+  "schemas": []
+}
