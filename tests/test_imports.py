@@ -13,7 +13,7 @@ from agenticops_control_tower.registry import AgentRegistry
 
 
 def test_surface_imports() -> None:
-    assert __version__ == "1.0.2"
+    assert __version__ == "1.0.3"
     assert "agenticlens" in ADAPTER_NAMES
     # `cli.main` is a real CLI now (v0.2) -- see tests/test_cli.py for
     # command-level coverage. This just confirms the console-script entry
