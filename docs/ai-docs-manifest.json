@@ -2,7 +2,7 @@
   "product": "Control Tower",
   "repository": "agenticops-control-tower",
   "distribution": "agenticops-control-tower",
-  "document": "llms-full.txt",
+  "document": "llms-full.md",
   "content_type": "text/markdown; charset=utf-8",
   "sha256": "f07cfc9144d0976c0b77cafeeb7879a8d1965528b2c7cbfd51bbe78997094103",
   "source_hash_normalization": "UTF-8 text with LF newlines",
