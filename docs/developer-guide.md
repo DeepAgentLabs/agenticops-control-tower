@@ -1,471 +1,312 @@
 # Control Tower developer guide
 
-Use this guide to set up Control Tower, run a local example, and apply it to your application. Optional provider and integration fragments identify the objects or services you must supply.
+Use this simple guide to choose a capability and run a local inventory or operator workflow. The [AI Reference (robust)](https://deepagentlabs.io/control-tower/docs/llms-full.md) includes detailed operational guides, current package/CLI declarations and both bundled Evals schemas. Deployment health, evidence outcomes, approvals and verified recovery remain separate signals.
 
-[Quickstart](#quickstart) · [Usage](#usage) · [Configuration](#settings) · [Troubleshooting](#troubleshooting) · [Reference](#reference)
+[Capability index](#capability-index) · [Quickstart](#quickstart) · [Configuration](#settings) · [Troubleshooting](#troubleshooting) · [Reference](#reference)
+
+## Capability index
+
+Each row links to a short workflow below, with a detailed reference for payloads, roles, state transitions and limitations.
+
+| Capability | What you can do |
+| --- | --- |
+| [Agent registration and heartbeats](#registration) | Register deployment identity and merge runtime-reported heartbeat metadata. |
+| [Fleet health and version assessment](#health) | Filter fleet status/capability coverage and compare reported PEP 440 versions. |
+| [Capability discovery and contract](#capabilities) | Read the versioned candidate registration/heartbeat contract and schemas. |
+| [Offline snapshots](#snapshots) | Inspect captured inventory, heartbeat history and evidence without a server. |
+| [Authentication and operator roles](#authentication) | Separate reader, writer and approver credentials and trusted operator identities. |
+| [Configuration ownership and desired state](#configuration) | Declare Tower-owned or mirrored settings and preview bounded desired-state changes. |
+| [Exact approval lifecycle](#approvals) | Bind immutable previews, revisions, expiry and one-time approval to the intended change. |
+| [Bulk fleet operations](#bulk) | Freeze deployment targets, approve once and report bounded per-target results. |
+| [Runtime stop and access revocation](#stop) | Coordinate host-installed Sidecar stop and MCP revocation without inferring cancellation. |
+| [Evidence ingestion and posture](#evidence) | Push attributed native observations and retain freshness, availability and native outcome tallies. |
+| [Native artifact readers and schemas](#native-contracts) | Read Lens/Evals/Sidecar/Chaos artifacts with explicit owner/correlation boundaries. |
+| [Lens execution verification](#execution) | Verify expected-run bundles using host trust keys and preserve distinct verification states. |
+| [Incident detection and investigation](#incidents) | Create durable incidents from native failures and assemble cited, uncertain investigations. |
+| [Approved staging recovery](#staging) | Run the fixed bounded staging dependency action through an installed connector. |
+| [Periodic detection and alerts](#alerts) | Scan stored observations, deduplicate/acknowledge alerts and join incident timelines. |
+| [Versioned runbooks](#runbooks) | Discover, validate, recommend, preview and execute installed versioned runbooks. |
+| [Cancellation, compensation and reconciliation](#cancellation) | Cancel between bounded steps, compensate known completions and reconcile unknown execution. |
+| [Recovery verification](#verification) | Require a successful probe and fresh same-run Lens/Evals evidence before resolution. |
+| [Read-only console](#console) | Inspect fleet, evidence, alerts, incidents and runbook state through authenticated reads. |
+| [MCP operator integration](#mcp) | Expose Tower evidence/recovery through separate MCP tools while keeping approval human-only. |
+| [AIOS investigation-report export](#aios) | Project a held native Incident with redacted summaries and explicit citations. |
+| [Python, HTTP and CLI surfaces](#interfaces) | Use one control model through the facade, authenticated API or operator CLI. |
+| [Persistence and hosting](#hosting) | Persist local SQLite state and host the API/console with deployment-owned access. |
+| [Settings and operational limits](#settings) | Configure server/client options, detection windows, quotas and optional verification trust. |
+| [Compatibility and acceptance](#acceptance) | Distinguish candidate inventory interoperability from production/runtime or AIOS certification. |
 
 ## Quickstart
 
-Requires Python 3.10 or newer. Run commands in an activated virtual environment. Download referenced files into the same working directory before running them.
+Requires Python 3.10 or newer in an activated virtual environment:
 
-### Install
-
-```
-python -m pip install "agenticops-control-tower[api]"
+```bash
+python -m pip install 'agenticops-control-tower[api]'
 ```
 
-### Read a fleet snapshot offline
+[Download sample_fleet_snapshot.json](guide/examples/sample_fleet_snapshot.json) into the working folder. It is historical fixture evidence, not a package-install recommendation:
 
-Download the repository's sample snapshot. It represents historical fixture data; its embedded package fields are evidence values, not installation recommendations.
-
-[Download sample_fleet_snapshot.json](guide/examples/sample_fleet_snapshot.json)
-
-```
+```bash
 agenticops-control-tower --snapshot sample_fleet_snapshot.json status
 agenticops-control-tower --snapshot sample_fleet_snapshot.json agents list
 agenticops-control-tower --snapshot sample_fleet_snapshot.json posture
 ```
 
-**Expected:** the fixture lists two agents and their recorded status/evidence. This reports the snapshot, not a live health check.
+Expect two recorded agents and their captured health/evidence. This is an offline view, not a live health probe. Loading the snapshot does not populate a running server.
 
-### Start a local console
+For a live local server, generate separate reader/writer/approver secrets, configure `AGENTICOPS_READ_TOKEN`, `AGENTICOPS_WRITE_TOKEN` and `AGENTICOPS_APPROVAL_TOKEN`, then run:
 
-Create separate reader and writer tokens, then configure them in the server terminal. The placeholders below must be replaced with generated secrets.
-
-```
-python -c "import secrets; print(secrets.token_hex(32))"
-```
-
-Windows PowerShell
-
-```
-$env:AGENTICOPS_READ_TOKEN = "YOUR_GENERATED_READER_TOKEN"
-$env:AGENTICOPS_WRITE_TOKEN = "YOUR_GENERATED_WRITER_TOKEN"
+```bash
 agenticops-control-tower serve --database registry.sqlite --host 127.0.0.1 --port 8000
 ```
 
-macOS / Linux
-
-```
-export AGENTICOPS_READ_TOKEN="YOUR_GENERATED_READER_TOKEN"
-export AGENTICOPS_WRITE_TOKEN="YOUR_GENERATED_WRITER_TOKEN"
-agenticops-control-tower serve --database registry.sqlite --host 127.0.0.1 --port 8000
-```
-
-Open [the local console](http://localhost:8000/console/), supply the reader token, and refresh. A fresh registry is empty until agents register; loading the offline snapshot does not populate the server.
-
-### Connect agents and evidence
-
-Register an agent using the documented registration payload, send heartbeats from its runtime, then push producer artifacts with explicit agent/run links. Use a writer token for mutations. Evidence posture and reported runtime health remain separate signals.
-
-[Register and send heartbeats ↗](getting-started.md) · [Link evidence ↗](evidence-posture.md) · [Authentication ↗](authentication.md)
+Open [the local console](http://localhost:8000/console/) with the reader token. A fresh registry is empty until agents register. See [token generation](authentication.md) and [hosting](hosting.md).
 
 ## Usage
 
+Commands referencing `examples/` require a source checkout and run from its root. Other payload files, IDs and tokens are inputs you supply. Global CLI options (`--api-url`, `--token`, `--snapshot`) go before the command. Use the appropriate credential for each lifecycle step.
+
 <span id="registration"></span>
 
-### Register agents and send heartbeats
+### Agent registration and heartbeats
 
-Start the server using [the quickstart](#quickstart). In a second terminal, activate the same environment and configure the writer token for the CLI client.
+This complete in-memory Python example needs only the base package:
 
-#### Client credentials
+```python
+from agenticops_control_tower.snapshot import create_api
+from agenticops_control_tower.models import AgentRegistrationPayload, HeartbeatPayload
 
-PowerShell
-
-```
-$env:AGENTICOPS_TOKEN = "THE_SERVER_WRITER_TOKEN"
-```
-
-macOS / Linux
-
-```
-export AGENTICOPS_TOKEN="THE_SERVER_WRITER_TOKEN"
-```
-
-The server's token setting is not automatically inherited by another terminal.
-
-tower_registration.json · complete file
-
-```json
-{
-  "agent_id": "support-demo",
-  "name": "Support demo",
-  "environment": "staging",
-  "runtime": "local-python",
-  "framework": "custom",
-  "status": "unknown",
-  "capabilities": {}
-}
+api = create_api()
+api.register(AgentRegistrationPayload(
+    agent_id="demo-agent", name="Demo agent", environment="staging",
+    runtime="python", framework="custom", capabilities={"agenticlens": "1.0.3"},
+))
+agent = api.heartbeat("demo-agent", HeartbeatPayload(status="healthy"))
+assert agent.heartbeat_count == 1
+assert agent.capabilities["agenticlens"] == "1.0.3"
 ```
 
-[Download tower_registration.json](guide/examples/tower_registration.json)
+HTTP/CLI equivalents use `agents register payload.json` and `agents heartbeat AGENT_ID heartbeat.json`. Registration replaces a matching deployment and resets heartbeat count; heartbeat merges metadata maps and updates reported status/last_seen. See [registration payloads](getting-started.md) and [merge/replacement contract](capability-contract.md).
 
-tower_heartbeat.json · complete file
+<span id="health"></span>
 
-```json
-{"status":"healthy","capabilities":{}}
-```
+### Fleet health and version assessment
 
-[Download tower_heartbeat.json](guide/examples/tower_heartbeat.json)
+Use `status`, `agents list` filters and `GET /versions` / `api.assess_versions(...)` for reported fleet state and minimum-version assessment. Filters combine environment, status, capability presence or absence. Health is explicitly reported by the runtime; heartbeat age or a failed Evals gate does not rewrite it. Version comparisons use PEP 440, with missing/invalid versions represented separately. See [inventory/status API](api-reference.md) and [health semantics](limitations.md).
 
-```
-agenticops-control-tower agents register tower_registration.json
-agenticops-control-tower agents heartbeat support-demo tower_heartbeat.json
-agenticops-control-tower status
-```
+<span id="capabilities"></span>
 
-**Expected:** the registered demo deployment reports a healthy heartbeat. Refresh the console to inspect it. This is a manually supplied demo heartbeat, not a runtime probe.
+### Capability discovery and contract
 
-<span id="evidence"></span>
+`GET /contracts/capabilities` or `api.get_capability_contract()` returns `tower.capabilities.v1`, with registration/heartbeat/readback JSON Schemas and mutation semantics. `capabilities list` inventories reported capabilities across registered agents. Python and Node.js worker examples exercise the same HTTP contract; framework metadata is not certified framework integration. See [contract, runtime examples and compatibility policy](capability-contract.md).
 
-### Ingest evidence and read posture
+<span id="snapshots"></span>
 
-#### Ingesting evidence
+### Offline snapshots
 
-| Surface | Call |
-| --- | --- |
-| Python | `ControlTowerAPI.ingest_evidence(EvidenceIngestRequest(link=..., artifact=..., gate=...))` |
-| HTTP (writer) | `POST /evidence` with `{"link": {...}, "artifact": {...}, "gate": {...}}` |
-| CLI (writer) | `evidence ingest AGENT SOURCE ARTIFACT.json --source-version V --artifact-ref REF` |
-| CLI manifest | `evidence ingest-manifest examples/evidence/manifest.json` |
-| CLI Sidecar journal | `evidence ingest-sidecar-journal AGENT journal.json --source-version 0.7.0` |
-
-`--observed-at` defaults to the current time. `--gate` attaches an existing
-
-Evals `GateDecision`, and `--run-id` and `--runtime-agent-id` add correlation.
-
-Manifest entries contain a `link`, plus an optional `artifact_path` and
-
-`gate_path`, resolved relative to the manifest. Files are read by the CLI
-
-process; the server never opens caller paths. An entry without an artifact is
-
-stored as an honest `unavailable` record.
-
-Ingestion rules:
-
-- The deployment must already be registered (`404` / `AgentNotFoundError`).
-- The same deployment, source, `artifact_ref` and `observed_at` identify one
-
-observation. Retries return the existing record with `created: false` (HTTP
-
-`200` instead of `201`), so producers can safely retry.
-
-- `observed_at` more than five minutes in the future is rejected (`422`).
-
-Naive timestamps are treated as UTC.
-
-- HTTP bodies need a `Content-Length` (`411`) and are limited to 1 MiB (`413`).
-
-ASGI middleware enforces this before the body is parsed or authorized, and
-
-also counts streamed bytes.
-
-- Invalid or unsupported artifacts are stored as `unavailable`, with a reason
-
-that names the failing native field without echoing producer values.
-
-- Only the projection is stored. Raw artifacts, Lens span inputs/outputs and
-
-error messages are not stored. Sidecar `trigger_details` are kept because
-
-the native reader projects them.
-
-#### History and posture
-
-| Read | Python | HTTP (reader) | CLI |
-| --- | --- | --- | --- |
-| History, newest first | `evidence_history(agent, source=, limit=)` | `GET /agents/{id}/evidence/history?source=&limit=` (1–500) | `evidence history AGENT [--source] [--limit]` |
-| Agent posture | `agent_posture(agent, stale_after_seconds=)` | `GET /agents/{id}/evidence?stale_after_seconds=` | `evidence posture AGENT` |
-| Fleet posture | `fleet_posture(environment=, stale_after_seconds=)` | `GET /posture?environment=&stale_after_seconds=` | `posture [--environment]` |
-
-Each deployment gets one entry per producer:
-
-- `freshness`: `fresh` when the latest observation is inside the window
-
-(default 86400 seconds, maximum 30 days over HTTP), `stale` when it is older,
-
-`missing` when nothing was recorded. Missing evidence is never treated as healthy
-
-or as a failed check.
-
-Each agent or fleet posture is read from one store transaction, so concurrent
-
-ingestion or pruning cannot make it internally inconsistent. History limits
-
-(1–500) and windows (1 second to 30 days) are validated in Python, HTTP and CLI,
-
-including `--snapshot` mode.
-
-- `latest`: the newest record by `observed_at`, including an `unavailable` one,
-
-so a broken producer feed stays visible.
-
-- `recent_records` / `recent_unavailable`: counts inside the window.
-- `summary`: counts of native values in available records inside the window:
-
-| Source | Native tallies |
-| --- | --- |
-| agenticlens | `status_counts` (running/succeeded/failed; runs and diagnosis reports), `attribution_counts` (attributed/recovered/unattributed/no_failure), `faulty_agents`, `failed_tool_names` from failed spans |
-| agentic-evals | `gate_counts`: producer gate passed/failed, or `not_supplied` when no gate was paired |
-| agentic-sidecar | `status_counts` for all seven outcomes, `risk_counts` (null risk is `unclassified`, never LOW), `escalations_required` |
-| agentic-chaos | `experiments`, `completed`/`incomplete` by report end time, `fault_events` |
-
-Fleet posture lists `fresh_agents`, `stale_agents`, `missing_agents` and
-
-`latest_unavailable_agents` per producer, and adds the per-agent tallies
-
-together. The `reported_health` field in agent posture is the registry value,
-
-shown for context only.
-
-Lens runs now also project `trace_id`, timing, `task_success`, `error_type`,
-
-`span_count`, `tool_names` and `failed_spans` (span ID, name, type, tool and
-
-error type). These link a failed run to the failing tool dependency. Lens has
-
-no native prompt-version field, so Tower does not infer one.
-
-Diagnosis artifacts can also be ingested through the supported producer contract. Keep detailed failure analysis in Lens.
-
-#### Storage and retention
-
-`serve --database registry.sqlite` (or `AGENTICOPS_DATABASE`) stores evidence in
-
-the same SQLite file as the registry and configuration audit. Without a database,
-
-evidence lives in process memory. `EvidenceStore.prune(before)` removes older
-
-observations from Python. No automatic retention policy runs.
-
-#### Offline snapshots
-
-A fleet snapshot can contain an `evidence` list of ingestion requests.
-
-`--snapshot FILE posture`, `evidence posture` and `evidence history` evaluate
-
-freshness as of the snapshot's `captured_at`, so offline results do not change
-
-with wall-clock time. Ingest commands are rejected in snapshot mode.
-
-#### Console
-
-The read-only console shows an **Ecosystem evidence posture** panel for the
-
-selected environment, plus a per-agent evidence table with freshness, the
-
-latest record, the recent window and native tallies. Producer text is
-
-rendered as text, and the console still sends only GET requests.
-
-<span id="settings"></span>
-
-## Configuration
-
-### Configure the server and client
-
-#### Server (`agenticops-control-tower serve`)
-
-| Option | Default | Meaning |
-| --- | --- | --- |
-| `--host` | `127.0.0.1` | Interface to bind. Use `0.0.0.0` to accept other computers on the network ([hosting](hosting.md)). |
-| `--port` | `8000` | Port for the API and the console. |
-| `--database PATH` | none (in memory) | SQLite file for inventory, evidence, configuration, alerts and incidents. Relative to the working directory. Without it, everything is lost on restart. |
-
-| Environment variable | Used by | Meaning |
-| --- | --- | --- |
-| `AGENTICOPS_DATABASE` | server | SQLite path when `--database` is not given. |
-| `AGENTICOPS_READ_TOKEN` | server | Bearer token allowed to read. |
-| `AGENTICOPS_WRITE_TOKEN` | server | Bearer token allowed to read and write (register, heartbeat, evidence, previews, execution). |
-| `AGENTICOPS_APPROVAL_TOKEN` | server | Separate token for approving, denying and revoking actions. Must differ from the reader and writer tokens, or the server refuses to start. |
-
-Token rules, enforced on every HTTP route:
-
-- **No token configured:** anonymous access to inventory routes. Local development
-
-only. Configuration actions, bulk operations and incidents still require
-
-configured credentials.
-
-- **Reader only:** reads work, all writes are rejected.
-- A writer token also permits reads. Missing or wrong tokens return `401`; a
-
-reader calling a write route gets `403`.
-
-Generate tokens with `python -c 'import secrets; print(secrets.token_hex(32))'`
-
-or `openssl rand -hex 32`, once per deployment, and keep them in secret storage.
-
-See [Authentication](authentication.md).
-
-#### Built-in limits
-
-| Setting | Value | Where it applies |
-| --- | --- | --- |
-| Live detection interval | 30 seconds | Scans stored telemetry while the server runs. Python hosts can pass `create_app(detection_interval_seconds=0)` to disable it and call `POST /alerts/evaluate` from their own scheduler. |
-| Detection freshness and heartbeat windows | 300 seconds each | `DetectionPolicy`, configurable by a trusted Python host ([live operations](live-operations.md)). |
-| Evidence stale-after | 1 day (max 30 days) | `--stale-after-seconds` / `stale_after_seconds` on posture reads. |
-| Evidence history limit | 50 (max 500) | `evidence history --limit`. |
-| Request body size | 1 MiB, `Content-Length` required | `POST /evidence` and `POST /bulk/preview`. |
-| Action expiry | 1–3600 seconds | Configuration previews ([controlled configuration](configuration.md)). |
-
-#### CLI client
-
-| Option | Environment variable | Default | Meaning |
-| --- | --- | --- | --- |
-| `--api-url` | `AGENTICOPS_API_URL` | `http://localhost:8000` | Server to talk to. |
-| `--token` | `AGENTICOPS_TOKEN` | none | Bearer token sent with every request. |
-| `--snapshot FILE` | — | none | Answer read commands from a snapshot file instead of a server. |
-
-Options go **before** the command:
-
-```
-agenticops-control-tower --api-url https://tower.example.com --token "$READER_TOKEN" status
-```
-
-#### Python hosts
-
-Embedding Control Tower in your own service uses the same settings as
-
-arguments, which take precedence over the environment:
-
-```
-from agenticops_control_tower.api.http import create_app
-
-app = create_app(
-    database_path="registry.sqlite",
-    read_token="...",
-    write_token="...",
-    approval_token="...",
-    detection_interval_seconds=30,
-)
-```
-
-Run it with any ASGI server, for example `uvicorn module:app`.
+`read_snapshot()` validates captured data; `load_snapshot()` builds an in-memory facade. The CLI fixes posture freshness to the snapshot's capture time. Inventory/evidence reads work without a server; snapshots do not restore approvals, desired settings, live alerts, incident execution or credentials. See [snapshot fields and offline commands](evidence-posture.md#offline-snapshots) and [CLI support limits](cli-reference.md#offline-snapshot-mode).
 
 <span id="authentication"></span>
 
-### Set up tokens and authorization
+### Authentication and operator roles
 
-#### Generate tokens
+Reader tokens inspect state; writer tokens register, push evidence, preview and execute authorized operations; a distinct approver token approves/denies/revokes. Writers cannot approve their own proposal. HTTP identities derive from configured credentials, not request bodies. Trusted Python `Operator` objects can narrow `agent_ids`; shared HTTP role tokens are not per-user tenancy.
 
-Install the package into your Python environment:
+Set `AGENTICOPS_TOKEN` in a client terminal or pass `--token`. Anonymous development inventory is possible with no tokens, but controlled operations still require credentials. See [authentication/rotation](authentication.md), [server settings](settings.md) and [exact role requirements](api-reference.md#authentication).
 
-```
-python -m pip install "agenticops-control-tower[api]"
-```
+<span id="configuration"></span>
 
-Generate independent reader and writer values with Python's standard library:
+### Configuration ownership and desired state
 
-```
-export AGENTICOPS_READ_TOKEN="$(python -c 'import secrets; print(secrets.token_hex(32))')"
-export AGENTICOPS_WRITE_TOKEN="$(python -c 'import secrets; print(secrets.token_hex(32))')"
-agenticops-control-tower serve --database registry.sqlite --host 127.0.0.1 --port 8000
+Trusted Python setup declares configuration as Tower-owned or mirrored. HTTP cannot elevate ownership. `config AGENT_ID CAPABILITY` reads values/revision; an action preview proposes a bounded patch or desired enable/disable. Executing a configuration action commits desired state; it does not mutate heartbeat inventory or prove a remote runtime applied it.
+
+```bash
+uv run python examples/controlled_configuration.py
 ```
 
-These commands use Bash or a compatible shell. Use `python3` instead of `python`
+See [declaration, patch semantics and desired-state boundaries](configuration.md). No generic production remote configuration connector is shipped.
 
-if that is your interpreter name. `openssl rand -hex 32` is an alternative to the
+<span id="approvals"></span>
 
-Python generator. Both produce a random 64-character hexadecimal value.
+### Exact approval lifecycle
 
-Generate once per deployment and retain the values in your secret manager or a
-
-restricted configuration file. Do not regenerate on every server start: clients
-
-using the previous value would lose access. Environment variables exported in
-
-one terminal do not automatically appear in another terminal or survive logout.
-
-For PowerShell, the equivalent setup is:
-
-```
-$env:AGENTICOPS_READ_TOKEN = python -c "import secrets; print(secrets.token_hex(32))"
-$env:AGENTICOPS_WRITE_TOKEN = python -c "import secrets; print(secrets.token_hex(32))"
-agenticops-control-tower serve --database registry.sqlite --host 127.0.0.1 --port 8000
+```bash
+agenticops-control-tower --token "$WRITER_TOKEN" actions preview request.json
+agenticops-control-tower --token "$APPROVER_TOKEN" actions approve ACTION_ID
+agenticops-control-tower --token "$WRITER_TOKEN" actions execute ACTION_ID
 ```
 
-#### Give readers access
+Inspect the returned preview before approval. It binds target/environment, revision, before/after values, intent, impact and expiry; changed/stale/revoked/consumed proposals cannot dispatch. Denial/revocation use approver authority. See [immutable previews and one-time consumption](configuration.md).
 
-Open <http://localhost:8000/console/> on the server's
+<span id="bulk"></span>
 
-computer. Retrieve the reader value from your terminal or secret manager and
+### Bulk fleet operations
 
-share it with authorized readers through a secure channel. Paste it into the
+`bulk preview` freezes a sorted 1–100 target list from explicit environment/capability selectors and optional IDs. Separate approval binds that exact set; later registrations do not join it. Execute rechecks target identity/revision and reports every result, including partial failure. The CLI exits 1 if any target fails.
 
-console's **Reader token** field and select **Connect / refresh**. The console
-
-holds the token in page memory; reload or **Disconnect** clears it.
-
-For CLI reads, set the client variable to that same reader value:
-
-```
-# In the server's shell this can reuse the generated value.
-# In another shell, first obtain it from your deployment's secret storage.
-export AGENTICOPS_TOKEN="$AGENTICOPS_READ_TOKEN"
-agenticops-control-tower status
+```bash
+uv run python examples/fleet_operations.py
 ```
 
-| Variable | Set on | Purpose |
-| --- | --- | --- |
-| `AGENTICOPS_READ_TOKEN` | Server | Authorizes inventory, status, version, evidence history and posture reads |
-| `AGENTICOPS_WRITE_TOKEN` | Server | Authorizes reads plus agent registration, heartbeats and evidence ingestion |
-| `AGENTICOPS_TOKEN` | CLI client | Sends a configured reader or writer value to the server |
-| `AGENTICOPS_API_URL` | CLI client | Selects the server, e.g. `https://tower.example.com` |
+See [bulk payloads, scope, deterministic targeting, audit and interruption](fleet-operations.md).
 
-Use the writer value for CLI registration/heartbeats or agent integrations:
+<span id="stop"></span>
 
+### Runtime stop and access revocation
+
+Trusted hosts install `SidecarContainmentAdapter` per deployment and configure issuer-backed MCP revocation. Incident control routes and bulk `runtime.stop` coordinate bounded acknowledgements; they do not discover arbitrary runtimes or accept caller-selected endpoints/commands. Already-reserved work can complete. Missing connectors, timeout and partial revocation remain explicit.
+
+See [incident runtime controls and revoker contract](incident-recovery.md), [bulk stop semantics](fleet-operations.md#bulk-stop-and-mcp-revocation) and [containment integration limits](phase6-containment.md). Restart does not renew revoked credentials.
+
+<span id="evidence"></span>
+
+### Evidence ingestion and posture
+
+Push native artifacts with an `EvidenceLink` naming a registered deployment, producer/version, artifact type/reference, observation time and optional run/runtime-agent correlation. `evidence ingest`, manifest ingestion and Sidecar-journal ingestion preserve explicit attribution. References are labels: Tower neither fetches nor opens them.
+
+Read `evidence history`, per-agent evidence posture and fleet `posture`. Idempotent ingestion, history retention and freshness are separate from producer outcomes. See [payloads, storage and native tallies](evidence-posture.md) and [identity/reader boundaries](ecosystem-alignment.md).
+
+<span id="native-contracts"></span>
+
+### Native artifact readers and schemas
+
+Thin adapters project native Lens runs/diagnosis, Evals reports/gates, Sidecar decisions/journals and Chaos reports. They do not recompute producer judgments. Two bundled native Evals JSON Schemas support report/gate validation; native availability, schema validity, authentication and task success remain different claims.
+
+The capability descriptor generates its own Tower-local schemas; it is not an AIOS artifact. See [reader failure behavior and ownership](ecosystem-alignment.md), [native Evals contracts](evals-report-contract.md), and [capability contract](capability-contract.md).
+
+<span id="execution"></span>
+
+### Lens execution verification
+
+Ingest a Lens `ExecutionBundle` with expected run identity and `spec_version="0.4-draft"`. Configure `AGENTICOPS_LENS_TRUST_STORE` or host `trusted_lens_keys`; the HTTP request cannot configure trust. Only verified bundles produce available evidence/causal claims. Failed, unknown and incomplete states persist distinctly without raw payloads.
+
+Keys are loaded at app creation; restart after trust-file changes. Stored results are historical ingestion-time verification; changing trust does not rewrite them. See [complete key setup, rotation, identity mapping and limits](lens-execution-evidence.md).
+
+<span id="incidents"></span>
+
+### Incident detection and investigation
+
+`incidents detect` consumes available failed native Lens evidence for a registered deployment. Repeated detection of that observation returns the same incident. `incidents investigate` assembles same-deployment/run evidence with citations, missing inputs, uncertainty and contradictory signals. It does not call a bundled model or establish exact causality.
+
+See [detection/investigation inputs and timeline windows](incident-recovery.md) and [joined incident views](live-operations.md#incident-console-and-joined-audit).
+
+<span id="staging"></span>
+
+### Approved staging recovery
+
+The fixed `staging.restore_dependency.v1` action needs a host-installed `StagingDependencyRuntime` connector. A separate human approves the exact preview digest before writer execution. The default `serve` instance has no installed remediation connector; it cannot execute a production fix by itself.
+
+```bash
+uv run --with ../agenticlens --with ../agentic-evals python examples/incident_recovery.py
 ```
-export AGENTICOPS_TOKEN="$AGENTICOPS_WRITE_TOKEN"
-agenticops-control-tower agents register examples/sample_agent_registration.json
+
+This offline fixture runs no shell commands. A successful action moves to awaiting verification, not resolved. See [connector installation, exact request bodies, durable claims and negative walkthrough](incident-recovery.md).
+
+<span id="alerts"></span>
+
+### Periodic detection and alerts
+
+The local server scans stored telemetry every 30 seconds by default; trusted hosts can configure `DetectionPolicy` or disable the loop and schedule `POST /alerts/evaluate`. Rules cover failed native evidence, heartbeat gaps and evidence freshness. Alerts deduplicate, retain acknowledgement and clear/reopen lifecycle audit.
+
+```bash
+agenticops-control-tower --token "$WRITER_TOKEN" alerts evaluate
+agenticops-control-tower --token "$READER_TOKEN" alerts list --active-only
 ```
 
-The sample registration file is provided in the source repository; PyPI users
+This is current-posture scanning, not lossless remote polling. Clearing an alert never resolves its incident. See [rules, freshness, correlation and atomic scan persistence](live-operations.md).
 
-can supply their own JSON file. The console remains read-only even if given a
+<span id="runbooks"></span>
 
-writer token, but reader tokens are the appropriate credentials to distribute.
+### Versioned runbooks
 
-#### Authorization behavior and rotation
+Runbook catalog versions define bounded steps, prerequisites, impact, rollback and recovery criteria. Read `runbooks catalog`, validate a version against explicitly supplied Chaos/Evals evidence, request recommendations for an incident, then preview exact version/parameters/digest. Separate human approval precedes execution.
 
-With both server variables unset, the API permits anonymous local development.
+```bash
+uv run --with ../agenticlens --with ../agentic-evals python examples/runbook_recovery.py
+```
 
-With only a reader configured, writes are rejected. With only a writer configured,
+Hosts install trusted connectors; no arbitrary model-generated shell action is executed. See [catalog, connector interfaces, validation, limits and CLI](runbooks.md).
 
-reads and writes require that writer. Set different, nonempty values for both roles;
+<span id="cancellation"></span>
 
-using the same value would give readers writer access.
+### Cancellation, compensation and reconciliation
 
-To rotate a token, generate a new value, update the deployment's secret storage,
+`runbooks cancel EXECUTION_ID` requests cancellation before/between steps. Known completed steps may receive bounded compensation; partial, timed-out, interrupted or unknown execution can require manual reconciliation. Approval consumption and execution claims commit before dispatch to avoid unsafe replay after a crash.
 
-restart/redeploy the service, and distribute the replacement to its clients.
+A timeout or cancellation request is not proof that external side effects stopped or rolled back. See [step outcomes, cancellation, interruption and compensation](runbooks.md#step-outcomes) and [reconciliation limits](limitations.md).
 
-The service reads these settings at application startup. It supports one token
+<span id="verification"></span>
 
-per role, with no overlap period, per-user revocation, expiry or tenant isolation.
+### Recovery verification
 
-Do not put tokens in URLs, tracked files, Docker images or shared logs. Use HTTPS
+Resolution requires a successful connector probe plus fresh native Lens success and a passing Evals gate linked to the same recovery run/deployment, with observations and ingestion after execution began. Missing, stale, future, contradictory or mismatched evidence cannot establish recovery. Tower reads producer conclusions; it does not recompute Lens/Evals policy.
 
-for remote browser/API traffic. See [the hosting guide](hosting.md) for local,
+See [verification request fields and evidence-age rules](incident-recovery.md#evidence-uncertainty-and-verification) and [versioned runbook recovery criteria](runbooks.md#recovery-criteria).
 
-private-network and cloud access.
+<span id="console"></span>
+
+### Read-only console
+
+The `/console/` shell loads no fleet data until authenticated reads succeed. Inspect inventory, reported health, capability/version coverage, evidence posture, alerts, incidents and runbook executions. Joined timelines identify citations, approval/execution state and truncated evidence windows. Console requests remain GET-only; mutations use the same role-protected API/CLI. See [console and joined audit](live-operations.md#incident-console-and-joined-audit) and [hosting](hosting.md).
+
+<span id="mcp"></span>
+
+### MCP operator integration
+
+The separate MCP package exposes Tower read, investigation, preview, execution and verification tools. Configure trusted connector origins/read-write credentials on the MCP host; hosted MCP uses per-user bindings. Prompt `tower.investigation` guides evidence-based review. No model tool grants human approval, and execution must use the separately approved digest.
+
+See [connector setup, timeouts, tools and approval boundary](mcp-connector.md), [runbook MCP surface](runbooks.md#mcp) and [candidate capability discovery](capability-contract.md).
+
+<span id="aios"></span>
+
+### AIOS investigation-report export
+
+`incidents.export.export_investigation_report(incident, created_at=...)` projects a held authorized native Incident into an AIOS `0.8-draft` report. It preserves deployment/source identity, native state and explicit evidence citations while redacting summaries, private findings and event details. It fetches nothing and executes no recovery.
+
+```bash
+uv run python examples/operational_artifacts.py
+```
+
+Closure alone yields unknown recovery; a supported native verification event is cited separately without authenticating/recomputing it. See [projection checks and rollback](coordinated-v1-readiness.md) and [operational artifact boundaries](aios-0.8-operational-artifacts.md).
+
+<span id="interfaces"></span>
+
+### Python, HTTP and CLI surfaces
+
+The base `ControlTowerAPI` facade composes registry/discovery, configuration, evidence, incidents, bulk, operations and runbook services. The optional `[api]` extra adds FastAPI, server and HTTP client dependencies. Global CLI options precede commands. `/docs` exposes the running API's OpenAPI shapes; `GET /contracts/capabilities` is the separate candidate inventory descriptor.
+
+See [full route inventory and Python methods](api-reference.md) and [all CLI commands/arguments](cli-reference.md). Python service calls are trusted-host calls; authentication is the host's responsibility.
+
+<span id="hosting"></span>
+
+### Persistence and hosting
+
+Use `--database` / `AGENTICOPS_DATABASE` for local SQLite persistence. With no database, state is memory-local and disappears on restart. Registry, evidence, desired configuration, approvals, incidents, alerts and runbook claims share the configured local control model; fixture/runtime state can use its own database.
+
+Host one Python API/console service with deployment-owned secrets and an HTTPS/access boundary. The package does not provision cloud resources, distribute SQLite or install production connectors. See [local/private/remote hosting and storage responsibilities](hosting.md) and [concurrency/scale limits](limitations.md).
+
+<span id="settings"></span>
+
+## Settings and operational limits
+
+Configure `serve --host`, `--port`, `--database`, role-token environment variables and optional Lens trust. Client options are `--api-url`, `--token` and `--snapshot`. Python hosts can configure detection intervals/policies, service instances, trusted connectors, operator scopes and verification keys explicitly.
+
+See [all server/client settings and built-in limits](settings.md), [configuration ownership](configuration.md), [authentication](authentication.md) and [limitations](limitations.md). Reported packages/capabilities are inventory assertions, not installation or production-readiness proof.
+
+<span id="acceptance"></span>
+
+### Compatibility and acceptance
+
+The capability contract has its own candidate identifier; native evidence and AIOS markers remain independently versioned. Python/Node HTTP fixtures and installed-wheel tests demonstrate inventory interoperability within their recorded matrix, not production runtime connectors, general causal diagnosis, distributed control or independent AIOS conformance.
+
+See [candidate validation record](phase10-validation.md), [contract evolution](capability-contract.md#evolution-and-release-gate), [ecosystem compatibility](integrations.md) and [coordinated acceptance limits](coordinated-v1-readiness.md). Version-labelled notes apply to their stated releases.
 
 ## Troubleshooting
 
-Check the failing boundary before changing application behavior.
-
-- Missing server command dependencies: install the API extra.
-- Unauthorized: use the correct reader/writer token and pass it in the client terminal as documented.
-- Empty console: register agents; the offline example does not seed the database.
-- Stale posture: inspect evidence timestamps and links before inferring current health.
-
-### Verify your environment
-
-Run commands from the environment where you installed the package. Confirm the input file exists and matches the expected artifact contract. Keep the original evidence when diagnosing a failure.
+Check server/client token roles, global option order, exact deployment/evidence IDs and whether a required connector/trust store is installed. For rejected operations inspect preview expiry, revision, approval actor/digest, consumed state and durable execution claims. Reconcile unknown work rather than retrying a side effect blindly. See [troubleshooting](troubleshooting.md).
 
 ## Reference
 
-Use the current product reference for exact method signatures, command options, and supported artifacts. The code fragments in configuration and how-to articles build on the quickstart; they are not all standalone scripts.
-
-- [Open API / CLI reference ↗](cli-reference.md)
+- [API reference](api-reference.md), [CLI reference](cli-reference.md) and [capability descriptor](capability-contract.md).
+- [AI Reference (robust)](https://deepagentlabs.io/control-tower/docs/llms-full.md) and [capability/source index](ai-reference-index.md).
+- [Source manifest and checksums](ai-docs-manifest.json).
