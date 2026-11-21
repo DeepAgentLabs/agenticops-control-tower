@@ -4,34 +4,54 @@
   "distribution": "agenticops-control-tower",
   "document": "llms-full.md",
   "content_type": "text/markdown; charset=utf-8",
-  "sha256": "f07cfc9144d0976c0b77cafeeb7879a8d1965528b2c7cbfd51bbe78997094103",
+  "sha256": "31bf2d2c84a64976c95d9abaa9ca3442bd2dc4a62f0b47ad0153fa331ebd7176",
   "source_hash_normalization": "UTF-8 text with LF newlines",
   "human_guide": "developer-guide.md",
   "sources": [
     {
       "path": "pyproject.toml",
       "kind": "package-metadata",
-      "sha256": "d5b89fcda2423700a5140b8c962c2c8464660fda1129ddde04440c851d7dfcba"
+      "sha256": "4e6811294bce19379d203889c3f415027c59538e659447017eb5bd98879ffd86"
     },
     {
       "path": "docs/ai-docs.json",
       "kind": "source-selection",
-      "sha256": "d3b11a3c90eb153a467cd8b0dd6f1c7d00aafa0e164679a5a09bee25d49c2f7c"
+      "sha256": "a8230a55a33c3efbf5e6c4cad5c5864ed47b1071eb5f4d23de04cb1efd94f411"
+    },
+    {
+      "path": "docs/ai-reference-index.md",
+      "kind": "reference",
+      "sha256": "39b1bf1b64921c95b9462bbd85ab8c7259bfef10b386630e782531f06ea24d8a"
     },
     {
       "path": "docs/developer-guide.md",
       "kind": "reference",
-      "sha256": "9f6b67d232ab7c56cc3ea63061fef483048765fcf483830d8a03177a24b92386"
+      "sha256": "aaeae92500ec9136ed1a790715409d077ffd5f537f974fa3b6f552b482504632"
     },
     {
       "path": "docs/api-reference.md",
       "kind": "reference",
-      "sha256": "52444508e37fed2c4755eb0cea26a08ec7e85fe149feafe9116e38e50ba617cc"
+      "sha256": "c35822aa549aa775f215f8a3302904d52b6fd5f3e64d3ec917e9d48ca29004fd"
     },
     {
       "path": "docs/cli-reference.md",
       "kind": "reference",
-      "sha256": "2a27fc3a123ebd0e5aa1e3941c82041c008b915161a48b8ecd75def76a6da2c2"
+      "sha256": "dc56deb82a3b7e482d113568241210fa011add4c0e2a3384d8e0bec376d12687"
+    },
+    {
+      "path": "docs/getting-started.md",
+      "kind": "reference",
+      "sha256": "4d73771a8c1486a4bb14099bd3cbe77bbb31ee6574ee9e58ba649243bc5b284f"
+    },
+    {
+      "path": "docs/architecture.md",
+      "kind": "reference",
+      "sha256": "39cb782d5c61d82c74b02e8e40f1f619d09c11dad2507bfcc27381465f267c92"
+    },
+    {
+      "path": "docs/features.md",
+      "kind": "reference",
+      "sha256": "ce7fc1500ddd29e1840541ddefc6d0275c1d95438a8330531844f3b2dc567e19"
     },
     {
       "path": "docs/evidence-posture.md",
@@ -39,9 +59,24 @@
       "sha256": "4623aa0ef5136e799c8e33698b21d8057a10b641a0645ea45902808326829fd1"
     },
     {
-      "path": "docs/settings.md",
+      "path": "docs/ecosystem-alignment.md",
       "kind": "reference",
-      "sha256": "698542356af26c8c64b441222f267a2b62e02dbff43ae5b90aa137a36c532fe5"
+      "sha256": "97a5e7326e2700075a051d6e64b46f59b706d110b606598a045415e37a9b1f65"
+    },
+    {
+      "path": "docs/evals-report-contract.md",
+      "kind": "reference",
+      "sha256": "301ba9dcb8fe48c1848785cdddd4bf609ffea2b51ef9ed73e1dd8dc57db68a05"
+    },
+    {
+      "path": "docs/lens-execution-evidence.md",
+      "kind": "reference",
+      "sha256": "8dd9ec27c22e64f2292554e82fa7b44c8c80964c2aafb8ebb396afdb82bc31fe"
+    },
+    {
+      "path": "docs/configuration.md",
+      "kind": "reference",
+      "sha256": "350b9dd1aeb9d203ffa9e5aeef41685b9f7b6ac27dc5afbb4c9ec6985d13300d"
     },
     {
       "path": "docs/authentication.md",
@@ -49,19 +84,24 @@
       "sha256": "e85d52f9e79b98d12b0434b251476086a21ba74070882bac6a0a24d906164961"
     },
     {
+      "path": "docs/settings.md",
+      "kind": "reference",
+      "sha256": "e12a6b43c55161c7464eb5f6bca2e194bac3bcb95415d4b41287a7bf2c0a6d23"
+    },
+    {
       "path": "docs/capability-contract.md",
       "kind": "reference",
       "sha256": "2f7287ef0030596b502935229478b2e75e8d929cd81c83323ac1a0d82cf8a72e"
     },
     {
-      "path": "docs/runbooks.md",
+      "path": "docs/incident-recovery.md",
       "kind": "reference",
-      "sha256": "a16ded46eb4ee97876449f04357e49210ef94a4553571cd2f2f7ed859d68458a"
+      "sha256": "9cd3c9b86f5c266b9f44433e511f29c401fa0de85fb420b5bd06add1f5fc745c"
     },
     {
       "path": "docs/fleet-operations.md",
       "kind": "reference",
-      "sha256": "18ecced24ad6938677b0b8773a7cbd516f4f2c6db267345c46fc87150153b95a"
+      "sha256": "0b735fba9afdc4fe89ddce55937ff4a19c2515f93fbec25e393b06c381df6b5b"
     },
     {
       "path": "docs/live-operations.md",
@@ -69,14 +109,349 @@
       "sha256": "e12f6a972871a42c5f27aa4d834f95f0d935b57a7db8ba0203e8a75e4cd928af"
     },
     {
+      "path": "docs/runbooks.md",
+      "kind": "reference",
+      "sha256": "a16ded46eb4ee97876449f04357e49210ef94a4553571cd2f2f7ed859d68458a"
+    },
+    {
+      "path": "docs/mcp-connector.md",
+      "kind": "reference",
+      "sha256": "0ff474ea67fede93a8e4aa651bb3ad2bb1dfb1db52adae6c3b0ce8fbdcf1e39b"
+    },
+    {
+      "path": "docs/hosting.md",
+      "kind": "reference",
+      "sha256": "451ae38e5c689974fb69b2a2e9710b1618ee2d26fb3b211e179521b6559cc8d7"
+    },
+    {
+      "path": "docs/coordinated-v1-readiness.md",
+      "kind": "reference",
+      "sha256": "64c21f883105b0e5d72c0ec1df718489653d2cd3f6fa1f79a2c988a6a4bfbaaf"
+    },
+    {
+      "path": "docs/aios-0.8-operational-artifacts.md",
+      "kind": "reference",
+      "sha256": "6d0bcafa28a9c8b56b5a7fda917e1ccd2d4c18196d88284e7dc320c22fe8cc17"
+    },
+    {
+      "path": "docs/phase10-validation.md",
+      "kind": "reference",
+      "sha256": "6d1acb7283b4efc660bbbe9d70335f791d44d51fe10f40b780a576e8f02a5bc1"
+    },
+    {
+      "path": "docs/integrations.md",
+      "kind": "reference",
+      "sha256": "10c9c0d61381e62455b6cd833ce02614365730412bed7b0bb43ada8074145708"
+    },
+    {
+      "path": "docs/examples.md",
+      "kind": "reference",
+      "sha256": "6a8978ab330eb82e5dd8d61e26d1751a30ca49e404d79c18fdac89eaa24abbcf"
+    },
+    {
+      "path": "docs/troubleshooting.md",
+      "kind": "reference",
+      "sha256": "ba12c6421f9dbc7f756944c21aad8135fac9381c82513d20710a3d269011a976"
+    },
+    {
       "path": "docs/limitations.md",
       "kind": "reference",
       "sha256": "734800e120d07c4a05d20e0bc638978e6db618b30675f087f56133f6641e59a9"
     },
     {
+      "path": "docs/aios-0.6.1.md",
+      "kind": "reference",
+      "sha256": "d8b6e4a4d680d233630c721dcdf819c1b5fc848a5fba988b5e19d74c91a156f8"
+    },
+    {
+      "path": "docs/aios-0.7.0.md",
+      "kind": "reference",
+      "sha256": "818ae68ee4930e35a12bff71c9ab45ae0ecbfd7d41165bdd03d3fae7c70777fb"
+    },
+    {
+      "path": "docs/aios-v0.6.md",
+      "kind": "reference",
+      "sha256": "66fbc63b3e3fc210d3f29fc77b67be308dfd1876b704a5af36c145e1a6f8c849"
+    },
+    {
+      "path": "docs/chaos-0.11-chaoshub.md",
+      "kind": "reference",
+      "sha256": "bd9d79ead0ea60b37fc43ab44071d7770eec1fce82fac5f2fe779973d4b186ad"
+    },
+    {
+      "path": "docs/chaos-0.7.md",
+      "kind": "reference",
+      "sha256": "7ea07bb7daa2ecdbc4a6b2c7c794d0649812565f8edd4d948f05012cf64d9f7b"
+    },
+    {
+      "path": "docs/chaos-0.8.md",
+      "kind": "reference",
+      "sha256": "3493330d201faaca3a327ad2fe0a64ce3661c11d8815d4dd27c1ef096662f572"
+    },
+    {
+      "path": "docs/chaos-0.9.md",
+      "kind": "reference",
+      "sha256": "3c48b134fa006303a03642f4eda7089c67f4e96e9bd1af1ff2a726d651925f28"
+    },
+    {
+      "path": "docs/evals-0.10-aios-evidence.md",
+      "kind": "reference",
+      "sha256": "9ecc1205d8a0fec5bc60c298a170c75cc2591343ee7ab270091b8fc8ea15190d"
+    },
+    {
+      "path": "docs/evals-0.11-containment.md",
+      "kind": "reference",
+      "sha256": "fc46a152cac6da00e0c29c3c46d5c75dea1cdb9ad7324fd80d178ff71497b7fd"
+    },
+    {
+      "path": "docs/evals-0.12.md",
+      "kind": "reference",
+      "sha256": "b75e97128be2fb5f14113dc89e94d4e766a8372661698b1ef07ddb694689f346"
+    },
+    {
+      "path": "docs/evals-0.8-cli.md",
+      "kind": "reference",
+      "sha256": "216fec6a63866e1c9b28159b56ea4e3293972d65fbbf134efe8c14befd6ccf75"
+    },
+    {
+      "path": "docs/evals-0.9-judge-reliability.md",
+      "kind": "reference",
+      "sha256": "06b55a87e8b27ddd3c425de02fa67453180bb2868c6db82a81506db735ab80c7"
+    },
+    {
+      "path": "docs/lens-0.10-routing.md",
+      "kind": "reference",
+      "sha256": "7ccc833b885dfd9cfd943aff9ba818edadde47c8a1c6d41ad252d03e3d5df591"
+    },
+    {
+      "path": "docs/lens-0.11-optimization.md",
+      "kind": "reference",
+      "sha256": "087ccbb31205ad5d7dafe4d116e19af41c64788f1ca01c9d2a6119c2562d4b83"
+    },
+    {
+      "path": "docs/lens-0.13.md",
+      "kind": "reference",
+      "sha256": "3e0316b8649afad6dd12c8bebc74201632790ea5b2a71aa8782965f39ee40e18"
+    },
+    {
+      "path": "docs/mcp-0.4-unified-workflows.md",
+      "kind": "reference",
+      "sha256": "6c9ca49b8790b0b7f2bf33bda7d2e6beb237e1def2b9eca987617d4c485ad0ac"
+    },
+    {
+      "path": "docs/mcp-0.5-access-control.md",
+      "kind": "reference",
+      "sha256": "9df866e5fd1652afd93454d580c06c329b81438d5752b7e902eec9be0e717a40"
+    },
+    {
+      "path": "docs/mcp-0.7-readiness.md",
+      "kind": "reference",
+      "sha256": "b28840f3c9de49ac7115cd548751194d9a3c9d1fbdd5da5833fbfea09181ab84"
+    },
+    {
+      "path": "docs/phase6-containment.md",
+      "kind": "reference",
+      "sha256": "0c3fdb4c30a7063bb04e3bd4017ea4a6ea09697005a394edf33c256b70a13b97"
+    },
+    {
+      "path": "docs/sidecar-0.10.md",
+      "kind": "reference",
+      "sha256": "ef14743a45936849c3456b7517bb64b636c0fd133ccd38f1b488c6b7e0be982b"
+    },
+    {
+      "path": "docs/sidecar-0.9.md",
+      "kind": "reference",
+      "sha256": "fb602566af5726359688d6a311dd9085a1adc3dcc8b930e3b1e4fc87f3763bc8"
+    },
+    {
+      "path": "docs/sidecar-v0.8.md",
+      "kind": "reference",
+      "sha256": "381036b9afb49aeb5a712ed33963ff6b665f3b1e7a96c0d3e3d05286af22c64b"
+    },
+    {
+      "path": "docs/tower-0.8-compatibility.md",
+      "kind": "reference",
+      "sha256": "cb92cb73d84eae4c1a7289cdf8e33f2e9a915a29cb40c645396914b09b73a678"
+    },
+    {
+      "path": "docs/tower-0.9-compatibility.md",
+      "kind": "reference",
+      "sha256": "e02d73208265d275f790c8b50602c6993c82e054fff5dc3805e5969961fe7cc7"
+    },
+    {
       "path": "src/agenticops_control_tower/__init__.py",
       "kind": "source-contract",
-      "sha256": "dc74c321e528049b7551387e0097f830d5930ded839680aeb444eb11b6deb18f"
+      "sha256": "fb35b53818110c3c5c5e38d51cb4a42b0151144a39c0ed3ae578826d578a2145"
+    },
+    {
+      "path": "src/agenticops_control_tower/adapters/__init__.py",
+      "kind": "source-contract",
+      "sha256": "505a5aea4630dc2c6aab7f66d637496365120a8773c724281a54a9f577cbb176"
+    },
+    {
+      "path": "src/agenticops_control_tower/adapters/catalog.py",
+      "kind": "source-contract",
+      "sha256": "7d6042a07a1ad35d0938ecd0f2319c9e0dd31fad5b25fb0cfdb099f3908b04da"
+    },
+    {
+      "path": "src/agenticops_control_tower/adapters/containment.py",
+      "kind": "source-contract",
+      "sha256": "1182a586babfebb0091614a2c4ac91ef271b0c0fbda5557fcf2f9994aaa48461"
+    },
+    {
+      "path": "src/agenticops_control_tower/adapters/evals_contract.py",
+      "kind": "source-contract",
+      "sha256": "c30d3e1932b074e1239fa71f9bb0a35eea887d71626e001b3149c6536cea7fce"
+    },
+    {
+      "path": "src/agenticops_control_tower/adapters/evidence.py",
+      "kind": "source-contract",
+      "sha256": "f2871a72958ca58a31c372b75f67d6a799f73a80c6715e489730e847fb0f5b56"
+    },
+    {
+      "path": "src/agenticops_control_tower/adapters/lens_execution.py",
+      "kind": "source-contract",
+      "sha256": "4f600f0dabd0a379a69075eb4f136c9a834c061f52d5548ad7c986da32cff3d8"
+    },
+    {
+      "path": "src/agenticops_control_tower/adapters/sidecar_journal.py",
+      "kind": "source-contract",
+      "sha256": "01d93d11056a35c8c8901f3c800eb7af8ed2ecd83303d5c421d2ef5feda7c142"
+    },
+    {
+      "path": "src/agenticops_control_tower/api/__init__.py",
+      "kind": "source-contract",
+      "sha256": "31c471e4efcfd4ef920f06d2058c4d0bd9b1fd3cdd02ece1a98b26c64aec2ffa"
+    },
+    {
+      "path": "src/agenticops_control_tower/api/http.py",
+      "kind": "source-contract",
+      "sha256": "9c1af7fe1954210858e62eb0237dcb4cffeaa3974baf7296380fb6b7e694d5fe"
+    },
+    {
+      "path": "src/agenticops_control_tower/api/limits.py",
+      "kind": "source-contract",
+      "sha256": "6c534d52c2281532e2ce9f913e08691a06445d0f5447f0731aabe0b74d618b8f"
+    },
+    {
+      "path": "src/agenticops_control_tower/api/surface.py",
+      "kind": "source-contract",
+      "sha256": "a953aa85001d0f42e014ee1dc59dd5a08b008958541b6dc2ce68add93143d12a"
+    },
+    {
+      "path": "src/agenticops_control_tower/bulk/__init__.py",
+      "kind": "source-contract",
+      "sha256": "e8526e8e56b9c741e46e74e42de1eac843932d38d690f3ac6fb240e43d8e4b87"
+    },
+    {
+      "path": "src/agenticops_control_tower/bulk/models.py",
+      "kind": "source-contract",
+      "sha256": "3e52c5ea7786383ec0a2ea01a914293b80c7de1c75ab575acd628681234226f2"
+    },
+    {
+      "path": "src/agenticops_control_tower/bulk/service.py",
+      "kind": "source-contract",
+      "sha256": "441c591db15131d90e592c78932bbbbfde30e73196a063ad0a235bf9d10503dd"
+    },
+    {
+      "path": "src/agenticops_control_tower/cli/__init__.py",
+      "kind": "source-contract",
+      "sha256": "2227c6274ba995dcdc95400ec84db9ff344d849307e036f44724eb6cf16d0d87"
+    },
+    {
+      "path": "src/agenticops_control_tower/cli/main.py",
+      "kind": "source-contract",
+      "sha256": "b7d468a6edae6c3a8c88820d82cc904be633778b9c9e103376ee23e94bc89e64"
+    },
+    {
+      "path": "src/agenticops_control_tower/config/__init__.py",
+      "kind": "source-contract",
+      "sha256": "25e26aa81fefe4b0329f4d85468e48449c7edc7fb31e2e823104ad34d9b97c00"
+    },
+    {
+      "path": "src/agenticops_control_tower/config/models.py",
+      "kind": "source-contract",
+      "sha256": "945a39f5f8b7e6c02c6d55ff315fba6504dc8bb80d7931c3d8320eef652770be"
+    },
+    {
+      "path": "src/agenticops_control_tower/config/service.py",
+      "kind": "source-contract",
+      "sha256": "55b661c02b86a821f28c85f14cadcca15efa2c46375700b107ae3903d1b7322c"
+    },
+    {
+      "path": "src/agenticops_control_tower/console/__init__.py",
+      "kind": "source-contract",
+      "sha256": "b3db1ea9d58d2ff51edd7d8135cd5456c47e6147f13b62d753654c2b9428d51f"
+    },
+    {
+      "path": "src/agenticops_control_tower/console/app.py",
+      "kind": "source-contract",
+      "sha256": "b9273575d04695f5b43303f556251efca4c23a66e5d10dee0a3838fb12f13bb2"
+    },
+    {
+      "path": "src/agenticops_control_tower/discovery/__init__.py",
+      "kind": "source-contract",
+      "sha256": "d95d38a5c7777eb9893fe0650ef82bc6023698f2ec5a0551d53f8c3439f3f764"
+    },
+    {
+      "path": "src/agenticops_control_tower/discovery/service.py",
+      "kind": "source-contract",
+      "sha256": "35732d39c40a71a14bd8e2a6978562444716a4d401e114a2896e871bdd5b334b"
+    },
+    {
+      "path": "src/agenticops_control_tower/errors.py",
+      "kind": "source-contract",
+      "sha256": "9ddeb37f4aa54dfcba52069828709ae828097538fc06ead2a60932252bfe51a5"
+    },
+    {
+      "path": "src/agenticops_control_tower/evidence/__init__.py",
+      "kind": "source-contract",
+      "sha256": "7702477e1d5ee5c7119e93f0df9f1b7e9899779a7af788527f12ec483bf99e23"
+    },
+    {
+      "path": "src/agenticops_control_tower/evidence/posture.py",
+      "kind": "source-contract",
+      "sha256": "d81b57f1b04ae3f9130cd6a85743d6ad10dc3e1336caf0460e6d5eef5336efc8"
+    },
+    {
+      "path": "src/agenticops_control_tower/evidence/store.py",
+      "kind": "source-contract",
+      "sha256": "7f9aef0f560e0d98525b1523e15f5cbbd06456e2a65dad3493c955014e895e79"
+    },
+    {
+      "path": "src/agenticops_control_tower/incidents/__init__.py",
+      "kind": "source-contract",
+      "sha256": "999e3901a4c1415be38c99068a46311995fa7771e7c273d41e2489603085a6d2"
+    },
+    {
+      "path": "src/agenticops_control_tower/incidents/_aios.py",
+      "kind": "source-contract",
+      "sha256": "43afc067f5cedd696acef8da79759635053297b00e9e953dabb345281fce0f90"
+    },
+    {
+      "path": "src/agenticops_control_tower/incidents/connectors.py",
+      "kind": "source-contract",
+      "sha256": "80b6cadfa472f2d4cd0b13846390215161c87326873ff0fbc94d463e5644428d"
+    },
+    {
+      "path": "src/agenticops_control_tower/incidents/export.py",
+      "kind": "source-contract",
+      "sha256": "823f680ce830377f8c1eb1670db9f2706d169041908e5e2678649e14347d5238"
+    },
+    {
+      "path": "src/agenticops_control_tower/incidents/models.py",
+      "kind": "source-contract",
+      "sha256": "75e4ac0ddffc6268a290b74dab0b8b8d5af9cf2cbb009ec7550791dcaecd8caa"
+    },
+    {
+      "path": "src/agenticops_control_tower/incidents/service.py",
+      "kind": "source-contract",
+      "sha256": "ef625cd1585794d25729f3dc48dfe29a718e49683733259c3362a23bf40544bd"
+    },
+    {
+      "path": "src/agenticops_control_tower/incidents/staging.py",
+      "kind": "source-contract",
+      "sha256": "6c354f5b5f5bd4ca558f43f1013b80558495f8a71a4fef506b5559b25df68f6d"
     },
     {
       "path": "src/agenticops_control_tower/models/__init__.py",
@@ -109,9 +484,84 @@
       "sha256": "a37ff6641899aef9df18f8ebe3dbc0d7c5f200fd569b223565845f7218c42d07"
     },
     {
-      "path": "src/agenticops_control_tower/api/surface.py",
+      "path": "src/agenticops_control_tower/operations/__init__.py",
       "kind": "source-contract",
-      "sha256": "a953aa85001d0f42e014ee1dc59dd5a08b008958541b6dc2ce68add93143d12a"
+      "sha256": "f318739f0091c41c7991c5e4f6f3e6387068786cf01647455e95e63727168812"
+    },
+    {
+      "path": "src/agenticops_control_tower/operations/models.py",
+      "kind": "source-contract",
+      "sha256": "2193bf02a4a9e2a675918258d723d92f0ed4557dc567f8fa5145833bd4a0d977"
+    },
+    {
+      "path": "src/agenticops_control_tower/operations/service.py",
+      "kind": "source-contract",
+      "sha256": "dc92acf16e9b9f0a78dbc6d1d62cb4dbd38724d5bd77576a3d20a8e67ca39310"
+    },
+    {
+      "path": "src/agenticops_control_tower/registry/__init__.py",
+      "kind": "source-contract",
+      "sha256": "13e617f4b99b531a22acfb680ca849d4816276b35f9aac88fa52aea8763cd872"
+    },
+    {
+      "path": "src/agenticops_control_tower/registry/service.py",
+      "kind": "source-contract",
+      "sha256": "06f9e6d2644fe2dcd5945f11bf6163697eac8e61935954d5165f5aa39d1d98d3"
+    },
+    {
+      "path": "src/agenticops_control_tower/runbooks/__init__.py",
+      "kind": "source-contract",
+      "sha256": "656211baae906e27877ba8157dc4b031b56c535e93bb54dc04c4ecc3b09203e3"
+    },
+    {
+      "path": "src/agenticops_control_tower/runbooks/catalog.py",
+      "kind": "source-contract",
+      "sha256": "6e2aa6b15482d6ec9f85b3795b6d96d1606d20161ce968d43814855133ea582f"
+    },
+    {
+      "path": "src/agenticops_control_tower/runbooks/connectors.py",
+      "kind": "source-contract",
+      "sha256": "eab5e91b5fe4e1d93a2c1dbe4191a36a47bb5d0445379606d72be80de6255aa0"
+    },
+    {
+      "path": "src/agenticops_control_tower/runbooks/models.py",
+      "kind": "source-contract",
+      "sha256": "04da54264000581273b9d33a85836f45a564aa051a0ed69a9849b82794530469"
+    },
+    {
+      "path": "src/agenticops_control_tower/runbooks/service.py",
+      "kind": "source-contract",
+      "sha256": "28b6b423e6ba3038d3339789fd8bfddb67fb4de4ad0321c70b7aa26fa8a16f92"
+    },
+    {
+      "path": "src/agenticops_control_tower/runbooks/staging.py",
+      "kind": "source-contract",
+      "sha256": "7c45344aae82ce28bf1b278dad3d5db277150b77e1c92bc81eac47fcd44c2e83"
+    },
+    {
+      "path": "src/agenticops_control_tower/snapshot.py",
+      "kind": "source-contract",
+      "sha256": "d205df100b703414caf2f697ff201f227fcaba4cc401b38fb991c6a9030c3614"
+    },
+    {
+      "path": "src/agenticops_control_tower/status/__init__.py",
+      "kind": "source-contract",
+      "sha256": "541b9cf0abf48f65e2e091089d1a21944a31e2f5901110bc8c0beb38f6f4598b"
+    },
+    {
+      "path": "src/agenticops_control_tower/status/service.py",
+      "kind": "source-contract",
+      "sha256": "e2daadf9f536c5c46d535e424ff3e5b7b26a199e2341ddacfa754870d4df4457"
+    },
+    {
+      "path": "src/agenticops_control_tower/schemas/evals/evaluation-report-1.0.schema.json",
+      "kind": "json-schema",
+      "sha256": "b878a2924e2d4bfd2889b8b26575fea77be26ae05fa478f815343add779c508a"
+    },
+    {
+      "path": "src/agenticops_control_tower/schemas/evals/gate-decision-1.0.schema.json",
+      "kind": "json-schema",
+      "sha256": "407b0dc9e8cee79d66518abef071fd4a9488bee906459946b4400b6a8d851c17"
     },
     {
       "path": "docs/guide/examples/sample_fleet_snapshot.json",
