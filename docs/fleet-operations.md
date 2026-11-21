@@ -6,7 +6,7 @@ remains read-only. Fleet commands are Tower-local contracts, not AIOS schemas.
 
 ## Preview, approve, execute
 
-Install `agenticops-control-tower[api]==0.7.0`. Configure distinct
+Install `agenticops-control-tower[api]`. Configure distinct
 `AGENTICOPS_WRITE_TOKEN` and `AGENTICOPS_APPROVAL_TOKEN` on the server.
 The trusted host must declare Tower-owned desired settings through
 `api.config.declare(Configuration(..., authority="tower"), writer)` first;
