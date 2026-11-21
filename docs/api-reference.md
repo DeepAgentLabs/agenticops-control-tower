@@ -3,7 +3,7 @@
 Control Tower has two programmatic surfaces: the **HTTP API** served by
 `agenticops-control-tower serve` (or `create_app()`), and the **Python API**
 (`ControlTowerAPI`), which the HTTP layer and CLI both use. The routes below are
-taken from `api/http.py` in 0.9.0. While the server runs, FastAPI's generated
+taken from the current `api/http.py` surface; focused guides retain their feature-origin release labels. While the server runs, FastAPI's generated
 OpenAPI page at `/docs` lists the exact request and response schemas.
 
 ## Authentication
@@ -88,6 +88,65 @@ See [runbooks](runbooks.md) for request bodies and outcomes.
 | --- | --- |
 | `GET /console/` | The read-only console shell. It contains no fleet data; the page reads the routes above with the token you paste. Served with a restrictive Content-Security-Policy and `Cache-Control: no-store`. |
 
+## Complete HTTP route inventory
+
+The current app registers the following method/path pairs, excluding FastAPI's documentation/OpenAPI routes. The detailed sections above and linked workflows define roles, bodies and state transitions. `GET /openapi.json` / `/docs` describe the running app's typed schemas. The console shell and assets are served by the same application; the browser issues reads only.
+
+| Method | Path |
+| --- | --- |
+| `GET` | `/actions/{action_id}` |
+| `GET` | `/agents` |
+| `GET` | `/agents/{agent_id}` |
+| `GET` | `/agents/{agent_id}/audit` |
+| `GET` | `/agents/{agent_id}/config/{capability}` |
+| `GET` | `/agents/{agent_id}/evidence` |
+| `GET` | `/agents/{agent_id}/evidence/history` |
+| `GET` | `/alerts` |
+| `GET` | `/bulk/{bulk_id}` |
+| `GET` | `/capabilities` |
+| `GET` | `/console` |
+| `GET` | `/console/` |
+| `GET` | `/contracts/capabilities` |
+| `GET` | `/incidents` |
+| `GET` | `/incidents/{incident_id}` |
+| `GET` | `/incidents/{incident_id}/runbook-executions` |
+| `GET` | `/incidents/{incident_id}/runbooks` |
+| `GET` | `/incidents/{incident_id}/view` |
+| `GET` | `/posture` |
+| `GET` | `/runbook-executions/{execution_id}` |
+| `GET` | `/runbooks` |
+| `GET` | `/runbooks/{runbook_id}/{version}/validations` |
+| `GET` | `/status` |
+| `GET` | `/versions` |
+| `POST` | `/actions/preview` |
+| `POST` | `/actions/{action_id}/approval` |
+| `POST` | `/actions/{action_id}/execute` |
+| `POST` | `/actions/{action_id}/revoke` |
+| `POST` | `/agents/register` |
+| `POST` | `/agents/{agent_id}/heartbeat` |
+| `POST` | `/alerts/evaluate` |
+| `POST` | `/alerts/{alert_id}/acknowledge` |
+| `POST` | `/bulk/preview` |
+| `POST` | `/bulk/{bulk_id}/approval` |
+| `POST` | `/bulk/{bulk_id}/execute` |
+| `POST` | `/bulk/{bulk_id}/revoke` |
+| `POST` | `/evidence` |
+| `POST` | `/incidents/detect` |
+| `POST` | `/incidents/{incident_id}/approval` |
+| `POST` | `/incidents/{incident_id}/control/{action}` |
+| `POST` | `/incidents/{incident_id}/execute` |
+| `POST` | `/incidents/{incident_id}/investigate` |
+| `POST` | `/incidents/{incident_id}/preview` |
+| `POST` | `/incidents/{incident_id}/reconcile` |
+| `POST` | `/incidents/{incident_id}/revoke` |
+| `POST` | `/incidents/{incident_id}/runbooks/preview` |
+| `POST` | `/incidents/{incident_id}/verify` |
+| `POST` | `/runbook-executions/{execution_id}/approval` |
+| `POST` | `/runbook-executions/{execution_id}/execute` |
+| `POST` | `/runbook-executions/{execution_id}/verify` |
+| `POST` | `/runbook-executions/{execution_id}/{transition}` |
+| `POST` | `/runbooks/{runbook_id}/{version}/validations` |
+
 ## Python API
 
 `ControlTowerAPI` is the facade every other surface goes through. The base
@@ -140,3 +199,24 @@ To serve HTTP from your own process, see
 ## Versioned capability discovery
 
 `GET /contracts/capabilities` requires inventory reader access and returns the `tower.capabilities.v1` candidate descriptor. Python: `api.get_capability_contract()`. See [schemas, runtime examples and evolution policy](capability-contract.md).
+
+
+## Capability modules and evidence boundaries
+
+| Module | Workflow and detailed contract |
+| --- | --- |
+| `registry`, `discovery`, `status`, `models` | [Inventory, health, versions and candidate capability descriptor](capability-contract.md) |
+| `snapshot` | [Offline inventory/evidence views](evidence-posture.md#offline-snapshots) |
+| `config` | [Ownership, desired settings, immutable previews and separate approval](configuration.md) |
+| `evidence`, `adapters` | [Native projections, attributed ingestion, freshness and history](evidence-posture.md) |
+| `adapters.lens_execution` | [Optional host-trusted execution verification](lens-execution-evidence.md) |
+| `incidents` | [Detection, cited investigation, installed staging connectors and verified recovery](incident-recovery.md) |
+| `bulk` | [Frozen target selection, execution and bounded stop/revoke](fleet-operations.md) |
+| `operations` | [Detection policies, periodic scans, alerts and joined timeline](live-operations.md) |
+| `runbooks` | [Versioned catalog, validation, approval, bounded steps, compensation and reconciliation](runbooks.md) |
+| `incidents.export` | [Redacted AIOS investigation-report projection](coordinated-v1-readiness.md) |
+| `api`, `cli`, `console` | [One role-controlled model through HTTP/CLI and read-only console](hosting.md) |
+
+Module names in this table are relative to `agenticops_control_tower`. The [AI Reference (robust)](https://deepagentlabs.io/control-tower/docs/llms-full.md) includes declarations from every package module and both bundled Evals-native schemas. Undocumented helpers remain internal; static extraction does not promote them to public APIs. The capability descriptor's candidate inventory schemas are separate from those Evals schemas and from AIOS artifacts.
+
+See [the capability index](ai-reference-index.md), [producer ownership](ecosystem-alignment.md), [Lens trust setup](lens-execution-evidence.md) and [current AIOS export](coordinated-v1-readiness.md). Serialized approval/evidence is not permission to execute; the live service rechecks the exact state and connector boundary.

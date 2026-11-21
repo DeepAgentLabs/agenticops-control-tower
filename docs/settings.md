@@ -2,7 +2,7 @@
 
 Control Tower has no configuration file. The server is configured with
 `serve` options and environment variables; the CLI with its own options and
-environment variables. Defaults below are taken from the 0.8.0 source.
+environment variables. Defaults below describe the current server/client surface; declarations in the robust reference capture the included checkout.
 
 ## Server (`agenticops-control-tower serve`)
 
@@ -18,6 +18,7 @@ environment variables. Defaults below are taken from the 0.8.0 source.
 | `AGENTICOPS_READ_TOKEN` | server | Bearer token allowed to read. |
 | `AGENTICOPS_WRITE_TOKEN` | server | Bearer token allowed to read and write (register, heartbeat, evidence, previews, execution). |
 | `AGENTICOPS_APPROVAL_TOKEN` | server | Separate token for approving, denying and revoking actions. Must differ from the reader and writer tokens, or the server refuses to start. |
+| `AGENTICOPS_LENS_TRUST_STORE` | server | Protected JSON key-ID → hex HMAC-key map for optional Lens execution verification; read once at app creation. Invalid configuration fails startup. |
 
 Token rules, enforced on every HTTP route:
 
@@ -63,15 +64,24 @@ Embedding Control Tower in your own service uses the same settings as
 arguments, which take precedence over the environment:
 
 ```python
+import secrets
 from agenticops_control_tower.api.http import create_app
 
+# Local app-construction example: no port is opened or database created.
+# A real host securely distributes its persistent role credentials.
 app = create_app(
-    database_path="registry.sqlite",
-    read_token="...",
-    write_token="...",
-    approval_token="...",
-    detection_interval_seconds=30,
+    read_token=secrets.token_urlsafe(32),
+    write_token=secrets.token_urlsafe(32),
+    approval_token=secrets.token_urlsafe(32),
+    detection_interval_seconds=0,
 )
 ```
 
 Run it with any ASGI server, for example `uvicorn module:app`.
+
+
+## Connector and verification setup
+
+Python hosts supply trusted service instances/connector registries rather than accepting caller-selected runtime endpoints or commands. `create_app` accepts `trusted_lens_keys` for execution bundles; when an existing `ControlTowerAPI` is supplied, its evidence store owns trust configuration. Do not configure a second conflicting key map. Optional Lens is required to verify these bundles; ordinary native projections remain standalone.
+
+Trust-file changes require app restart. Existing persisted verification records retain their original ingestion-time result; reverify as a new explicitly attributed observation when trust changes. See [Lens key setup and lifecycle](lens-execution-evidence.md), [staging connector installation](incident-recovery.md), [runbook connectors](runbooks.md#connectors) and [hosting](hosting.md).

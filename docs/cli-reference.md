@@ -18,6 +18,66 @@ agenticops-control-tower --token "$READER_TOKEN" agents list --unhealthy
 
 The package also runs as a module: `python -m agenticops_control_tower.cli.main …`.
 
+## Complete command inventory
+
+Every registered leaf command is listed below, including nested lifecycle operations. Global options go before the command; arguments/options below follow it. Use `agenticops-control-tower COMMAND --help` for defaults, allowed choices and exact request-file semantics. These are CLI commands; additional Python/HTTP-only operations are listed in the API reference and detailed guides.
+
+| Command | Arguments and command options |
+| --- | --- |
+| `serve` | `[--host HOST] [--port PORT] [--database DATABASE]` |
+| `agents register` | `PAYLOAD_FILE` |
+| `agents heartbeat` | `AGENT_ID PAYLOAD_FILE` |
+| `agents list` | `[--status STATUS] [--unhealthy] [--environment ENVIRONMENT] [--capability CAPABILITY] [--missing-capability MISSING_CAPABILITY]` |
+| `agents get` | `AGENT_ID` |
+| `capabilities list` | `—` |
+| `status` | `[--environment ENVIRONMENT]` |
+| `config` | `AGENT_ID CAPABILITY` |
+| `audit` | `AGENT_ID` |
+| `actions preview` | `PAYLOAD_FILE` |
+| `actions get` | `ACTION_ID` |
+| `actions approve` | `ACTION_ID` |
+| `actions deny` | `ACTION_ID` |
+| `actions revoke` | `ACTION_ID` |
+| `actions execute` | `ACTION_ID` |
+| `bulk preview` | `PAYLOAD_FILE` |
+| `bulk get` | `BULK_ID` |
+| `bulk approve` | `BULK_ID` |
+| `bulk deny` | `BULK_ID` |
+| `bulk revoke` | `BULK_ID` |
+| `bulk execute` | `BULK_ID` |
+| `alerts list` | `[--environment ENVIRONMENT] [--active-only]` |
+| `alerts evaluate` | `—` |
+| `alerts acknowledge` | `ALERT_ID` |
+| `incidents list` | `—` |
+| `incidents get` | `INCIDENT_ID` |
+| `incidents detect` | `PAYLOAD_FILE` |
+| `incidents view` | `INCIDENT_ID` |
+| `incidents investigate` | `INCIDENT_ID` |
+| `incidents preview` | `INCIDENT_ID PAYLOAD_FILE` |
+| `incidents approval` | `INCIDENT_ID PAYLOAD_FILE` |
+| `incidents revoke` | `INCIDENT_ID` |
+| `incidents execute` | `INCIDENT_ID PAYLOAD_FILE` |
+| `incidents verify` | `INCIDENT_ID PAYLOAD_FILE` |
+| `runbooks catalog` | `—` |
+| `runbooks recommend` | `INCIDENT_ID` |
+| `runbooks history` | `INCIDENT_ID` |
+| `runbooks preview` | `INCIDENT_ID PAYLOAD_FILE` |
+| `runbooks validations` | `RUNBOOK_ID VERSION` |
+| `runbooks validate` | `RUNBOOK_ID VERSION PAYLOAD_FILE` |
+| `runbooks get` | `EXECUTION_ID` |
+| `runbooks approval` | `EXECUTION_ID PAYLOAD_FILE` |
+| `runbooks revoke` | `EXECUTION_ID` |
+| `runbooks execute` | `EXECUTION_ID PAYLOAD_FILE` |
+| `runbooks cancel` | `EXECUTION_ID` |
+| `runbooks verify` | `EXECUTION_ID PAYLOAD_FILE` |
+| `runbooks reconcile` | `EXECUTION_ID` |
+| `evidence ingest` | `AGENT_ID SOURCE ARTIFACT_FILE [--source-version SOURCE_VERSION] [--artifact-ref ARTIFACT_REF] [--observed-at OBSERVED_AT] [--run-id RUN_ID] [--runtime-agent-id RUNTIME_AGENT_ID] [--gate GATE]` |
+| `evidence ingest-manifest` | `MANIFEST_FILE` |
+| `evidence ingest-sidecar-journal` | `AGENT_ID JOURNAL_FILE [--source-version SOURCE_VERSION] [--run-id RUN_ID] [--runtime-agent-id RUNTIME_AGENT_ID]` |
+| `evidence history` | `AGENT_ID [--source SOURCE] [--limit LIMIT]` |
+| `evidence posture` | `AGENT_ID [--stale-after-seconds STALE_AFTER_SECONDS]` |
+| `posture` | `[--environment ENVIRONMENT] [--stale-after-seconds STALE_AFTER_SECONDS]` |
+
 ## Server
 
 | Command | Role | Description |

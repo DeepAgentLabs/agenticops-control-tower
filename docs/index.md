@@ -22,4 +22,6 @@ Read a sample fleet offline; then start the local console.
 
 Fleet status does not turn a failed eval into a pass. Evidence ingestion and producer integrations must be configured explicitly.
 
-[Read the detailed developer guide](developer-guide.md).
+[Developer Guide (simple)](developer-guide.md#capability-index) · [AI Reference (robust)](https://deepagentlabs.io/control-tower/docs/llms-full.md)
+
+Both include a capability index. The simple guide offers short workflows; the robust reference includes detailed operational guides, current package/CLI declarations and bundled schemas.

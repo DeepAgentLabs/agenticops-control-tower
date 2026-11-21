@@ -18,7 +18,7 @@ version and validate against its schemas and semantic rules.
 
 The base Tower package needs no sibling package imports. Existing JSON exports
 can be read without installing their producers. The adapter catalog also names
-MCP, whose transport integration is still planned.
+MCP, whose separate authenticated HTTP connector is described in the [MCP guide](mcp-connector.md).
 
 ## Identity and attribution
 
@@ -40,8 +40,7 @@ join records by display name, application name, suite name or framework.
   diagnosis report it must match the artifact's `run_id`; other producers' correlations are caller assertions.
 - `runtime_agent_id`: optional runtime occurrence identity, separate from the
   deployment ID. Caller asserts the mapping; Tower does not infer it.
-- `spec_version`: reserved for an explicit future AIOS mapping. Supplying it
-  currently returns `unavailable`, rather than treating native JSON as AIOS.
+- `spec_version`: ordinary native readers do not treat a supplied marker as AIOS validation. The explicit Lens `execution_bundle` path accepts `0.4-draft` and delegates verification to Lens using host trust; see [execution evidence](lens-execution-evidence.md).
 
 AIOS distinguishes reusable agent definitions from runtime Agent occurrences.
 Keep these identities separate when introducing future mappings; a deployment
@@ -173,3 +172,8 @@ approvals and receipts are Tower-local contracts. Existing optional sibling
 ranges stay sufficient. Native evidence, deployment health, runtime enforcement
 and issuer revocation retain separate ownership and meaning. New fleet writes
 are HTTP/CLI/Python-only; MCP investigation remains compatible and cannot approve.
+
+
+## Current operational export
+
+The opt-in `incidents.export.export_investigation_report` projects held native incidents into AIOS `0.8-draft` investigation reports with redacted text and explicit citations. This producer projection is separate from native evidence readers and does not make Tower an AIOS validator. See [current export/migration behavior](coordinated-v1-readiness.md) and [operational artifacts](aios-0.8-operational-artifacts.md). Historical sections describe their stated release's native reader scope.
