@@ -3,54 +3,218 @@
   "scope": "Manage agent inventory, explicit evidence, and authorized operator workflows. Deployment health remains separate from producer evaluation, governance, and resilience outcomes.",
   "references": [
     {
+      "title": "AI Reference capability index",
+      "path": "docs/ai-reference-index.md"
+    },
+    {
       "title": "Setup and task workflows",
       "path": "docs/developer-guide.md"
     },
     {
-      "title": "Api Reference",
+      "title": "API reference",
       "path": "docs/api-reference.md"
     },
     {
-      "title": "Cli Reference",
+      "title": "CLI reference",
       "path": "docs/cli-reference.md"
     },
     {
-      "title": "Evidence Posture",
+      "title": "Registration and getting started",
+      "path": "docs/getting-started.md"
+    },
+    {
+      "title": "Architecture",
+      "path": "docs/architecture.md"
+    },
+    {
+      "title": "Features",
+      "path": "docs/features.md"
+    },
+    {
+      "title": "Evidence ingestion and posture",
       "path": "docs/evidence-posture.md"
     },
     {
-      "title": "Settings",
-      "path": "docs/settings.md"
+      "title": "Ecosystem evidence boundaries",
+      "path": "docs/ecosystem-alignment.md"
     },
     {
-      "title": "Authentication",
+      "title": "Native Evals contracts",
+      "path": "docs/evals-report-contract.md"
+    },
+    {
+      "title": "Lens execution verification",
+      "path": "docs/lens-execution-evidence.md"
+    },
+    {
+      "title": "Controlled configuration",
+      "path": "docs/configuration.md"
+    },
+    {
+      "title": "Authentication and roles",
       "path": "docs/authentication.md"
     },
     {
-      "title": "Capability Contract",
+      "title": "Server and client settings",
+      "path": "docs/settings.md"
+    },
+    {
+      "title": "Capability discovery contract",
       "path": "docs/capability-contract.md"
     },
     {
-      "title": "Runbooks",
-      "path": "docs/runbooks.md"
+      "title": "Incident investigation and staging recovery",
+      "path": "docs/incident-recovery.md"
     },
     {
-      "title": "Fleet Operations",
+      "title": "Bulk fleet operations",
       "path": "docs/fleet-operations.md"
     },
     {
-      "title": "Live Operations",
+      "title": "Live detection and incident views",
       "path": "docs/live-operations.md"
+    },
+    {
+      "title": "Runbook execution and recovery",
+      "path": "docs/runbooks.md"
+    },
+    {
+      "title": "MCP investigation connector",
+      "path": "docs/mcp-connector.md"
+    },
+    {
+      "title": "Hosting the API and console",
+      "path": "docs/hosting.md"
+    },
+    {
+      "title": "AIOS export and coordinated readiness",
+      "path": "docs/coordinated-v1-readiness.md"
+    },
+    {
+      "title": "AIOS operational artifacts",
+      "path": "docs/aios-0.8-operational-artifacts.md"
+    },
+    {
+      "title": "Candidate validation record",
+      "path": "docs/phase10-validation.md"
+    },
+    {
+      "title": "Producer integrations",
+      "path": "docs/integrations.md"
+    },
+    {
+      "title": "Examples",
+      "path": "docs/examples.md"
+    },
+    {
+      "title": "Troubleshooting",
+      "path": "docs/troubleshooting.md"
     },
     {
       "title": "Limitations",
       "path": "docs/limitations.md"
+    },
+    {
+      "title": "Historical integration note: AIOS v0.6.1 compatibility",
+      "path": "docs/aios-0.6.1.md"
+    },
+    {
+      "title": "Historical integration note: AIOS repository v0.7.0 compatibility",
+      "path": "docs/aios-0.7.0.md"
+    },
+    {
+      "title": "Historical integration note: AIOS v0.6 compatibility",
+      "path": "docs/aios-v0.6.md"
+    },
+    {
+      "title": "Historical integration note: Chaos 0.11 ChaosHub compatibility",
+      "path": "docs/chaos-0.11-chaoshub.md"
+    },
+    {
+      "title": "Historical integration note: Chaos 0.7 compatibility",
+      "path": "docs/chaos-0.7.md"
+    },
+    {
+      "title": "Historical integration note: Chaos 0.8 compatibility",
+      "path": "docs/chaos-0.8.md"
+    },
+    {
+      "title": "Historical integration note: Chaos 0.9 compatibility",
+      "path": "docs/chaos-0.9.md"
+    },
+    {
+      "title": "Historical integration note: Evals 0.10.0 evaluation evidence compatibility",
+      "path": "docs/evals-0.10-aios-evidence.md"
+    },
+    {
+      "title": "Historical integration note: Evals 0.11 containment compatibility",
+      "path": "docs/evals-0.11-containment.md"
+    },
+    {
+      "title": "Historical integration note: Evals 0.12 API and report readiness",
+      "path": "docs/evals-0.12.md"
+    },
+    {
+      "title": "Historical integration note: Evals 0.8.0 CLI interoperability",
+      "path": "docs/evals-0.8-cli.md"
+    },
+    {
+      "title": "Historical integration note: Evals 0.9.0 judge reliability and live resilience (Tower 0.7.1)",
+      "path": "docs/evals-0.9-judge-reliability.md"
+    },
+    {
+      "title": "Historical integration note: Lens routing integration boundary",
+      "path": "docs/lens-0.10-routing.md"
+    },
+    {
+      "title": "Historical integration note: Lens optimization and Tower boundaries",
+      "path": "docs/lens-0.11-optimization.md"
+    },
+    {
+      "title": "Historical integration note: Lens 0.13 readiness compatibility",
+      "path": "docs/lens-0.13.md"
+    },
+    {
+      "title": "Historical integration note: MCP 0.4.0 unified workflows",
+      "path": "docs/mcp-0.4-unified-workflows.md"
+    },
+    {
+      "title": "Historical integration note: MCP 0.5.0 hosted access control",
+      "path": "docs/mcp-0.5-access-control.md"
+    },
+    {
+      "title": "Historical integration note: MCP 0.7 integration readiness \u2014 Tower 0.10.0",
+      "path": "docs/mcp-0.7-readiness.md"
+    },
+    {
+      "title": "Historical integration note: MCP Phase 6 coordinated containment release",
+      "path": "docs/phase6-containment.md"
+    },
+    {
+      "title": "Historical integration note: Sidecar 0.10 contract readiness",
+      "path": "docs/sidecar-0.10.md"
+    },
+    {
+      "title": "Historical integration note: Sidecar 0.9.0 compatibility",
+      "path": "docs/sidecar-0.9.md"
+    },
+    {
+      "title": "Historical integration note: Sidecar 0.8 integration boundary",
+      "path": "docs/sidecar-v0.8.md"
+    },
+    {
+      "title": "Historical integration note: Tower 0.8.0 ecosystem compatibility",
+      "path": "docs/tower-0.8-compatibility.md"
+    },
+    {
+      "title": "Historical integration note: Tower 0.9.0 ecosystem compatibility",
+      "path": "docs/tower-0.9-compatibility.md"
     }
   ],
   "contracts": [
-    "src/agenticops_control_tower/__init__.py",
-    "src/agenticops_control_tower/models/*.py",
-    "src/agenticops_control_tower/api/surface.py"
+    "src/agenticops_control_tower/**/*.py"
   ],
-  "schemas": []
+  "schemas": [
+    "src/agenticops_control_tower/schemas/**/*.schema.json"
+  ]
 }
