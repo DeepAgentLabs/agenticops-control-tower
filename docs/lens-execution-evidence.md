@@ -22,7 +22,7 @@ Use `ControlTowerAPI(..., evidence_store=store)` to share the configured store
 with the facade and HTTP surface. When passing an existing API to `create_app`,
 its store owns trust configuration; do not pass a second key map.
 
-Lens is optional; install Lens >=0.12,<1 for its execution-verification API.
+Lens is optional; install Lens >=0.12,<2 for its execution-verification API.
 Absent/older Lens yields unknown/unavailable, rather than trusting the caller.
 The host provides the key map; no HTTP request field configures trust. Use
 32-byte or longer random HMAC keys, rotate key IDs and retain historical keys
