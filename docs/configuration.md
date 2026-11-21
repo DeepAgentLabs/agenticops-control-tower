@@ -3,9 +3,7 @@
 Tower is authoritative only for settings explicitly declared `authority="tower"`
 by trusted Python setup. `mirrored` settings belong to their producer; absent
 surfaces return `unsupported` and an honest reason. Ownership cannot be elevated
-through HTTP. The base package imports no sibling runtime. Optional dependency
-floors align with the sibling models checked in v0.5: Lens 0.6, Evals 0.7,
-Sidecar 0.7, Chaos 0.5 and MCP 0.3.4. None provides a writable Tower adapter yet.
+through HTTP. The base package imports no sibling runtime for ordinary native artifact reading. Current optional dependency ranges are declared in `pyproject.toml`; they do not install a production configuration connector.
 
 Run `examples/controlled_configuration.py` to declare a desired configuration,
 preview an update, approve it as a different operator and execute it. A patch is
@@ -61,5 +59,4 @@ same URL-safe syntax as agent IDs and are required in action targets.
 The execution result explicitly states that remote application is unverified.
 `failed`/`partial_failure`, rollback and reconciliation fields are reserved for
 future remote adapters. No remote adapter is shipped; Tower never claims a remote
-rollback or recovery. Sidecar runtime stop/revoke, task scopes and remote partial
-failure recovery remain future integration work. The console still sends GET only.
+rollback or recovery. Separate host-installed Sidecar stop/MCP revocation coordination is implemented through incident and bulk runtime-control paths; see [incident recovery](incident-recovery.md) and [fleet operations](fleet-operations.md). It does not turn desired configuration into generic remote application or guarantee remote rollback. The console still sends GET only.
