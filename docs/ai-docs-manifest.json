@@ -4,7 +4,7 @@
   "distribution": "agenticops-control-tower",
   "document": "llms-full.md",
   "content_type": "text/markdown; charset=utf-8",
-  "sha256": "c04d8b2ddcacec6cb01ef05bf4cd8c702a9a01001805785a11ce5f8c31f0b62d",
+  "sha256": "769375796f5e9484b11c63e91e24f85f4fb2434cb0d577fc0c1ecdd2bbe37c80",
   "source_hash_normalization": "UTF-8 text with LF newlines",
   "human_guide": "developer-guide.md",
   "sources": [
@@ -16,7 +16,7 @@
     {
       "path": "docs/ai-docs.json",
       "kind": "source-selection",
-      "sha256": "a8230a55a33c3efbf5e6c4cad5c5864ed47b1071eb5f4d23de04cb1efd94f411"
+      "sha256": "3a832b73296fdc0db53504b7afac5fa3a0216ebde521a79dc431e3feaa2878fa"
     },
     {
       "path": "docs/ai-reference-index.md",
@@ -27,6 +27,11 @@
       "path": "docs/developer-guide.md",
       "kind": "reference",
       "sha256": "2060f77453b0e7c803c4571efd5808e53f5e90d648d7299862a5c4d6e322de7d"
+    },
+    {
+      "path": "docs/index.md",
+      "kind": "reference",
+      "sha256": "073c3469dbbd0350d66e3abd3a61f377c9819b019253c306de0632e339fe4c86"
     },
     {
       "path": "docs/api-reference.md",
