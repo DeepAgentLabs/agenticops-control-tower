@@ -4,14 +4,14 @@
   "distribution": "agenticops-control-tower",
   "document": "llms-full.md",
   "content_type": "text/markdown; charset=utf-8",
-  "sha256": "31bf2d2c84a64976c95d9abaa9ca3442bd2dc4a62f0b47ad0153fa331ebd7176",
+  "sha256": "c04d8b2ddcacec6cb01ef05bf4cd8c702a9a01001805785a11ce5f8c31f0b62d",
   "source_hash_normalization": "UTF-8 text with LF newlines",
   "human_guide": "developer-guide.md",
   "sources": [
     {
       "path": "pyproject.toml",
       "kind": "package-metadata",
-      "sha256": "4e6811294bce19379d203889c3f415027c59538e659447017eb5bd98879ffd86"
+      "sha256": "e6e5d5e55eeba833d86e017bb3f656e393665cb0cd3c9034f6932ed78cbd23e2"
     },
     {
       "path": "docs/ai-docs.json",
@@ -26,12 +26,12 @@
     {
       "path": "docs/developer-guide.md",
       "kind": "reference",
-      "sha256": "aaeae92500ec9136ed1a790715409d077ffd5f537f974fa3b6f552b482504632"
+      "sha256": "2060f77453b0e7c803c4571efd5808e53f5e90d648d7299862a5c4d6e322de7d"
     },
     {
       "path": "docs/api-reference.md",
       "kind": "reference",
-      "sha256": "c35822aa549aa775f215f8a3302904d52b6fd5f3e64d3ec917e9d48ca29004fd"
+      "sha256": "fce0430b34532ca2a4999a36bd82d2a936292bc85453e976d3c1997884d27626"
     },
     {
       "path": "docs/cli-reference.md",
@@ -156,7 +156,7 @@
     {
       "path": "docs/limitations.md",
       "kind": "reference",
-      "sha256": "734800e120d07c4a05d20e0bc638978e6db618b30675f087f56133f6641e59a9"
+      "sha256": "90b16ffe18cc22f99f1c20e13de9786f99f5f6524a74769264379abe621f0986"
     },
     {
       "path": "docs/aios-0.6.1.md",
@@ -281,7 +281,7 @@
     {
       "path": "src/agenticops_control_tower/__init__.py",
       "kind": "source-contract",
-      "sha256": "fb35b53818110c3c5c5e38d51cb4a42b0151144a39c0ed3ae578826d578a2145"
+      "sha256": "abdd283a52f5adfd0ffa21bfb24181d4162ac8bde11b000ef034b3314a93de61"
     },
     {
       "path": "src/agenticops_control_tower/adapters/__init__.py",
