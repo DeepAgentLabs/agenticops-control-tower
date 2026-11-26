@@ -4,7 +4,7 @@
   "distribution": "agenticops-control-tower",
   "document": "llms-full.md",
   "content_type": "text/markdown; charset=utf-8",
-  "sha256": "769375796f5e9484b11c63e91e24f85f4fb2434cb0d577fc0c1ecdd2bbe37c80",
+  "sha256": "613d941c77e9d372511f6a9c69aa059995479099687040cac4ccde6cdbfe9000",
   "source_hash_normalization": "UTF-8 text with LF newlines",
   "human_guide": "developer-guide.md",
   "sources": [
@@ -31,7 +31,7 @@
     {
       "path": "docs/index.md",
       "kind": "reference",
-      "sha256": "073c3469dbbd0350d66e3abd3a61f377c9819b019253c306de0632e339fe4c86"
+      "sha256": "2cc604a57292d3285009647bb91cb831f7a1741e00b6794360db2c8111413e16"
     },
     {
       "path": "docs/api-reference.md",
