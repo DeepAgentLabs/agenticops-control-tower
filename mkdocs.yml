@@ -62,8 +62,6 @@ plugins:
 
 # A page missing from nav fails the strict build.
 nav:
-  - Developer Guide (simple): developer-guide.md
-  - AI Reference capability index: ai-reference-index.md
   - Coordinated v1 readiness: coordinated-v1-readiness.md
   - MCP 0.7 readiness: mcp-0.7-readiness.md
   - Chaos 0.11 ChaosHub: chaos-0.11-chaoshub.md
@@ -74,6 +72,9 @@ nav:
   - MCP Phase 6 Containment: phase6-containment.md
   - Evals 0.11 Containment Scoring: evals-0.11-containment.md
   - Home: index.md
+  - Developer Guide (simple): developer-guide.md
+  - API Reference (detailed): api-reference.md
+  - AI Readable Documentation: ai-reference-index.md
   - Getting started: getting-started.md
   - Architecture: architecture.md
   - Features: features.md
@@ -89,7 +90,6 @@ nav:
       - Fleet operations: fleet-operations.md
       - Live operations: live-operations.md
       - Runbooks: runbooks.md
-  - API reference: api-reference.md
   - CLI reference: cli-reference.md
   - Integrations: integrations.md
   - Ecosystem compatibility:
