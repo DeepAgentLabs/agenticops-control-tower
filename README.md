@@ -21,7 +21,7 @@ See the [ecosystem release policy](https://github.com/DeepAgentLabs/.github/blob
 
 ## Status
 
-**Current version: 1.0.0. Source-preserving AIOS investigation exports are available. Versioned candidate capability discovery and CPython/Node.js HTTP validation complete Phase 10 readiness. Evals 0.12.0 validation preserves native schema 1.0. Optional Lens 0.12 execution evidence adds host-trusted verification and redacted causal links. Phase 9 introduced versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery.** The registry,
+**Current version: 1.1.0. Source-preserving AIOS investigation exports are available. Versioned candidate capability discovery and CPython/Node.js HTTP validation complete Phase 10 readiness. Evals 0.12.0 validation preserves native schema 1.0. Optional Lens 0.12 execution evidence adds host-trusted verification and redacted causal links. Phase 9 introduced versioned runbooks with exact-digest approval, bounded steps, compensation, cancellation and verified recovery.** The registry,
 HTTP API and CLI support SQLite persistence, reader/writer bearer authorization,
 shared fleet health and capability coverage, agent filters, and offline snapshots.
 Tower-owned configuration uses approved actions, and pushed Lens, Evals, Sidecar
@@ -931,5 +931,5 @@ optional adoption guidance; no runtime dependency or patch release is required.
 
 See [the implementation and migration guide](docs/coordinated-v1-readiness.md)
 for the current candidate scope, interoperability evidence and remaining gates.
-Current version: 1.0.0. Internal tests do not close independent review,
+Current version: 1.1.0. Internal tests do not close independent review,
 live-provider/deployment acceptance or the coordinated stable freeze.
