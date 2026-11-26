@@ -634,7 +634,7 @@ See [Limitations](https://github.com/DeepAgentLabs/agenticops-control-tower/blob
 
 - [Developer Guide (simple)](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/developer-guide.md): short task workflows and a capability index
 - [API Reference (detailed)](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/api-reference.md): HTTP routes, Python methods and service signatures
-- [AI Readable Documentation](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/ai-reference-index.md): the full reference as one file for AI tools, with source declarations and schemas
+- [AI Readable Documentation](https://deepagentlabs.io/control-tower/docs/llms-full.md): the full reference as one file for AI tools, with source declarations and schemas
 
 ---
 
