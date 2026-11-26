@@ -1,4 +1,6 @@
-# API reference
+# API Reference (detailed)
+
+**Version:** 1.1.0
 
 Control Tower has two programmatic surfaces: the **HTTP API** served by
 `agenticops-control-tower serve` (or `create_app()`), and the **Python API**
@@ -65,7 +67,8 @@ Errors: `401` missing or invalid token, `403` wrong role, `404` unknown agent,
 | `POST /alerts/evaluate` | operator (writer) | Run a detection scan now. |
 | `POST /alerts/{alert_id}/acknowledge` | operator (writer) | Acknowledge an alert. |
 | `GET /incidents`, `GET /incidents/{id}`, `GET /incidents/{id}/view` | operator | Read incidents; `view` is the joined timeline. |
-| `POST /incidents/detect`, `POST /incidents/{id}/investigate`, `/preview`, `/approval`, `/revoke`, `/execute`, `/verify`, `/control/{action}`, `/reconcile` | operator | Approved staging recovery; see [incident recovery](incident-recovery.md). |
+| `POST /incidents/detect`, `POST /incidents/{id}/investigate`, `/preview`, `/approval`, `/revoke`, `/execute`, `/verify`, `/reconcile` | operator | Approved staging recovery; see [incident recovery](incident-recovery.md). |
+| `POST /incidents/{id}/control/{action}` | operator (writer) | Emergency control: `action` is `stop` or `restart`; see [emergency control](#emergency-control). |
 
 ### Runbooks
 
@@ -181,13 +184,130 @@ print(api.get_status().degraded_agents)
 | `agent_posture(agent_id, *, stale_after_seconds, now)` | `AgentEvidencePosture` |
 | `fleet_posture(*, environment, stale_after_seconds, now)` | `FleetEvidencePosture` |
 
-Further services hang off the facade: `api.config` (controlled configuration),
-`api.bulk` (fleet operations), `api.operations` (detection, alerts, incident
-views), `api.incidents` (investigation and recovery) and `api.runbooks`
-(versioned runbooks). Their usage is shown in
-`examples/controlled_configuration.py`, `examples/fleet_operations.py`,
+`get_capability_contract()` returns the `tower.capabilities.v1` descriptor
+(see [versioned capability discovery](#versioned-capability-discovery)).
+
+### Service objects
+
+Further services hang off the facade. Every method takes a trusted `Operator`
+(from `agenticops_control_tower.config.models`); the service checks its role
+(`reader`, `writer` or `approver`) and optional `agent_ids` scope. Runnable
+flows: `examples/controlled_configuration.py`, `examples/fleet_operations.py`,
 `examples/live_operations.py`, `examples/incident_recovery.py` and
 `examples/runbook_recovery.py`.
+
+**`api.config`**: `ConfigurationService` ([controlled configuration](configuration.md))
+
+| Method | Returns |
+| --- | --- |
+| `get(agent_id, capability)` | `Configuration` (ownership, values, revision) |
+| `declare(configuration, operator)` | `Configuration`; trusted-host only, sets Tower or mirrored ownership |
+| `preview(request: ActionRequest, operator)` | `ActionPreview` (immutable) |
+| `action(action_id)` | `ActionPreview` |
+| `approve(action_id, approved, operator)` | `ActionPreview`; approver role |
+| `revoke(action_id, operator)` | `ActionPreview`; approver role |
+| `execute(action_id, operator)` | `ExecutionResult`; commits desired state |
+| `audit(agent_id)` | `list[AuditRecord]` |
+
+**`api.bulk`**: `BulkService` ([fleet operations](fleet-operations.md))
+
+| Method | Returns |
+| --- | --- |
+| `preview(request: BulkRequest, operator)` | `BulkAction` with the frozen target list |
+| `get(bulk_id, operator)` | `BulkAction` |
+| `decide(bulk_id, approved, operator)` | `BulkAction`; approver role |
+| `revoke(bulk_id, operator)` | `BulkAction`; approver role |
+| `execute(bulk_id, operator)` | `BulkAction` with per-target `TargetResult`s |
+| `install(agent_id, adapter: SidecarContainmentAdapter)` | `None`; trusted-host setup for `runtime.stop` |
+
+`BulkRequest.operation` is one of `config.update`, `capabilities.enable`,
+`capabilities.disable` or `runtime.stop`.
+
+**`api.operations`**: `OperationsService` ([live operations](live-operations.md))
+
+| Method | Returns |
+| --- | --- |
+| `evaluate(operator, *, now=None)` | `list[Alert]` from one detection scan |
+| `list(operator, *, environment=None, active_only=False)` | `list[Alert]` |
+| `acknowledge(alert_id, operator)` | `Alert` |
+| `incident_view(incident_id, operator)` | `dict` joined incident timeline |
+
+**`api.incidents`**: `IncidentService` ([incident recovery](incident-recovery.md))
+
+| Method | Returns |
+| --- | --- |
+| `detect(agent_id, evidence_id, operator)` | `Incident` (deduplicated per observation) |
+| `get(incident_id, operator)` / `list(operator)` | `Incident` / `list[Incident]` |
+| `investigate(incident_id, operator)` | `Incident` with a cited `Investigation` |
+| `preview(incident_id, dependency, expires_in_seconds, operator)` | `Incident` with a `RecoveryPlan` digest |
+| `decide(incident_id, digest, approved, operator)` | `Incident`; approver role |
+| `revoke(incident_id, operator)` | `Incident`; approver role |
+| `execute(incident_id, digest, operator)` | `Incident` awaiting verification |
+| `verify(incident_id, lens_id, evals_id, operator)` | `Incident` resolved or escalated |
+| `control(incident_id, action, operator)` | `Incident`; `action` is `stop` or `restart` |
+| `reconcile(incident_id, operator)` | `Incident` after host reconciliation |
+
+Recovery connectors (`RecoveryConnector`) and containment adapters are passed to
+`IncidentService(registry, evidence, connectors={...}, containment={...})` by the
+trusted host. `StagingDependencyRuntime` is the bundled deterministic fixture.
+
+**`api.runbooks`**: `RunbookService` ([runbooks](runbooks.md))
+
+| Method | Returns |
+| --- | --- |
+| `definitions()` | `list[RunbookDefinition]` installed in the catalog |
+| `recommend(incident_id, operator)` | `list[RunbookRecommendation]` with unmet prerequisites |
+| `validations(runbook_id, version)` | `list[RunbookValidation]` |
+| `record_validation(runbook_id, version, request, operator)` | `RunbookValidation` from a completed Chaos report and passing Evals gate |
+| `preview(incident_id, request: RunbookPreviewRequest, operator)` | `RunbookExecution` with an exact digest |
+| `get(execution_id, operator)` / `list(incident_id, operator)` | `RunbookExecution` / `list[RunbookExecution]` |
+| `decide(execution_id, digest, approved, operator)` | `RunbookExecution`; approver role |
+| `revoke(execution_id, operator)` | `RunbookExecution`; approver role |
+| `execute(execution_id, digest, operator)` | `RunbookExecution` with `StepResult`s |
+| `cancel(execution_id, operator)` | `RunbookExecution`; writer or approver |
+| `reconcile(execution_id, operator)` | `RunbookExecution` |
+| `verify(execution_id, lens_id, evals_id, operator)` | `RunbookExecution` resolved or escalated |
+| `install(agent_id, connector: RunbookConnector)` | `None`; trusted-host connector setup |
+
+`RunbookStep` fields: `step_id`, `action`, `description`, `timeout_seconds`
+(1–30, default 5), `max_attempts` (1–3; retries only on a connector-reported
+clean failure), `rollback_action` and `rollback_timeout_seconds`. A definition
+holds 1–10 steps. The built-in `STAGING_DEPENDENCY_RECOVERY` is
+`staging.dependency_recovery` 1.0.0 (`traffic.drain` → `dependency.restore` →
+`traffic.resume`), run by the deterministic `StagingRunbookRuntime`.
+
+### Emergency control
+
+Emergency control is independent of model approval and of recovery verification.
+
+| Symbol | Module | Purpose |
+| --- | --- | --- |
+| `SidecarContainmentAdapter(runtime)` | `adapters.containment` | Wraps a host-installed Sidecar runtime; `control(action, actor)` returns `acknowledged`, `incomplete`, `unsupported` or `failed`. |
+| `MCPAccessRevoker(issuer, task_id, user, token)` | `adapters.containment` | Binds one task to its hosted MCP issuer credential; revokes it and confirms it no longer authenticates. |
+
+Use them through `POST /incidents/{id}/control/{action}` (`stop`, `restart`),
+`api.incidents.control(...)`, or a bulk `runtime.stop`. Restart does not renew
+revoked credentials. See [phase 6 containment](phase6-containment.md).
+
+### Lens execution verification
+
+| Symbol | Module | Purpose |
+| --- | --- | --- |
+| `summarize_execution(artifact, *, trusted_keys, expected_run_id)` | `adapters.lens_execution` | Verifies a Lens `ExecutionBundle` with host-held keys; returns verification status and redacted causal links. Without the optional Lens verifier the status is `unknown`. |
+
+On the server, configure `AGENTICOPS_LENS_TRUST_STORE` or pass
+`create_app(trusted_lens_keys=...)`; HTTP requests cannot configure trust. See
+[Lens execution evidence](lens-execution-evidence.md).
+
+### AIOS investigation-report export
+
+| Symbol | Module | Purpose |
+| --- | --- | --- |
+| `export_investigation_report(incident, *, created_at)` | `incidents.export` | Projects a held `Incident` into an AIOS `0.8-draft` investigation report with explicit citations and redacted summaries. Fetches nothing and executes no recovery. |
+
+There is no HTTP route for export; call it in Python after reading an incident.
+See `examples/operational_artifacts.py` and
+[coordinated v1 readiness](coordinated-v1-readiness.md).
 
 Models are importable from `agenticops_control_tower.models`, including
 `AgentRegistrationPayload`, `HeartbeatPayload`, `AgentRecord`, `AgentStatus`,
@@ -195,6 +315,14 @@ Models are importable from `agenticops_control_tower.models`, including
 
 To serve HTTP from your own process, see
 [server settings → Python hosts](settings.md#python-hosts).
+
+## MCP connector
+
+MCP access is provided by the separate `deep-agentic-core-mcp` package, not by this
+API. Its `tower.*` and `tower.runbook*` tools call the HTTP routes above with
+credentials configured on the MCP host, and the `tower.investigation` prompt guides
+evidence-based review. No MCP tool can grant human approval. See
+[MCP connector](mcp-connector.md).
 
 ## Versioned capability discovery
 

@@ -154,7 +154,7 @@ See [bulk payloads, scope, deterministic targeting, audit and interruption](flee
 
 ### Runtime stop and access revocation
 
-Trusted hosts install `SidecarContainmentAdapter` per deployment and configure issuer-backed MCP revocation. Incident control routes and bulk `runtime.stop` coordinate bounded acknowledgements; they do not discover arbitrary runtimes or accept caller-selected endpoints/commands. Already-reserved work can complete. Missing connectors, timeout and partial revocation remain explicit.
+Trusted hosts install `SidecarContainmentAdapter` per deployment and configure issuer-backed MCP revocation (`MCPAccessRevoker`). `POST /incidents/{id}/control/{action}` accepts `stop` or `restart`. Incident control routes and bulk `runtime.stop` coordinate bounded acknowledgements; they do not discover arbitrary runtimes or accept caller-selected endpoints/commands. Already-reserved work can complete. Missing connectors, timeout and partial revocation remain explicit.
 
 See [incident runtime controls and revoker contract](incident-recovery.md), [bulk stop semantics](fleet-operations.md#bulk-stop-and-mcp-revocation) and [containment integration limits](phase6-containment.md). Restart does not renew revoked credentials.
 
@@ -219,7 +219,7 @@ This is current-posture scanning, not lossless remote polling. Clearing an alert
 
 ### Versioned runbooks
 
-Runbook catalog versions define bounded steps, prerequisites, impact, rollback and recovery criteria. Read `runbooks catalog`, validate a version against explicitly supplied Chaos/Evals evidence, request recommendations for an incident, then preview exact version/parameters/digest. Separate human approval precedes execution.
+Runbook catalog versions define up to 10 bounded steps, prerequisites, impact, rollback and recovery criteria. Each step has a 1–30 s timeout, up to 3 attempts (retried only after a connector-reported clean failure) and an optional rollback action. The built-in `staging.dependency_recovery` 1.0.0 drains, restores and resumes one dependency on the deterministic `StagingRunbookRuntime`. Read `runbooks catalog`, validate a version against explicitly supplied Chaos/Evals evidence, request recommendations for an incident, then preview exact version/parameters/digest. Separate human approval precedes execution.
 
 ```bash
 uv run --with ../agenticlens --with ../agentic-evals python examples/runbook_recovery.py
@@ -275,7 +275,7 @@ Closure alone yields unknown recovery; a supported native verification event is 
 
 The base `ControlTowerAPI` facade composes registry/discovery, configuration, evidence, incidents, bulk, operations and runbook services. The optional `[api]` extra adds FastAPI, server and HTTP client dependencies. Global CLI options precede commands. `/docs` exposes the running API's OpenAPI shapes; `GET /contracts/capabilities` is the separate candidate inventory descriptor.
 
-See [full route inventory and Python methods](api-reference.md) and [all CLI commands/arguments](cli-reference.md). Python service calls are trusted-host calls; authentication is the host's responsibility.
+See [API Reference (detailed)](api-reference.md) for the full route inventory, facade methods and every service signature and [all CLI commands/arguments](cli-reference.md). Python service calls are trusted-host calls; authentication is the host's responsibility.
 
 <span id="hosting"></span>
 

@@ -274,7 +274,7 @@ See [bulk payloads, scope, deterministic targeting, audit and interruption](http
 
 ### Runtime stop and access revocation
 
-Trusted hosts install `SidecarContainmentAdapter` per deployment and configure issuer-backed MCP revocation. Incident control routes and bulk `runtime.stop` coordinate bounded acknowledgements; they do not discover arbitrary runtimes or accept caller-selected endpoints/commands. Already-reserved work can complete. Missing connectors, timeout and partial revocation remain explicit.
+Trusted hosts install `SidecarContainmentAdapter` per deployment and configure issuer-backed MCP revocation (`MCPAccessRevoker`). `POST /incidents/{id}/control/{action}` accepts `stop` or `restart`. Incident control routes and bulk `runtime.stop` coordinate bounded acknowledgements; they do not discover arbitrary runtimes or accept caller-selected endpoints/commands. Already-reserved work can complete. Missing connectors, timeout and partial revocation remain explicit.
 
 See [incident runtime controls and revoker contract](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/incident-recovery.md), [bulk stop semantics](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/fleet-operations.md#bulk-stop-and-mcp-revocation) and [containment integration limits](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/phase6-containment.md). Restart does not renew revoked credentials.
 
@@ -339,7 +339,7 @@ This is current-posture scanning, not lossless remote polling. Clearing an alert
 
 ### Versioned runbooks
 
-Runbook catalog versions define bounded steps, prerequisites, impact, rollback and recovery criteria. Read `runbooks catalog`, validate a version against explicitly supplied Chaos/Evals evidence, request recommendations for an incident, then preview exact version/parameters/digest. Separate human approval precedes execution.
+Runbook catalog versions define up to 10 bounded steps, prerequisites, impact, rollback and recovery criteria. Each step has a 1–30 s timeout, up to 3 attempts (retried only after a connector-reported clean failure) and an optional rollback action. The built-in `staging.dependency_recovery` 1.0.0 drains, restores and resumes one dependency on the deterministic `StagingRunbookRuntime`. Read `runbooks catalog`, validate a version against explicitly supplied Chaos/Evals evidence, request recommendations for an incident, then preview exact version/parameters/digest. Separate human approval precedes execution.
 
 ```bash
 uv run --with ../agenticlens --with ../agentic-evals python examples/runbook_recovery.py
@@ -395,7 +395,7 @@ Closure alone yields unknown recovery; a supported native verification event is 
 
 The base `ControlTowerAPI` facade composes registry/discovery, configuration, evidence, incidents, bulk, operations and runbook services. The optional `[api]` extra adds FastAPI, server and HTTP client dependencies. Global CLI options precede commands. `/docs` exposes the running API's OpenAPI shapes; `GET /contracts/capabilities` is the separate candidate inventory descriptor.
 
-See [full route inventory and Python methods](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/api-reference.md) and [all CLI commands/arguments](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/cli-reference.md). Python service calls are trusted-host calls; authentication is the host's responsibility.
+See [API Reference (detailed)](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/api-reference.md) for the full route inventory, facade methods and every service signature and [all CLI commands/arguments](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/cli-reference.md). Python service calls are trusted-host calls; authentication is the host's responsibility.
 
 <span id="hosting"></span>
 
@@ -436,6 +436,8 @@ Check server/client token roles, global option order, exact deployment/evidence 
 ## API reference
 
 Source: [docs/api-reference.md](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/api-reference.md)
+
+**Version:** 1.1.0
 
 Control Tower has two programmatic surfaces: the **HTTP API** served by
 `agenticops-control-tower serve` (or `create_app()`), and the **Python API**
@@ -502,7 +504,8 @@ Errors: `401` missing or invalid token, `403` wrong role, `404` unknown agent,
 | `POST /alerts/evaluate` | operator (writer) | Run a detection scan now. |
 | `POST /alerts/{alert_id}/acknowledge` | operator (writer) | Acknowledge an alert. |
 | `GET /incidents`, `GET /incidents/{id}`, `GET /incidents/{id}/view` | operator | Read incidents; `view` is the joined timeline. |
-| `POST /incidents/detect`, `POST /incidents/{id}/investigate`, `/preview`, `/approval`, `/revoke`, `/execute`, `/verify`, `/control/{action}`, `/reconcile` | operator | Approved staging recovery; see [incident recovery](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/incident-recovery.md). |
+| `POST /incidents/detect`, `POST /incidents/{id}/investigate`, `/preview`, `/approval`, `/revoke`, `/execute`, `/verify`, `/reconcile` | operator | Approved staging recovery; see [incident recovery](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/incident-recovery.md). |
+| `POST /incidents/{id}/control/{action}` | operator (writer) | Emergency control: `action` is `stop` or `restart`; see [emergency control](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/api-reference.md#emergency-control). |
 
 ### Runbooks
 
@@ -618,13 +621,130 @@ print(api.get_status().degraded_agents)
 | `agent_posture(agent_id, *, stale_after_seconds, now)` | `AgentEvidencePosture` |
 | `fleet_posture(*, environment, stale_after_seconds, now)` | `FleetEvidencePosture` |
 
-Further services hang off the facade: `api.config` (controlled configuration),
-`api.bulk` (fleet operations), `api.operations` (detection, alerts, incident
-views), `api.incidents` (investigation and recovery) and `api.runbooks`
-(versioned runbooks). Their usage is shown in
-`examples/controlled_configuration.py`, `examples/fleet_operations.py`,
+`get_capability_contract()` returns the `tower.capabilities.v1` descriptor
+(see [versioned capability discovery](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/api-reference.md#versioned-capability-discovery)).
+
+### Service objects
+
+Further services hang off the facade. Every method takes a trusted `Operator`
+(from `agenticops_control_tower.config.models`); the service checks its role
+(`reader`, `writer` or `approver`) and optional `agent_ids` scope. Runnable
+flows: `examples/controlled_configuration.py`, `examples/fleet_operations.py`,
 `examples/live_operations.py`, `examples/incident_recovery.py` and
 `examples/runbook_recovery.py`.
+
+**`api.config`**: `ConfigurationService` ([controlled configuration](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/configuration.md))
+
+| Method | Returns |
+| --- | --- |
+| `get(agent_id, capability)` | `Configuration` (ownership, values, revision) |
+| `declare(configuration, operator)` | `Configuration`; trusted-host only, sets Tower or mirrored ownership |
+| `preview(request: ActionRequest, operator)` | `ActionPreview` (immutable) |
+| `action(action_id)` | `ActionPreview` |
+| `approve(action_id, approved, operator)` | `ActionPreview`; approver role |
+| `revoke(action_id, operator)` | `ActionPreview`; approver role |
+| `execute(action_id, operator)` | `ExecutionResult`; commits desired state |
+| `audit(agent_id)` | `list[AuditRecord]` |
+
+**`api.bulk`**: `BulkService` ([fleet operations](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/fleet-operations.md))
+
+| Method | Returns |
+| --- | --- |
+| `preview(request: BulkRequest, operator)` | `BulkAction` with the frozen target list |
+| `get(bulk_id, operator)` | `BulkAction` |
+| `decide(bulk_id, approved, operator)` | `BulkAction`; approver role |
+| `revoke(bulk_id, operator)` | `BulkAction`; approver role |
+| `execute(bulk_id, operator)` | `BulkAction` with per-target `TargetResult`s |
+| `install(agent_id, adapter: SidecarContainmentAdapter)` | `None`; trusted-host setup for `runtime.stop` |
+
+`BulkRequest.operation` is one of `config.update`, `capabilities.enable`,
+`capabilities.disable` or `runtime.stop`.
+
+**`api.operations`**: `OperationsService` ([live operations](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/live-operations.md))
+
+| Method | Returns |
+| --- | --- |
+| `evaluate(operator, *, now=None)` | `list[Alert]` from one detection scan |
+| `list(operator, *, environment=None, active_only=False)` | `list[Alert]` |
+| `acknowledge(alert_id, operator)` | `Alert` |
+| `incident_view(incident_id, operator)` | `dict` joined incident timeline |
+
+**`api.incidents`**: `IncidentService` ([incident recovery](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/incident-recovery.md))
+
+| Method | Returns |
+| --- | --- |
+| `detect(agent_id, evidence_id, operator)` | `Incident` (deduplicated per observation) |
+| `get(incident_id, operator)` / `list(operator)` | `Incident` / `list[Incident]` |
+| `investigate(incident_id, operator)` | `Incident` with a cited `Investigation` |
+| `preview(incident_id, dependency, expires_in_seconds, operator)` | `Incident` with a `RecoveryPlan` digest |
+| `decide(incident_id, digest, approved, operator)` | `Incident`; approver role |
+| `revoke(incident_id, operator)` | `Incident`; approver role |
+| `execute(incident_id, digest, operator)` | `Incident` awaiting verification |
+| `verify(incident_id, lens_id, evals_id, operator)` | `Incident` resolved or escalated |
+| `control(incident_id, action, operator)` | `Incident`; `action` is `stop` or `restart` |
+| `reconcile(incident_id, operator)` | `Incident` after host reconciliation |
+
+Recovery connectors (`RecoveryConnector`) and containment adapters are passed to
+`IncidentService(registry, evidence, connectors={...}, containment={...})` by the
+trusted host. `StagingDependencyRuntime` is the bundled deterministic fixture.
+
+**`api.runbooks`**: `RunbookService` ([runbooks](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/runbooks.md))
+
+| Method | Returns |
+| --- | --- |
+| `definitions()` | `list[RunbookDefinition]` installed in the catalog |
+| `recommend(incident_id, operator)` | `list[RunbookRecommendation]` with unmet prerequisites |
+| `validations(runbook_id, version)` | `list[RunbookValidation]` |
+| `record_validation(runbook_id, version, request, operator)` | `RunbookValidation` from a completed Chaos report and passing Evals gate |
+| `preview(incident_id, request: RunbookPreviewRequest, operator)` | `RunbookExecution` with an exact digest |
+| `get(execution_id, operator)` / `list(incident_id, operator)` | `RunbookExecution` / `list[RunbookExecution]` |
+| `decide(execution_id, digest, approved, operator)` | `RunbookExecution`; approver role |
+| `revoke(execution_id, operator)` | `RunbookExecution`; approver role |
+| `execute(execution_id, digest, operator)` | `RunbookExecution` with `StepResult`s |
+| `cancel(execution_id, operator)` | `RunbookExecution`; writer or approver |
+| `reconcile(execution_id, operator)` | `RunbookExecution` |
+| `verify(execution_id, lens_id, evals_id, operator)` | `RunbookExecution` resolved or escalated |
+| `install(agent_id, connector: RunbookConnector)` | `None`; trusted-host connector setup |
+
+`RunbookStep` fields: `step_id`, `action`, `description`, `timeout_seconds`
+(1–30, default 5), `max_attempts` (1–3; retries only on a connector-reported
+clean failure), `rollback_action` and `rollback_timeout_seconds`. A definition
+holds 1–10 steps. The built-in `STAGING_DEPENDENCY_RECOVERY` is
+`staging.dependency_recovery` 1.0.0 (`traffic.drain` → `dependency.restore` →
+`traffic.resume`), run by the deterministic `StagingRunbookRuntime`.
+
+### Emergency control
+
+Emergency control is independent of model approval and of recovery verification.
+
+| Symbol | Module | Purpose |
+| --- | --- | --- |
+| `SidecarContainmentAdapter(runtime)` | `adapters.containment` | Wraps a host-installed Sidecar runtime; `control(action, actor)` returns `acknowledged`, `incomplete`, `unsupported` or `failed`. |
+| `MCPAccessRevoker(issuer, task_id, user, token)` | `adapters.containment` | Binds one task to its hosted MCP issuer credential; revokes it and confirms it no longer authenticates. |
+
+Use them through `POST /incidents/{id}/control/{action}` (`stop`, `restart`),
+`api.incidents.control(...)`, or a bulk `runtime.stop`. Restart does not renew
+revoked credentials. See [phase 6 containment](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/phase6-containment.md).
+
+### Lens execution verification
+
+| Symbol | Module | Purpose |
+| --- | --- | --- |
+| `summarize_execution(artifact, *, trusted_keys, expected_run_id)` | `adapters.lens_execution` | Verifies a Lens `ExecutionBundle` with host-held keys; returns verification status and redacted causal links. Without the optional Lens verifier the status is `unknown`. |
+
+On the server, configure `AGENTICOPS_LENS_TRUST_STORE` or pass
+`create_app(trusted_lens_keys=...)`; HTTP requests cannot configure trust. See
+[Lens execution evidence](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/lens-execution-evidence.md).
+
+### AIOS investigation-report export
+
+| Symbol | Module | Purpose |
+| --- | --- | --- |
+| `export_investigation_report(incident, *, created_at)` | `incidents.export` | Projects a held `Incident` into an AIOS `0.8-draft` investigation report with explicit citations and redacted summaries. Fetches nothing and executes no recovery. |
+
+There is no HTTP route for export; call it in Python after reading an incident.
+See `examples/operational_artifacts.py` and
+[coordinated v1 readiness](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/coordinated-v1-readiness.md).
 
 Models are importable from `agenticops_control_tower.models`, including
 `AgentRegistrationPayload`, `HeartbeatPayload`, `AgentRecord`, `AgentStatus`,
@@ -632,6 +752,14 @@ Models are importable from `agenticops_control_tower.models`, including
 
 To serve HTTP from your own process, see
 [server settings → Python hosts](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/settings.md#python-hosts).
+
+## MCP connector
+
+MCP access is provided by the separate `deep-agentic-core-mcp` package, not by this
+API. Its `tower.*` and `tower.runbook*` tools call the HTTP routes above with
+credentials configured on the MCP host, and the `tower.investigation` prompt guides
+evidence-based review. No MCP tool can grant human approval. See
+[MCP connector](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/mcp-connector.md).
 
 ## Versioned capability discovery
 
@@ -3210,29 +3338,37 @@ with the command, the full output and your version.
 
 Source: [docs/limitations.md](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/limitations.md)
 
-Known limits of 0.9.0, taken from the repository's
+Known limits of the current release (1.1.0), taken from the repository's
 [implementation evidence and operational limits](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/ROADMAP.md#implementation-evidence-and-operational-limits)
-and the feature guides.
+and the feature guides. Topic guides list further limits for their own features.
 
 ## Release and maturity
 
-- The package is **pre-alpha**. **0.9.0** is published on PyPI; repository
-  checkouts are needed for walkthroughs that read bundled example files.
-- No 1.0 compatibility contract yet. Experimental features (0.4–0.9) may change.
+- The PyPI classifier is still **Pre-Alpha**. Version 1.0.0 marks the coordinated
+  DeepAgentLabs milestone (2026-11-05); it does not certify AIOS conformance or
+  production deployment readiness.
+- The capability contract (`tower.capabilities.v1`) and AIOS `0.8-draft` exports
+  keep their candidate/draft markers. Independent review, independent
+  implementations, live-provider validation and the stable contract freeze remain
+  open. See the [Phase 10 validation record](https://github.com/DeepAgentLabs/agenticops-control-tower/blob/main/docs/phase10-validation.md).
+- Repository checkouts are needed for walkthroughs that read bundled example files.
 
 ## Identity and access
 
 - Authentication uses shared deployment tokens (reader, writer, approval). There
-  are no user accounts, per-agent identities or tenant isolation.
+  are no user accounts, per-agent identities or tenant isolation. Trusted Python
+  `Operator.agent_ids` scoping is available only to in-process hosts.
 - With no tokens configured, inventory routes are anonymous. Use this only on
-  your own computer.
+  your own computer. Controlled operations always require credentials.
 - Serve over HTTPS when anyone else connects; Tower does not terminate TLS itself.
 
 ## Storage and scale
 
 - SQLite only, for a single host with a local database file. No distributed
-  storage.
+  storage or multi-instance coordination.
 - Without `--database`, all state is in memory and lost on restart.
+- Alert and incident audit history is retained without automatic pruning and is
+  not independently tamper-evident.
 
 ## Health and evidence
 
@@ -3243,6 +3379,17 @@ and the feature guides.
   connects to producer services.
 - Tower never recomputes a producer's verdict, and evidence never changes
   reported health.
+- Snapshots are offline views: they do not restore approvals, desired settings,
+  live alerts, incident execution or credentials.
+
+## Lens execution verification
+
+- Optional; requires Lens `>=0.12,<2`. Without it, results are `unknown`.
+- Verification uses host-held HMAC keys (trusted-host symmetric authentication),
+  not independent public signing. HTTP requests cannot configure trust.
+- Keys load at app start; restart after trust changes. Stored results reflect
+  ingestion-time verification and are not rewritten by key rotation or revocation.
+- Verified evidence does not prove complete execution, containment or recovery.
 
 ## Configuration and recovery
 
@@ -3254,19 +3401,32 @@ and the feature guides.
   runtime fixtures only. Production runtime connectors are not provided.
 - Runbook steps are not atomic. Tower dispatches each step at most once per claim;
   connectors own idempotency, and timeouts bound Tower's wait, not the connector.
-  Partial, timed-out or unknown steps need manual reconciliation.
+  Partial, timed-out or unknown steps need manual reconciliation. A timeout or
+  cancellation is not proof that side effects stopped or rolled back.
 - Runbook recovery criteria are fixed, and Chaos/Evals validation records are
   informational rather than an execution gate.
-- No model is bundled; investigation relies on an MCP host's model.
+- Emergency stop cannot recall work a runtime already reserved, and restart does
+  not renew revoked credentials.
 
-## Detection and console
+## Investigation and export
+
+- No model is bundled; investigation relies on an MCP host's model and does not
+  establish exact causality.
+- AIOS investigation-report export is a Python-only, redacted projection. Incident
+  closure alone yields unknown recovery, and a cited native verification event is
+  not authenticated or recomputed.
+
+## Detection, console and MCP
 
 - Detection is a current-posture scan of the latest observation, every 30
-  seconds, not a lossless event stream. There is no external notification
-  delivery; the alert feed and console are the notification surfaces.
-- The console is read-only and refreshes manually.
-- The hosted MCP endpoint rejects `tower.*` tools; the MCP connector works only
-  with a local MCP server you configure.
+  seconds by default, not a lossless event stream. There is no external
+  notification delivery; the alert feed and console are the notification surfaces.
+- The console is read-only (GET requests only). Alerts, acknowledgements and the
+  incident queue refresh every 30 seconds; inventory refreshes on **Connect /
+  refresh**.
+- Hosted/remote MCP rejects all `tower.*` tools until per-user Tower credential
+  binding is implemented; the connector works only with a local MCP server you
+  configure.
 
 ---
 

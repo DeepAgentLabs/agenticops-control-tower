@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+## 1.1.0
+
+Released 2026-11-26.
+
+### Changed
+
+- Rebuild the documentation home as a capability overview: 11 areas with sub-lists and links to each guide, matching the AgenticLens layout.
+- Rename the API reference to "API Reference (detailed)" and pin it with "AI Readable Documentation" under Getting started in the sidebar and header.
+- Document every `config`, `bulk`, `operations`, `incidents` and `runbooks` service method, emergency control adapters, Lens execution verification, AIOS investigation-report export and the MCP connector in the API reference.
+- Document runbook step limits and the built-in `staging.dependency_recovery` runbook in the developer guide.
+- Bring the limitations page up to date for 1.x, including Lens verification, AIOS export and console refresh behavior.
+- Regenerate the AI-readable reference and manifest. Runtime interfaces and artifact schema versions are unchanged.
+
 ## 1.0.4
 
 Released 2026-11-20.
