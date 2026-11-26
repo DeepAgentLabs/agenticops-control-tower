@@ -197,4 +197,4 @@ See [Limitations](limitations.md).
 
 - [Developer Guide (simple)](developer-guide.md): short task workflows and a capability index
 - [API Reference (detailed)](api-reference.md): HTTP routes, Python methods and service signatures
-- [AI Readable Documentation](ai-reference-index.md): the full reference as one file for AI tools, with source declarations and schemas
+- [AI Readable Documentation](https://deepagentlabs.io/control-tower/docs/llms-full.md): the full reference as one file for AI tools, with source declarations and schemas
